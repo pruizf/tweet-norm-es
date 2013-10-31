@@ -3,10 +3,22 @@ import sys
 sys.path.append("/home/pruiz/DATA/projects/Tweet-Norm/twenor2/config")
 import tnconfig as tc
 
+
+def run_fl_client(fn, outfn):
+    """ Run a FreeLing client on a server configured as in the devset
+        configuration for task"""
+    lgr.info("Orig call")
+    port = orig_server[1].replace("-p ", "")
+    comstr = "sudo %s %s <%s >%s" % (anacli, port, fn, outfn)
+    lgr.info(comstr)
+    os.system(comstr)
+
+
+
 ''' As per API sample.py '''
 
 FREELINGDIR = "/usr/local"
-DATA = FREELINGDIR + "/share/freeling/"
+DATA = FREELINGDIR + "/share/freeling"
 LANG = 'es'
 
 # set maco analyzer options
@@ -45,7 +57,6 @@ op.UserMap = True
 op.UserMapFile = tc.USERMAP
 
 # tweet tokenizer from workshop
-#twk = fl.tokenizer(tc.USERTOK)
-twk = fl.tokenizer(DATA + LANG + "/tokenizer.dat")
+twk = fl.tokenizer(tc.USERTOK)
 #mf = fl.maco(op)
 
