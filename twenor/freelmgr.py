@@ -2,8 +2,7 @@ import codecs
 import os
 import psutil
 import sys
-sys.path.append("/home/pruiz/DATA/projects/Tweet-Norm/twenor2/config")
-import tnconfig as tc
+import tnconfig as tc #assumes PYTHONPATH set in module importing this one
 
 def check_server(port):
     """Check if Freeling server is running on port"""
