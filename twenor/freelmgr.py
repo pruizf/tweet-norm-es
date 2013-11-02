@@ -1,8 +1,20 @@
 import codecs
 import os
+import logging
 import psutil
 import sys
 import tnconfig as tc #assumes PYTHONPATH set in module importing this one
+
+# logging
+logging.basicConfig(level=tc.loglevel)
+lgr = logging.getLogger(__name__)
+#lfh = logging.FileHandler(os.path.join(tc.LOGDIR, "%s.log" % __name__))
+lfh = logging.FileHandler(os.path.join(tc.LOGDIR, "run_%s.log" % tc.RUNID))
+frmt = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+lfh.setFormatter(frmt)
+lgr.propagate = False
+lgr.addHandler(lfh)
+
 
 def check_server(port):
     """Check if Freeling server is running on port"""
@@ -23,7 +35,7 @@ def start_server(servtype="default"):
     if servtype == "default":
         tc.fl_server.extend(tc.fl_options)
         comstr = " ".join(tc.fl_server)
-    print "Starting server %s" % servtype
+    lgr.info("Starting server %s" % servtype)
     os.system("%s %s&" % (tc.ANA, comstr))
 
 def run_fl_client(inp, outfn):
@@ -32,6 +44,7 @@ def run_fl_client(inp, outfn):
     port = tc.fl_server[1].replace("-p ", "")
     if os.path.isfile(inp):
         comstr = "%s %s <%s >%s" % (tc.ANACLI, port, inp, outfn)
+        lgr.debug(comstr)
     os.system(comstr)
 
 def tag_texts(txtdico):
@@ -41,7 +54,7 @@ def tag_texts(txtdico):
         os.makedirs(tc.TAGSDIR)
     tempfn = os.path.join(tc.TAGSDIR, "temp")
     for tid in txtdico:
-        print "Tagging %s" % tid
+        lgr.info("Tagging %s" % tid)
         temp = codecs.open(tempfn, "w", "utf8")
         temp.write(txtdico[tid])
         temp.close()

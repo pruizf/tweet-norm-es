@@ -2,7 +2,9 @@ import inspect
 import os
 import sys
 
-# ==============================================================================
+# BASIC ========================================================================
+RUNID = 2
+TAG = False                 # Tag with Freeling (1) or read tags from TAGSDIR (0)
 ENV = "H"                   # Work, Home, Server
 EVAL = bool(1)              # test (1) vs. dev (0) sets
 if ENV == "W":
@@ -11,23 +13,27 @@ elif ENV == "H":
     RESDIR = "/home/ps/DATA/wk/VT/projects/Tweet-Norm/results2"
 if not os.path.exists(RESDIR):
     os.makedirs(RESDIR)
-TAG = False                 # Tag with Freeling (1) or read tags from TAGSDIR (0)
-RUNID = 1
 # ==============================================================================
+
+# LOGGING ----------------------------------------------------------------------
+loglevel = "DEBUG"
 
 # PATHS ------------------------------------------------------------------------
 curdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) # script directory
 if not curdir in sys.path:
     sys.path.append(curdir)
 # add data and processing dir to PYTHONPATH
-parentdir = os.path.split(curdir)[0]
-if not os.path.join(parentdir, "data") in sys.path:
-    sys.path.append(os.path.join(parentdir, "data"))
-if not os.path.join(parentdir, "twenor") in sys.path:
-    sys.path.append(os.path.join(parentdir, "twenor"))
-
 APPDIR = os.path.split(curdir)[0]
-DATA = os.path.join(parentdir, "data")
+if not os.path.join(APPDIR, "data") in sys.path:
+    sys.path.append(os.path.join(APPDIR, "data"))
+if not os.path.join(APPDIR, "twenor") in sys.path:
+    sys.path.append(os.path.join(APPDIR, "twenor"))
+
+DATA = os.path.join(APPDIR, "data")
+LOGDIR = os.path.join(APPDIR, "logs")
+if not os.path.exists(LOGDIR):
+    os.makedirs(LOGDIR)
+
 
 # I/O --------------------------------------------------------------------------
 if EVAL:
@@ -61,8 +67,7 @@ USERMAP = os.path.join(DATA, "es-twit-map.dat")
 
 # server to tag with options used for devset
 fl_port = 8064
-fl_server = ["--server on",
-             "-p %s" % fl_port]
+fl_server = ["--server on", "-p %s" % fl_port]
 
 # opts for tagging like in devset
 fl_options = ["-f es.cfg",
@@ -80,3 +85,4 @@ fl_options = ["-f es.cfg",
 
 # EVALUATION -------------------------------------------------------------------
 evalscript = APPDIR + "/scripts/" + "new-tweet-norm-eval.py"
+

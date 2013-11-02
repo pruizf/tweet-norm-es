@@ -41,48 +41,66 @@ def write_out(corr_dico):
             for oov_corr in corr_dico[tid]:
                 outfh.write("\t%s\t%s\n" % (oov_corr[0], oov_corr[1]))
 
+# MAIN -------------------------------------------------------------------------
+if __name__ == "__main__":
+    # logger
+    logging.basicConfig(level=tc.loglevel)
+    lgr = logging.getLogger(__name__)
+    #lfh = logging.FileHandler(os.path.join(tc.LOGDIR, "%s.log" % __name__))
+    lfh = logging.FileHandler(os.path.join(tc.LOGDIR, "run_%s.log" % tc.RUNID))
+    frmt = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    lfh.setFormatter(frmt)
+    lgr.propagate = False #else writes to Python shell
+    lgr.addHandler(lfh)
+    
 
-# processing
-id_order = prep.find_id_order()
-ref_OOVs = prep.find_ref_OOVs(tc.ANNOTS)
-textdico = prep.grab_texts(tc.TEXTS)
-# start Freeling server if not running
-if not fl.check_server(tc.fl_port):
-    fl.start_server()
-# tag texts with Freeling
-if not os.path.exists(tc.TAGSDIR):
-    os.makedirs(tc.TAGSDIR)
-if tc.TAG:
-    fl.tag_texts(textdico)
+    # processing
+    lgr.info("Run {0} {1}".format(tc.RUNID, "="*80))
+    id_order = prep.find_id_order()
+    ref_OOVs = prep.find_ref_OOVs(tc.ANNOTS)
+    textdico = prep.grab_texts(tc.TEXTS)
+    # start Freeling server if not running
+    if not fl.check_server(tc.fl_port):
+        fl.start_server()
+    # tag texts with Freeling
+    if not os.path.exists(tc.TAGSDIR):
+        os.makedirs(tc.TAGSDIR)
+    if tc.TAG:
+        fl.tag_texts(textdico)
 
-# read text and token tags into Tweet and Token objects
-all_tweeto = {}
-baseline_dico = {}
-out_dico = {}
-x = 0
-for tid in textdico:
-    x += 1
-    # dico for final outputs
-    baseline_dico[tid] = []
-    out_dico[tid] = []
-    if "%s.tags" % tid not in os.listdir(tc.TAGSDIR):
-        print "Missing tags for %s" % tid
-    # create tweet objs
-    all_tweeto[tid] = Tweet(tid, textdico[tid])
-    # add OOVs if applies
-    all_tweeto[tid].find_OOV_status(ref_OOVs)
-    if all_tweeto[tid].hasOOVs:
-        all_tweeto[tid].set_ref_OOVs(ref_OOVs[tid])
-        all_tweeto[tid].find_toks_and_OOVs()
-    # baseline-populate output dico
-    for tok in all_tweeto[tid].toks:
-        if tok.isOOV:
-            baseline_dico[tid].append((tok.form, tok.form))
-    if x == 999:
-        break
+    # read text and token tags into Tweet and Token objects
+    all_tweeto = {}
+    baseline_dico = {}
+    out_dico = {}
+    x = 0
+    for tid in textdico:
+        x += 1
+        # dico for final outputs
+        baseline_dico[tid] = []
+        out_dico[tid] = []
+        if "%s.tags" % tid not in os.listdir(tc.TAGSDIR):
+            lgr.error("Missing tags for %s" % tid)
+        # create tweet objs
+        all_tweeto[tid] = Tweet(tid, textdico[tid])
+        tweet = all_tweeto[tid]
+        # add OOVs if applies
+        tweet.find_OOV_status(ref_OOVs)
+        if tweet.hasOOVs:
+            tweet.set_ref_OOVs(ref_OOVs[tid])
+            tweet.find_toks_and_OOVs()
+        # baseline-populate output dico
+        for tok in tweet.toks:
+            if tok.isOOV:
+                baseline_dico[tid].append((tok.form, tok.form))
+        if x == 999:
+            break
 
-# write results
-write_out(baseline_dico)
-# write eval
-neval.main(tc.ANNOTS, tc.OUTFN)                        
-        
+    # write results
+    lgr.info("Writing out")
+    write_out(baseline_dico)
+    # write eval
+    lgr.info("Running evaluation")
+    neval.main(tc.ANNOTS, tc.OUTFN)
+
+    lgr.removeHandler(lfh)
+    
