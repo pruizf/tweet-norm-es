@@ -6,11 +6,31 @@ Requires
  - psutil: apt-get install python-psutil
  - BeautifulSoup: pip  or easy_install beautifulsoup4, apt-get install python-bs4
 
+Running
+-------
+
+Preferred: from Python shell.
+
+``` python
+
+>>> import sys
+>>> sys.argv = [""]
+>>> execfile("/path/to/tnor2/twenor/processing.py")
+```
+
+
+Also from command line:
+
+``` python
+
+python /path/to/tnor2/twenor/processing.py
+
+```
 
 Structure
 -------
-The structure of the program is
 
+```
 tnor2
  |_ config
     |_ tnconfig.py		Config file
@@ -26,23 +46,5 @@ tnor2
   |_ evaluation
     |_ dev			devset texts and annotations
     |_ eval			test-set texts and annotations
-
-Running
--------
-
-``` python
-
-python /path/to/tnor2/twenor/processing.py
-
 ```
-
-Or from Python shell
-
-``` python
-
->>> import sys
->>> sys.argv = [""]
->>> execfile("/path/to/tnor2/twenor/processing.py")
-```
-
 
