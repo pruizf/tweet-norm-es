@@ -35,20 +35,32 @@ import neweval as neval
 # aux functions
 
 def write_out(corr_dico):
-    with codecs.open(tc.OUTFN, "w", "utf8") as outfh:
+    with codecs.open(tc.OUTFN.format(prep.find_run_id()), "w", "utf8") as outfh:
         for tid in corr_dico:
             outfh.write("%s\n" % tid)
             for oov_corr in corr_dico[tid]:
                 outfh.write("\t%s\t%s\n" % (oov_corr[0], oov_corr[1]))
 
+def write_to_cumulog():
+    inf = {}
+    inf["run_id"] = prep.find_run_id()
+    inf["revnum"] = prep.find_git_revnum()
+    inf["run_comment"] = tc.COMMENT
+    outhead = "Run ID [{0}], RevNum [{1}] {2}\n".format(inf["run_id"], inf["revnum"], "="*50)
+    with codecs.open(tc.EVALFN.format(prep.find_run_id()), "r", "utf8") as done_res:
+        with codecs.open(tc.CUMULOG, "a", "utf8") as cumu_res:
+            cumu_res.write(outhead)
+            cumu_res.write("RunComment: {}\n".format(inf["run_comment"]))
+            cumu_res.write("".join(done_res.readlines()[-4:]))
+
 # MAIN -------------------------------------------------------------------------
 if __name__ == "__main__":
     # logger
-    logfile_name = os.path.join(tc.LOGDIR, "run_%s.log" % tc.RUNID)
+    logfile_name = os.path.join(tc.LOGDIR, "run_%s.log" % prep.find_run_id())
     lgr, lfh = prep.set_log(__name__, logfile_name)
 
     # processing
-    lgr.info("Run {0} START {1}".format(tc.RUNID, "="*70))
+    lgr.info("Run {0} START | Rev [{1}] {2}".format(tc.RUNID, prep.find_git_revnum(), "="*60))
     id_order = prep.find_id_order()
     ref_OOVs = prep.find_ref_OOVs(tc.ANNOTS)
     textdico = prep.grab_texts(tc.TEXTS)
@@ -96,7 +108,8 @@ if __name__ == "__main__":
     write_out(chosen_out_dico)
     # write eval
     lgr.info("Running evaluation")
-    neval.main(tc.ANNOTS, tc.OUTFN)
+    neval.main(tc.ANNOTS, tc.OUTFN.format(prep.find_run_id()))
+    write_to_cumulog()
 
     lgr.removeHandler(lfh)
     

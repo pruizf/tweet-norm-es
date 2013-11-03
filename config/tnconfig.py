@@ -3,7 +3,8 @@ import os
 import sys
 
 # BASIC ========================================================================
-RUNID = 28
+COMMENT = "tests"
+RUNID = None
 TAG = False                 # Tag with Freeling (1) or read tags from TAGSDIR (0)
 ENV = "H"                   # Work, Home, Server
 EVAL = bool(1)              # test (1) vs. dev (0) sets
@@ -12,7 +13,7 @@ if ENV == "W":
 elif ENV == "H":
     RESDIR = "/home/ps/DATA/wk/VT/projects/Tweet-Norm/results2"
 if not os.path.exists(RESDIR):
-    os.makedirs(RESDIR)
+    os.makedirs(RESDIR)   
 # ==============================================================================
 
 # LOGGING ----------------------------------------------------------------------
@@ -36,6 +37,8 @@ if not os.path.exists(LOGDIR):
 
 
 # I/O --------------------------------------------------------------------------
+RUNID_FILE = APPDIR + "/config/" + "runid"
+
 if EVAL:
     ANNOTS = APPDIR + "/evaluation/eval/" + "tweets-test-reference.txt"
     TEXTS = APPDIR + "/evaluation/eval/" + "test600_texts.txt"
@@ -48,11 +51,13 @@ else:
 TAGSDIR = os.path.join(os.path.split(os.path.split(curdir)[0])[0], "tagged")
 
 if EVAL:
-    OUTFN = os.path.join(RESDIR, "testset_run_%s.txt" % RUNID)
+    # run id completed in calling modules
+    OUTFN = os.path.join(RESDIR, "testset_run_{0}.txt")
 else:
-    OUTFN = os.path.join(RESDIR, "devset_run_%s.txt" % RUNID)
+    OUTFN = os.path.join(RESDIR, "devset_run_{0}.txt")
 
 EVALFN = OUTFN.replace(".txt", "_eval.txt")
+CUMULOG = os.path.join(APPDIR, "cumulog.txt")
 
 # FREELING ---------------------------------------------------------------------
 if ENV == "W":

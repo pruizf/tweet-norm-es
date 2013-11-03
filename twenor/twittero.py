@@ -16,21 +16,9 @@ if not os.path.join(os.path.join(parentdir, "config")) in sys.path:
 import tnconfig as tc
 import preparation as prep
 
-
-# this should all move to a function in preparation.py
-# then import preparation here and mk logger with its fh and format
-# create_logger(lgr_name, lfh_name)
-
-##lgr = logging.getLogger(__name__)
-##lfh = logging.FileHandler(os.path.join(tc.LOGDIR, "run_%s.log" % tc.RUNID))
-##frmt = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-##lfh.setFormatter(frmt)
-##lgr.propagate = False #else writes to Python shell
-##lgr.addHandler(lfh)
 # logger
-logfile_name = os.path.join(tc.LOGDIR, "run_%s.log" % tc.RUNID)
+logfile_name = os.path.join(tc.LOGDIR, "run_%s.log" % prep.find_run_id())
 lgr, lfh = prep.set_log(__name__, logfile_name)
-
 
 
 """ Basic Twitter Objects """
@@ -67,7 +55,7 @@ class Tweet:
                 self.toks.append(ctok)
             for idx, tok in enumerate(self.toks):
                 if tok.isOOV:
-                    # skip what not in reference annotations
+                    # create OOV instance only if in reference annotations
                     if tok.form not in self.ref_OOVs:
                         lgr.warn("Skipping found OOV [{}], posi [{}], TID [{}], reason [Not in Ref]".format(
                             repr(tok.form), idx, self.tid))

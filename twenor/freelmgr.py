@@ -5,18 +5,10 @@ import psutil
 import sys
 
 import preparation as prep
-import tnconfig as tc #assumes PYTHONPATH set in module importing this one
+import tnconfig as tc
 
 # logging
-##logging.basicConfig(level=tc.loglevel)
-##lgr = logging.getLogger(__name__)
-###lfh = logging.FileHandler(os.path.join(tc.LOGDIR, "%s.log" % __name__))
-##lfh = logging.FileHandler(os.path.join(tc.LOGDIR, "run_%s.log" % tc.RUNID))
-##frmt = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-##lfh.setFormatter(frmt)
-##lgr.propagate = False
-##lgr.addHandler(lfh)
-logfile_name = os.path.join(tc.LOGDIR, "run_%s.log" % tc.RUNID)
+logfile_name = os.path.join(tc.LOGDIR, "run_%s.log" % prep.find_run_id())
 lgr, lfh = prep.set_log(__name__, logfile_name)
 
 

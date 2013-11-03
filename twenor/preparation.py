@@ -2,7 +2,9 @@ import codecs
 from collections import defaultdict
 import inspect
 import logging
+import os
 import re
+import subprocess
 import tnconfig as tc #assumes PYTHONPATH properly set in module importing this module
 
 def set_log(lh_name, lf_name, propa=False):
@@ -18,7 +20,24 @@ def set_log(lh_name, lf_name, propa=False):
     lgr.addHandler(lfh)
     return (lgr, lfh)
 
+def find_git_revnum():
+    """Find Git revision number for revision used"""
+    git_dir = "{}/.git".format(tc.APPDIR)    
+    return subprocess.check_output(["git", "--git-dir=%s" % git_dir, "describe", "--always"]).strip()
+    
+def find_run_id():
+    """Run ID for all modules. Should move to a singleton somewhere"""
+    if tc.RUNID is None:
+        if not os.path.exists(tc.RUNID_FILE):
+            with open(tc.RUNID_FILE, "w") as new_runid_file:
+                new_runid_file.write("1")
+        tc.RUNID = open(tc.RUNID_FILE, "r").read().rstrip()
+        with open(tc.RUNID_FILE, "w") as new_runid_file:
+            new_runid_file.write(str(int(tc.RUNID) + 1))
+    return tc.RUNID
+
 def find_id_order(orderfile=tc.id_order):
+    """ID Order to write out results as in reference"""
     id_order = []
     for line in open(orderfile).readlines():
         id_order.append(line.rstrip())
@@ -58,6 +77,8 @@ def grab_texts(txtfn):
                 print lines[-1]
                 txtdic[lines[0]] = ""
     return txtdic
+
+
     
 
     
