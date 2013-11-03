@@ -3,7 +3,7 @@ import os
 import sys
 
 # BASIC ========================================================================
-RUNID = 2
+RUNID = 28
 TAG = False                 # Tag with Freeling (1) or read tags from TAGSDIR (0)
 ENV = "H"                   # Work, Home, Server
 EVAL = bool(1)              # test (1) vs. dev (0) sets

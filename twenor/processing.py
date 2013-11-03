@@ -44,18 +44,11 @@ def write_out(corr_dico):
 # MAIN -------------------------------------------------------------------------
 if __name__ == "__main__":
     # logger
-    logging.basicConfig(level=tc.loglevel)
-    lgr = logging.getLogger(__name__)
-    #lfh = logging.FileHandler(os.path.join(tc.LOGDIR, "%s.log" % __name__))
-    lfh = logging.FileHandler(os.path.join(tc.LOGDIR, "run_%s.log" % tc.RUNID))
-    frmt = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    lfh.setFormatter(frmt)
-    lgr.propagate = False #else writes to Python shell
-    lgr.addHandler(lfh)
-    
+    logfile_name = os.path.join(tc.LOGDIR, "run_%s.log" % tc.RUNID)
+    lgr, lfh = prep.set_log(__name__, logfile_name)
 
     # processing
-    lgr.info("Run {0} {1}".format(tc.RUNID, "="*80))
+    lgr.info("Run {0} START {1}".format(tc.RUNID, "="*70))
     id_order = prep.find_id_order()
     ref_OOVs = prep.find_ref_OOVs(tc.ANNOTS)
     textdico = prep.grab_texts(tc.TEXTS)
@@ -88,6 +81,7 @@ if __name__ == "__main__":
         if tweet.hasOOVs:
             tweet.set_ref_OOVs(ref_OOVs[tid])
             tweet.find_toks_and_OOVs()
+            tweet.cf_OOVs_found_vs_ref()
         # baseline-populate output dico
         for tok in tweet.toks:
             if tok.isOOV:
@@ -97,7 +91,9 @@ if __name__ == "__main__":
 
     # write results
     lgr.info("Writing out")
-    write_out(baseline_dico)
+    #chosen_out_dico = out_dico
+    chosen_out_dico = baseline_dico
+    write_out(chosen_out_dico)
     # write eval
     lgr.info("Running evaluation")
     neval.main(tc.ANNOTS, tc.OUTFN)

@@ -1,9 +1,22 @@
 import codecs
 from collections import defaultdict
 import inspect
+import logging
 import re
 import tnconfig as tc #assumes PYTHONPATH properly set in module importing this module
 
+def set_log(lh_name, lf_name, propa=False):
+    """Set Logger based on log handler and logging.FileHandler name.
+       Return the Logger instance and FileHandler instance for access
+       from importing module."""
+    logging.basicConfig(level=tc.loglevel)
+    lgr = logging.getLogger(lh_name)
+    lfh = logging.FileHandler(lf_name)
+    frmt = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    lfh.setFormatter(frmt)
+    lgr.propagate = propa
+    lgr.addHandler(lfh)
+    return (lgr, lfh)
 
 def find_id_order(orderfile=tc.id_order):
     id_order = []
@@ -29,11 +42,7 @@ def find_ref_OOVs(ref_set):
                 ref_OOVs[tid]
                 #print "Matched %s" % tid
             else:
-                if tc.EVAL:
-                    ref_OOVs[tid].append(line.split("\t")[1].rstrip())
-                    #print "Added %s" % line.split("\t")[1].split(" ")[0]
-                else:
-                    ref_OOVs[tid].append(line.split("\t")[1].split(" ")[0])
+                ref_OOVs[tid].append(line.split("\t")[1].split(" ")[0])
             line = ref.readline()
         return dict(ref_OOVs)
 
@@ -42,7 +51,12 @@ def grab_texts(txtfn):
     with codecs.open(txtfn, "r", "utf8") as texts:
         for line in texts:
             lines = line.rstrip().split("\t")
-            txtdic[lines[0]] = lines[-1]
+            #print lines[-1]
+            if lines[-1] != "Not Available":
+                txtdic[lines[0]] = lines[-1]
+            else:
+                print lines[-1]
+                txtdic[lines[0]] = ""
     return txtdic
     
 

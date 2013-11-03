@@ -1,5 +1,6 @@
 import codecs
 import inspect
+import logging
 import os
 import sys
 
@@ -13,14 +14,33 @@ if not os.path.join(os.path.join(parentdir, "config")) in sys.path:
 
 # app-specific imports
 import tnconfig as tc
+import preparation as prep
+
+
+# this should all move to a function in preparation.py
+# then import preparation here and mk logger with its fh and format
+# create_logger(lgr_name, lfh_name)
+
+##lgr = logging.getLogger(__name__)
+##lfh = logging.FileHandler(os.path.join(tc.LOGDIR, "run_%s.log" % tc.RUNID))
+##frmt = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+##lfh.setFormatter(frmt)
+##lgr.propagate = False #else writes to Python shell
+##lgr.addHandler(lfh)
+# logger
+logfile_name = os.path.join(tc.LOGDIR, "run_%s.log" % tc.RUNID)
+lgr, lfh = prep.set_log(__name__, logfile_name)
+
+
 
 """ Basic Twitter Objects """
- 
+
 class Tweet:
-    def __init__(self, tid, itext):
+    def __init__(self, tid, itext, logger=None):
         self.tid = tid
         self.itext = itext
         self.set_toks([])
+        self.set_found_OOVs([])
 
     hasOOVs = None
     
@@ -47,10 +67,27 @@ class Tweet:
                 self.toks.append(ctok)
             for idx, tok in enumerate(self.toks):
                 if tok.isOOV:
+                    # skip what not in reference annotations
+                    if tok.form not in self.ref_OOVs:
+                        lgr.warn("Skipping found OOV [{}], posi [{}], TID [{}], reason [Not in Ref]".format(
+                            repr(tok.form), idx, self.tid))
+                        continue
                     self.toks[idx] = OOV(tok.form)
                     self.toks[idx].set_lemma(tok.lemma)
                     self.toks[idx].set_tag(tok.tag)
                     self.toks[idx].set_posi(tok.posi)
+
+        self.set_found_OOVs([tok for tok in self.toks if isinstance(tok, OOV)])
+        
+    def cf_OOVs_found_vs_ref(self):
+        """Compare found OOVs with reference ones. Log warning on differences."""
+        found_OOV_forms = [oov.form for oov in self.found_OOVs]
+        if len(found_OOV_forms) != len(self.ref_OOVs):
+            lgr.warn("Len of Ref OOVs ({0}) ne len of found OOVs ({1}), TID {2}".format(
+                len(self.ref_OOVs), len(found_OOV_forms), self.tid))
+        if found_OOV_forms != self.ref_OOVs:
+            lgr.warn("Ref OOVs ne found OOVs, TID {0}: REF {1} || FND {2}".format(
+                self.tid, repr(self.ref_OOVs), repr(found_OOV_forms)))
 
     def find_OOV_status(self, ref_OOVs):
         if self.tid not in ref_OOVs:
@@ -63,6 +100,9 @@ class Tweet:
         
     def set_ref_OOVs(self, ref_OOVs):
         self.ref_OOVs = ref_OOVs
+
+    def set_found_OOVs(self, found_OOVs):
+        self.found_OOVs = found_OOVs
 
 
 class Token:
