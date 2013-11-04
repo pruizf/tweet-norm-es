@@ -1,0 +1,119 @@
+# safelist: use at very beginning of workflow, or after preprocessing
+# promote matches to end, bypassing spellchecking
+
+# common internet abbreviations
+1	^omg$
+4	^btw$
+5	^lmao$
+6	^imho$
+7	^iirc$
+8	^rtfm$
+9	^afaik$
+13	^lol$
+# twitter
+2	^tt$
+3	^ff$
+10	^rt$
+11	^oh$
+12	^ht$
+
+# ABBREV BYPASSING
+# (Abbrev-rules where the context is destroyed by current prepro)
+2000	^wpp$	WhatsApp
+
+# PREFERRED TOKENS
+
+# Priority Person Names, not extracted by generic workflow
+100	^juan$	Juan	#need it here (vs. cuán) unless remove current algo to compare entity and non-entity candidates
+110	^jesus$	Jesús	#can't fix with current algo
+
+# Priority Locations
+#102	^inglaterra$	Inglaterra	#fixed
+
+# Priority Org and Brands
+104	^gh$	GH	#real issue here is hashtag/trending topic list
+106	^redbull$	RedBull
+
+
+# other common expressions that should be accepted as is, and are not in RAE
+101	^TV$	TV	#leaving as uppercase
+102	^DJ$	DJ
+
+# new brands or internet stuff
+14	^what?sapp?	WhatsApp
+15	^t+w+i+t+[ea]+h?r+	Twitter
+16	^fb$	Facebook
+17	^instagram$	Instagram
+18	^g\+$	Google+
+19	^twit$
+19	^tweet$
+199	^tweets$
+20	^retweet$
+21	^retwit$
+22	^retwittear$
+23	^twittear$
+24	^twitear$	twittear	#should actually put the correct one in a dictionary and let model etc. decide
+25	^trendings?$
+26	^topics?$
+27	^face$	abbrev for facebook, but as per devset, leave as is. Here so that dosnt' go to "hace"
+28	^twe+t+$	tweet
+29	^twe+t+s+$	tweets
+
+
+# emoticon tokens that are not caught by Freeling mapper
+MA100	^(x[d]+)$	\\1	#turn into raw string before compiling
+MA101	^(om+)$	\\1	#hack for one of the testset OOVs (logic bug in filtering candidates before writeout)
+
+# abbreviation tokens, to keep
+1000	^a\.$
+1001	^b\.$
+1002	^c\.$
+1003	^d\.$
+1004	^e\.$
+1005	^f\.$
+1006	^g\.$
+1007	^h\.$
+1008	^i\.$
+1009	^j\.$
+1010	^k\.$
+1011	^l\.$
+1012	^m\.$
+1013	^n\.$
+1014	^o\.$
+1015	^p\.$
+1016	^q\.$
+1017	^r\.$
+1018	^s\.$
+1019	^t\.$
+1020	^u\.$
+1021	^v\.$
+1022	^w\.$
+1023	^x\.$
+1024	^y\.$
+1025	^z\.$
+1026	^A\.$
+1027	^B\.$
+1028	^C\.$
+1029	^D\.$
+1030	^E\.$
+1031	^F\.$
+1032	^G\.$
+1033	^H\.$
+1034	^I\.$
+1035	^J\.$
+1036	^K\.$
+1037	^L\.$
+1038	^M\.$
+1039	^N\.$
+1040	^O\.$
+1041	^P\.$
+1042	^Q\.$
+1043	^R\.$
+1044	^S\.$
+1045	^T\.$
+1046	^U\.$
+1047	^V\.$
+1048	^W\.$
+1049	^X\.$
+1050	^Y\.$
+1051	^Z\.$

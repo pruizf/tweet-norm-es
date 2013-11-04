@@ -1,4 +1,5 @@
 import codecs
+import inspect
 import os
 import logging
 import psutil
@@ -8,8 +9,8 @@ import preparation as prep
 import tnconfig as tc
 
 # logging
-logfile_name = os.path.join(tc.LOGDIR, "run_%s.log" % prep.find_run_id())
-lgr, lfh = prep.set_log(__name__, logfile_name)
+logfile_name = os.path.join(tc.LOGDIR, "run_%s.log" % prep.find_run_id(increase=True))
+lgr, lfh = prep.set_log(__name__, logfile_name, False)
 
 
 def check_server(port):

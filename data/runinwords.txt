@@ -1,0 +1,14 @@
+# words often written together, to separate
+
+RI1	tequieromucho+	te_quiero_mucho
+RI2	esque	es_que
+RI3	Queva+	Qué_va
+RI4	Queba+	Qué_va
+RI5	Keva+	Qué_va
+RI6	losiento	lo_siento
+RI7	tequiero	te_quiero
+RI8	qel	que_el	#Quel is a village, we may need to require case sensitivity 
+RI9	ati	a_ti
+RI10	alfin	al_fin
+RI11	porfin	por_fin
+RI12	nose	no_sé	#pb is that this could also be "no_se"

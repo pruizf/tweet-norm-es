@@ -18,8 +18,7 @@ import preparation as prep
 
 # logger
 logfile_name = os.path.join(tc.LOGDIR, "run_%s.log" % prep.find_run_id())
-lgr, lfh = prep.set_log(__name__, logfile_name)
-
+lgr, lfh = prep.set_log(__name__, logfile_name, False)
 
 """ Basic Twitter Objects """
 

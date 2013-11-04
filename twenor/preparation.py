@@ -25,7 +25,7 @@ def find_git_revnum():
     git_dir = "{}/.git".format(tc.APPDIR)    
     return subprocess.check_output(["git", "--git-dir=%s" % git_dir, "describe", "--always"]).strip()
     
-def find_run_id():
+def find_run_id(increase=False):
     """Run ID for all modules. Should move to a singleton somewhere"""
     if tc.RUNID is None:
         if not os.path.exists(tc.RUNID_FILE):
@@ -34,6 +34,11 @@ def find_run_id():
         tc.RUNID = open(tc.RUNID_FILE, "r").read().rstrip()
         with open(tc.RUNID_FILE, "w") as new_runid_file:
             new_runid_file.write(str(int(tc.RUNID) + 1))
+            tc.RUNID = str(int(tc.RUNID) + 1)
+    elif increase:
+        tc.RUNID = int(tc.RUNID) + 1
+        with open(tc.RUNID_FILE, "w") as new_runid_file: 
+            new_runid_file.write(str(int(tc.RUNID)))
     return tc.RUNID
 
 def find_id_order(orderfile=tc.id_order):
@@ -70,11 +75,9 @@ def grab_texts(txtfn):
     with codecs.open(txtfn, "r", "utf8") as texts:
         for line in texts:
             lines = line.rstrip().split("\t")
-            #print lines[-1]
             if lines[-1] != "Not Available":
                 txtdic[lines[0]] = lines[-1]
             else:
-                print lines[-1]
                 txtdic[lines[0]] = ""
     return txtdic
 

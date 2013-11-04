@@ -1,6 +1,7 @@
 #!/usr/bin/python2.7
 # -*- coding: utf-8 -*-
 
+import argparse
 import codecs
 from collections import defaultdict
 import inspect
@@ -27,12 +28,23 @@ if not os.path.join(os.path.join(parentdir, "scripts")) in sys.path:
  
 # app-specific imports
 import tnconfig as tc
+if "prep" in dir(): reload(prep)
 import preparation as prep
+if "fl" in dir(): reload(fl)
 import freelmgr as fl
+if "twittero" in dir(): reload(twittero)
+import twittero
 from twittero import Tweet, Token, OOV
 import neweval as neval
 
 # aux functions
+
+def set_option_parser():
+    parser = argparse.ArgumentParser(prog='tnor2')
+    parser.add_argument("-t", "--tag", action="store_true", help="Tag with FreeLing")
+    parser.add_argument("-c", "--comment", help="Comment for Run")
+    args = parser.parse_args()
+    return args
 
 def write_out(corr_dico):
     with codecs.open(tc.OUTFN.format(prep.find_run_id()), "w", "utf8") as outfh:
@@ -41,11 +53,14 @@ def write_out(corr_dico):
             for oov_corr in corr_dico[tid]:
                 outfh.write("\t%s\t%s\n" % (oov_corr[0], oov_corr[1]))
 
-def write_to_cumulog():
+def write_to_cumulog(clargs=None):
     inf = {}
     inf["run_id"] = prep.find_run_id()
     inf["revnum"] = prep.find_git_revnum()
-    inf["run_comment"] = tc.COMMENT
+    if clargs is not None and clargs.comment != "":
+        inf["run_comment"] = clargs.comment
+    else:
+        inf["run_comment"] = tc.COMMENT
     outhead = "Run ID [{0}], RevNum [{1}] {2}\n".format(inf["run_id"], inf["revnum"], "="*50)
     with codecs.open(tc.EVALFN.format(prep.find_run_id()), "r", "utf8") as done_res:
         with codecs.open(tc.CUMULOG, "a", "utf8") as cumu_res:
@@ -53,11 +68,21 @@ def write_to_cumulog():
             cumu_res.write("RunComment: {}\n".format(inf["run_comment"]))
             cumu_res.write("".join(done_res.readlines()[-4:]))
 
+
 # MAIN -------------------------------------------------------------------------
-if __name__ == "__main__":
+
+def main():
     # logger
     logfile_name = os.path.join(tc.LOGDIR, "run_%s.log" % prep.find_run_id())
-    lgr, lfh = prep.set_log(__name__, logfile_name)
+    lgr, lfh = prep.set_log(__name__, logfile_name, False)
+    print "Run ID: %s" % prep.find_run_id()
+
+    # cl options
+    clargs = set_option_parser()
+    if clargs is not None and clargs.tag:
+        tc.TAG = True
+    elif clargs is not None and not clargs.tag:
+        tc.TAG = False
 
     # processing
     lgr.info("Run {0} START | Rev [{1}] {2}".format(tc.RUNID, prep.find_git_revnum(), "="*60))
@@ -109,7 +134,9 @@ if __name__ == "__main__":
     # write eval
     lgr.info("Running evaluation")
     neval.main(tc.ANNOTS, tc.OUTFN.format(prep.find_run_id()))
-    write_to_cumulog()
+    write_to_cumulog(clargs=clargs)
 
     lgr.removeHandler(lfh)
     
+if __name__ == "__main__":
+    main()

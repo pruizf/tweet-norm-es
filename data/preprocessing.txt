@@ -1,0 +1,90 @@
+# ordered
+
+# repeated characters
+1	([á]{3,})	á
+2	([a]{3,})	a
+3	([é]{3,})	é
+4	([e]{3,})	e
+5	([í]{3,})	í
+6	([i]{3,})	i
+7	([ó]{3,})	ó
+8	([o]{3,})	o
+9	([ú]{3,})	ú
+10	([u]{3,})	u
+11	([áa]{3,})	á
+12	([ée]{3,})	é
+13	([ó]{3,})	ó
+14	([úu]{3,})	ú
+15	([^lrcn])\1{2,}	\1\1	#idea is for them to be corrected by LM after
+
+# repeated characters, exceptions
+16	([l]{3,})	ll
+17	([r]{3,})	rr
+18	([c]{3,})	cc
+19	([n]{3,})	nn
+
+
+# map (or make closer) onomatopoeias to their RAE spelling
+
+#00	^[ajs]+$	ja
+#01	^[ejs]+$	ja
+
+# Laughs ("ja" et al)
+
+# would be better with a regex config allowing prefixes and suffixes
+# e.g. LAUGH_PREFIX = ^(?:[mw]+a+)?
+16	^(?:[mw]+a+)?(?:a+j+s*|j+a+s*)+[jq]*$	ja	#laugh
+161	^js([aj]+)$	ja	#laugh
+17	^(?:e+j+s*|j+e+s*)+j?$	je	#laugh
+172	^(?:e+h+s*|j+e+s*)+j?$	je	#laugh
+18	^(?:i+j+s*|j+i+s*)+j?$	ji	#laugh
+166	^(?:h+a)+?h$	ha	#laugh, don't care if it'S the verb
+190	^(aj)+	ja
+31	^muac?ks?	mua	#kisses
+32	muaxh?	mua	#kisses
+
+
+# eh-type
+150	^(e+h+){1,}$	eh	#ehh?
+151	^(e+r*m+)$	eh
+
+# Surprise ("ah" et al)
+162	^a(?:a*h*s*|h+a+s*)+j?$	ah	#surprise
+20	^a[h]+[sx]?$	ah
+21	^o[h]+[sx]?$	oh
+
+# disgust / relief ("uf", "ts") 
+23	^(u+f+)+$	uf
+24	^(p+u+f+)+$	puf
+244	^p+f+$	puf
+32	^t+s+$	chis
+28	^bu[ae]h$	bah
+29	^bu+[ae]+h+$	bah
+
+# "ay" and such
+25	^(a+y+)+$	ay
+19	^u+[aáiíy]{3,}$	uy+ay	#from task manual, don't ask
+
+# hey and such
+22	^ey$	eh
+26	^h?ey+$	eh
+27	^(h+e+y+)+$	eh
+271	^(h*u+y+)+$	uy
+
+# hum
+30	^(h+u+m+)+$	hum
+
+# "ya"
+31	^(y+a+)+$	ya
+
+# other exclamations
+33	^(e+a+)+$	ea
+34	^ol[ée]+$	olé
+
+# si or sí
+35	^(s+[íi]+){2,}$	sí
+
+# general repeated characters rule
+1000	([^lrnc])\1	\1	#if two repeated letters, leave only one, if not in safelist. Problem: entities
+
+

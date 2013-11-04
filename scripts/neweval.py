@@ -47,8 +47,6 @@ if not os.path.join(os.path.join(parentdir, "scripts")) in sys.path:
 import tnconfig as tc
 import preparation as prep
 
-evalfh = open(tc.EVALFN.format(prep.find_run_id()), "w")
-
 def loadFile(filename):
   resultdict=dict()
   buff=[]
@@ -101,6 +99,7 @@ def getReferencePair(line):
 
 
 def main(goldStandard, resultFile):
+  evalfh = open(tc.EVALFN.format(prep.find_run_id()), "w")
 
   # variables: 
   errors=0

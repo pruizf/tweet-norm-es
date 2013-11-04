@@ -1,0 +1,96 @@
+# abbrevs
+
+# Typical twitter/microtext abbreviations or variants
+
+#que
+1008	^qe$	que
+1009	^qtal$	qué_tal
+1010	^ktal$	qué_tal
+1011	^ke$	que
+
+#nada y todo
+10	^na+$	nada
+11	^to+$	todo	#pb is gender agreement
+
+#porque
+1019	^xk$	porque
+1013	^xq$	porque
+
+#por... with X
+10190	^xfa[vb]or$	por_favor
+10191	^xdios+$	por_Dios	#tribute to Luis Moya
+
+#así_que
+1001	^asik$	así_que
+1002	^asiq$	así_que
+10021	^asinque$	así_que
+10022	^asínque$	así_que
+
+#es_que
+1003	^esq$	es_que
+1004	^esk$	es_que
+1005	^esque$	es_que
+1006	^eske$	es_que
+1007	^esqe$	es_que
+
+#te_quiero_mucho
+1012	^te?quieromucho+$	te_quiero_mucho
+1013	^te?kieromucho+$	te_quiero_mucho
+1014	^te?kiero+$	te_quiero
+1015	^te?qu?iero+$	te_quiero
+1016	^te?qu?ieromucho$	te_quiero_mucho
+1017	^te?qu?ieromuxo$	te_quiero_mucho
+1000	^t+[kq]+m+$	te_quiero_mucho
+
+#preps
+1005	^cn$	con
+1006	^kn$	con
+1020	^dsd$	desde
+107	^pa$	para
+
+#pronouns
+1012	^ns$	nos
+
+#adverbs and such (conjunctions)
+1011	^alomejor$	a_lo_mejor
+1018	^mñn$	mañana
+1007	^ains$	ay
+1008	^porai$	por_ahí
+1009	^poray$	por_ahí
+1010	^pos$	pues
+1011	^tb$	también
+1012	^tb\.$	también	#>>> re.search(re.compile("^tb\.$"), "tb.") <_sre.SRE_Match object at 0x379dc1d0>, so leaving it
+
+
+# Brands or Internet
+#2000	^wpp$	WhatsApp	#bad, cos rules with repeated characters are disabled by preprocessing module, that applies before this!
+
+
+# Colloquial language
+2000	^cole+$	colegio
+2001	^insti+$	instituto
+2003	^peli+$	película
+2004	^finde+$	fin_de_semana
+2005	^compi+$	compañero
+2006	^compa+$	compañera
+2007	^cumple+$	cumpleaños
+2008	^fono+$	teléfono
+2009	^facul?$	facultad
+2010	^chuli$	chulo	#issue is gender agreement
+2011	^cari+$	cariño
+2012	^mani$	manifestación
+2013	^manifa$	manifestación
+20133	^manifas$	manifestaciones
+2014	^puti$	puticlub	#it IS in RAE
+2015	^conver$	conversación
+2016	^info$	información
+2017	^infos$	informaciones
+
+# CONTEXT SENSITIVE ABBREVS (algo not implemented)
+4000	capi	capital	#pb is that el capi => el capitán, la capi => la capital (or, la capitana, but that's a semantic WSD issue, not just morphology)
+
+# Standard abbreviations
+3000	^m[áa]x\.$	máxima	#real issue here is gender agreement (FreeLing's analysis is useful there)
+3001	^m[íi]n\.$	mínima
+
+
