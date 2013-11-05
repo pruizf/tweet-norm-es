@@ -4,9 +4,9 @@ import re
 import sys
 
 # BASIC ========================================================================
-COMMENT = "test safetokens"
+COMMENT = "test regexes"
 RUNID = None
-TAG = False                 # Tag with Freeling (1) or read tags from TAGSDIR (0)
+TAG = False                    # Tag with Freeling (1) or read tags from TAGSDIR (0)
 ENV = "W"                   # Work, Home, Server
 EVAL = bool(1)              # test (1) vs. dev (0) sets
 if ENV == "W":
@@ -91,8 +91,9 @@ fl_options = ["-f es.cfg",
               "--nortk"]
 
 # DATA -------------------------------------------------------------------------
+# preprocessing: all files utf-8
 SAFETOKENS = APPDIR + r"/data/" + "safelist.txt"
-
+REGPREPRO = APPDIR + r"/data/" + "preprocessing.txt"
 
 # EVALUATION -------------------------------------------------------------------
 evalscript = APPDIR + "/scripts/" + "new-tweet-norm-eval.py"

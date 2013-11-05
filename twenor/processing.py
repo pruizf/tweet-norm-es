@@ -110,6 +110,7 @@ def main():
 
     # prepare pre-processing
     safe_rules = ppro.load_safetokens()
+    rerules = ppro.load_regexes()
 
     # read text and token tags into Tweet and Token objects
     all_tweeto = {}
@@ -119,6 +120,7 @@ def main():
     for tid in textdico:
         lgr.info("# Start [%s] #" % tid)
         x += 1
+        doneposis = [] # positions of done OOVs
         # dico for final outputs
         baseline_dico[tid] = []
         outdico[tid] = []
@@ -142,19 +144,38 @@ def main():
                 baseline_dico[tid].append((tok.form, tok.form))
         # pre-processing
         logmes = {"st":0, "reg":0, "abbs":0}
+          # mbe should enumerate this to have access to
+          # position in the OOV list, not position in the token list
+          # or mbe add oovposi as attribute oov.oovposi vs oov.posi
+          # in the find_toks_and_OOVs function
         for oov in tweet.found_OOVs:
             if logmes["st"] == 0:
                 lgr.debug("# Safetokens #")
                 logmes["st"] = 1
-            #safetokens
+            # safetokens
             safecorr = ppro.find_safetoken(oov.form, safe_rules)
             if safecorr is not False and safecorr[1] is True:
                 oov.set_safecorr(safecorr[0])
                 tweet.set_par_cor(safecorr, posi=oov.posi)
+                # store posis of safelisted OOV
+                doneposis.append(oov.posi)
             if oov.safecorr is not None:
                 outdico[tid].append((oov.form, oov.safecorr))
             else:
                 outdico[tid].append((oov.form, oov.form))
+            # regexes
+              # here could feed oov.safecorr instead
+              # to reflect iterative corrections
+            recorr = ppro.find_rematch(oov.form, rerules)
+            print recorr
+
+            # these posis not useful way i've done it, they're tweet posis,
+            # not OOV-list posis
+            #if oov.posi not in doneposis:
+            #    if recorr[1] is not False:
+            #        outdico[tid][oov.posi] = (oov.form, recorr[0])
+                
+                    
 
         lgr.info("@ Done @")
         if x == 999:
