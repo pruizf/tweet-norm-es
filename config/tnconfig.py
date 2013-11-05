@@ -1,9 +1,10 @@
 import inspect
 import os
+import re
 import sys
 
 # BASIC ========================================================================
-COMMENT = "tests"
+COMMENT = "test safetokens"
 RUNID = None
 TAG = False                 # Tag with Freeling (1) or read tags from TAGSDIR (0)
 ENV = "W"                   # Work, Home, Server
@@ -13,7 +14,8 @@ if ENV == "W":
 elif ENV == "H":
     RESDIR = "/home/ps/DATA/wk/VT/projects/Tweet-Norm/results2"
 if not os.path.exists(RESDIR):
-    os.makedirs(RESDIR)   
+    os.makedirs(RESDIR)
+BASELINE = False
 # ==============================================================================
 
 # LOGGING ----------------------------------------------------------------------
@@ -88,6 +90,14 @@ fl_options = ["-f es.cfg",
               "--nortkcon",
               "--nortk"]
 
+# DATA -------------------------------------------------------------------------
+SAFETOKENS = APPDIR + r"/data/" + "safelist.txt"
+
+
 # EVALUATION -------------------------------------------------------------------
 evalscript = APPDIR + "/scripts/" + "new-tweet-norm-eval.py"
 
+# OTHER ------------------------------------------------------------------------
+BLANKLINES_RE = re.compile(r"^\s*$")
+COMMENTLINES_RE = re.compile(r"^#")
+file_for_dumps = APPDIR + "/tests/" + "objdumps.txt"

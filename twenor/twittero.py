@@ -30,6 +30,8 @@ class Tweet:
         self.set_found_OOVs([])
 
     hasOOVs = None
+    foundOOVs = None
+    par_cor = [] # partially corrected tweet
     
     def find_toks_and_OOVs(self):
         """Based on Freeling analyze ouptut, make Token and OOV instances for
@@ -91,6 +93,14 @@ class Tweet:
     def set_found_OOVs(self, found_OOVs):
         self.found_OOVs = found_OOVs
 
+    def set_par_cor(self, tok_or_tweet, posi=None):
+        """Set tok_or_tweet as a partially corrected version for the Tweet obj,
+           or set tok_or_tweet at par_cor's position given in kw argument posi"""
+        if posi:
+            self.par_cor[posi] = tok_or_tweet
+        else:
+            self.par_cor = tok_or_tweet
+
 
 class Token:
     def __init__(self, form):
@@ -120,6 +130,11 @@ class OOV(Token):
         Token.__init__(self, form)
         # isOOV always True
         self.set_OOV_status(True)
-       
-    def set_correction(corr):
+
+    safecorr = None
+
+    def set_safecorr(self, corr):
+        self.safecorr = corr
+    def set_correction(self, corr):
         self.correction = corr
+    

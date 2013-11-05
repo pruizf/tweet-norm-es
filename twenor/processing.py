@@ -36,13 +36,16 @@ if "twittero" in dir(): reload(twittero)
 import twittero
 from twittero import Tweet, Token, OOV
 import neweval as neval
+import preprocessing as ppro
+if "ppro" in dir(): reload(ppro)
 
 # aux functions
 
 def set_option_parser():
-    parser = argparse.ArgumentParser(prog='tnor2')
-    parser.add_argument("-t", "--tag", action="store_true", help="Tag with FreeLing")
-    parser.add_argument("-c", "--comment", help="Comment for Run")
+    parser = argparse.ArgumentParser(prog='processing.py')
+    parser.add_argument("-t", "--tag", action="store_true", help="tag with FreeLing")
+    parser.add_argument("-c", "--comment", help="comment for run (shown in cumulog.txt)")
+    parser.add_argument("-b", "--baseline", action="store_true",  help="baseline run: accept all OOV")
     args = parser.parse_args()
     return args
 
@@ -57,7 +60,7 @@ def write_to_cumulog(clargs=None):
     inf = {}
     inf["run_id"] = prep.find_run_id()
     inf["revnum"] = prep.find_git_revnum()
-    if clargs is not None and clargs.comment != "":
+    if clargs.comment is not None and clargs.comment != "":
         inf["run_comment"] = clargs.comment
     else:
         inf["run_comment"] = tc.COMMENT
@@ -72,10 +75,16 @@ def write_to_cumulog(clargs=None):
 # MAIN -------------------------------------------------------------------------
 
 def main():
+
+    global tweet
+    global clargs
+    global all_tweets # debug
+    global safe_rules # debug
+    all_tweets = []
+    
     # logger
     logfile_name = os.path.join(tc.LOGDIR, "run_%s.log" % prep.find_run_id())
     lgr, lfh = prep.set_log(__name__, logfile_name, False)
-    print "Run ID: %s" % prep.find_run_id()
 
     # cl options
     clargs = set_option_parser()
@@ -85,6 +94,7 @@ def main():
         tc.TAG = False
 
     # processing
+    print "Run ID: %s" % prep.find_run_id()
     lgr.info("Run {0} START | Rev [{1}] {2}".format(tc.RUNID, prep.find_git_revnum(), "="*60))
     id_order = prep.find_id_order()
     ref_OOVs = prep.find_ref_OOVs(tc.ANNOTS)
@@ -98,16 +108,20 @@ def main():
     if tc.TAG:
         fl.tag_texts(textdico)
 
+    # prepare pre-processing
+    safe_rules = ppro.load_safetokens()
+
     # read text and token tags into Tweet and Token objects
     all_tweeto = {}
     baseline_dico = {}
-    out_dico = {}
+    outdico = {}
     x = 0
     for tid in textdico:
+        lgr.info("# Start [%s] #" % tid)
         x += 1
         # dico for final outputs
         baseline_dico[tid] = []
-        out_dico[tid] = []
+        outdico[tid] = []
         if "%s.tags" % tid not in os.listdir(tc.TAGSDIR):
             lgr.error("Missing tags for %s" % tid)
         # create tweet objs
@@ -119,18 +133,40 @@ def main():
             tweet.set_ref_OOVs(ref_OOVs[tid])
             tweet.find_toks_and_OOVs()
             tweet.cf_OOVs_found_vs_ref()
+            tweet.set_par_cor(tweet.toks)
+            all_tweets.append(tweet) #debug
         # baseline-populate output dico
         for tok in tweet.toks:
-            if tok.isOOV:
+            # better than tok.isOOV cos no ref. vs. found err w isinstance
+            if isinstance(tok, OOV):
                 baseline_dico[tid].append((tok.form, tok.form))
+        # pre-processing
+        logmes = {"st":0, "reg":0, "abbs":0}
+        for oov in tweet.found_OOVs:
+            if logmes["st"] == 0:
+                lgr.debug("# Safetokens #")
+                logmes["st"] = 1
+            #safetokens
+            safecorr = ppro.find_safetoken(oov.form, safe_rules)
+            if safecorr is not False and safecorr[1] is True:
+                oov.set_safecorr(safecorr[0])
+                tweet.set_par_cor(safecorr, posi=oov.posi)
+            if oov.safecorr is not None:
+                outdico[tid].append((oov.form, oov.safecorr))
+            else:
+                outdico[tid].append((oov.form, oov.form))
+
+        lgr.info("@ Done @")
         if x == 999:
             break
 
     # write results
     lgr.info("Writing out")
-    #chosen_out_dico = out_dico
-    chosen_out_dico = baseline_dico
-    write_out(chosen_out_dico)
+    if tc.BASELINE:
+        chosen_outdico = baseline_dico
+    else:
+        chosen_outdico = outdico
+    write_out(chosen_outdico)
     # write eval
     lgr.info("Running evaluation")
     neval.main(tc.ANNOTS, tc.OUTFN.format(prep.find_run_id()))
