@@ -4,7 +4,7 @@ import re
 import sys
 
 # BASIC ========================================================================
-COMMENT = "test regexes"
+COMMENT = "test regex-based edit distance (wout appending to final dico)"
 RUNID = None
 TAG = False                    # Tag with Freeling (1) or read tags from TAGSDIR (0)
 ENV = "W"                   # Work, Home, Server
@@ -92,6 +92,8 @@ fl_options = ["-f es.cfg",
 
 # DATA -------------------------------------------------------------------------
 # preprocessing: all files utf-8
+doubledchar_dico = APPDIR + r"/data/" + "doubledchar-dic.txt"
+IVDICO = APPDIR + r"/data/" + "aspell-es-expanded.dic"
 SAFETOKENS = APPDIR + r"/data/" + "safelist.txt"
 REGPREPRO = APPDIR + r"/data/" + "preprocessing.txt"
 

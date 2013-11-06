@@ -1,27 +1,40 @@
 # ordered
 
 # repeated characters
-1	([á]{3,})	á
-2	([a]{3,})	a
-3	([é]{3,})	é
-4	([e]{3,})	e
-5	([í]{3,})	í
-6	([i]{3,})	i
-7	([ó]{3,})	ó
-8	([o]{3,})	o
-9	([ú]{3,})	ú
-10	([u]{3,})	u
-11	([áa]{3,})	á
-12	([ée]{3,})	é
-13	([ó]{3,})	ó
-14	([úu]{3,})	ú
-15	([^lrcn])\1{2,}	\1\1	#idea is for them to be corrected by LM after
+1	([á]{3,})	áá
+2	([a]{3,})	aa
+3	([é]{3,})	éé
+4	([e]{3,})	ee
+5	([í]{3,})	íí
+6	([i]{3,})	ii
+7	([ó]{3,})	óó
+8	([o]{3,})	oo
+9	([ú]{3,})	úú
+10	([u]{3,})	uu
+
+11	([á]{2,})	á
+12	([a]{2,})	a
+13	([é]{2,})	é
+14	([e]{2,})	e
+15	([í]{2,})	í
+16	([i]{2,})	i
+17	([ó]{2,})	ó
+18	([o]{2,})	o
+19	([ú]{2,})	ú
+20	([u]{2,})	u
+
+21	([áa]{3,})	á
+22	([ée]{3,})	é
+23	([ó]{3,})	ó
+24	([úu]{3,})	ú
+
+26	([^lrcn])\1{2,}	\1\1	#idea is for them to be corrected by LM after
 
 # repeated characters, exceptions
-16	([l]{3,})	ll
-17	([r]{3,})	rr
-18	([c]{3,})	cc
-19	([n]{3,})	nn
+27	([l]{3,})	ll
+28	([r]{3,})	rr
+29	([c]{3,})	cc
+30	([n]{3,})	nn
 
 
 # map (or make closer) onomatopoeias to their RAE spelling
@@ -33,15 +46,15 @@
 
 # would be better with a regex config allowing prefixes and suffixes
 # e.g. LAUGH_PREFIX = ^(?:[mw]+a+)?
-16	^(?:[mw]+a+)?(?:a+j+s*|j+a+s*)+[jq]*$	ja	#laugh
-161	^js([aj]+)$	ja	#laugh
-17	^(?:e+j+s*|j+e+s*)+j?$	je	#laugh
-172	^(?:e+h+s*|j+e+s*)+j?$	je	#laugh
-18	^(?:i+j+s*|j+i+s*)+j?$	ji	#laugh
-166	^(?:h+a)+?h$	ha	#laugh, don't care if it'S the verb
-190	^(aj)+	ja
-31	^muac?ks?	mua	#kisses
-32	muaxh?	mua	#kisses
+100	^(?:[mw]+a+)?(?:a+j+s*|j+a+s*)+[jq]*$	ja	#laugh
+101	^js([aj]+)$	ja	#laugh
+102	^(?:e+j+s*|j+e+s*)+j?$	je	#laugh
+103	^(?:e+h+s*|j+e+s*)+j?$	je	#laugh
+104	^(?:i+j+s*|j+i+s*)+j?$	ji	#laugh
+105	^(?:h+a)+?h$	ha	#laugh, don't care if it'S the verb
+106	^(aj)+	ja
+107	^muac?ks?	mua	#kisses
+108	muaxh?	mua	#kisses
 
 
 # eh-type
@@ -49,42 +62,42 @@
 151	^(e+r*m+)$	eh
 
 # Surprise ("ah" et al)
-162	^a(?:a*h*s*|h+a+s*)+j?$	ah	#surprise
-20	^a[h]+[sx]?$	ah
-21	^o[h]+[sx]?$	oh
+160	^a(?:a*h*s*|h+a+s*)+j?$	ah	#surprise
+161	^a[h]+[sx]?$	ah
+162	^o[h]+[sx]?$	oh
 
 # disgust / relief ("uf", "ts") 
-23	^(u+f+)+$	uf
-24	^(p+u+f+)+$	puf
-244	^p+f+$	puf
-32	^t+s+$	chis
-28	^bu[ae]h$	bah
-29	^bu+[ae]+h+$	bah
+200	^(u+f+)+$	uf
+201	^(p+u+f+)+$	puf
+202	^p+f+$	puf
+203	^t+s+$	chis
+204	^bu[ae]h$	bah
+205	^bu+[ae]+h+$	bah
 
 # "ay" and such
-25	^(a+y+)+$	ay
-19	^u+[aáiíy]{3,}$	uy+ay	#from task manual, don't ask
+250	^(a+y+)+$	ay
+251	^u+[aáiíy]{3,}$	uy+ay	#from task manual, don't ask
 
 # hey and such
-22	^ey$	eh
-26	^h?ey+$	eh
-27	^(h+e+y+)+$	eh
-271	^(h*u+y+)+$	uy
+260	^ey$	eh
+261	^h?ey+$	eh
+262	^(h+e+y+)+$	eh
+263	^(h*u+y+)+$	uy
 
 # hum
-30	^(h+u+m+)+$	hum
+300	^(h+u+m+)+$	hum
 
 # "ya"
-31	^(y+a+)+$	ya
+310	^(y+a+)+$	ya
 
 # other exclamations
-33	^(e+a+)+$	ea
-34	^ol[ée]+$	olé
+320	^(e+a+)+$	ea
+321	^ol[ée]+$	olé
 
 # si or sí
-35	^(s+[íi]+){2,}$	sí
+330	^(s+[íi]+){2,}$	sí
 
 # general repeated characters rule
-1000	([^lrnc])\1	\1	#if two repeated letters, leave only one, if not in safelist. Problem: entities
+9000	([^lrnc])\1	\1	#if two repeated letters, leave only one, if not in safelist. Problem: entities
 
 

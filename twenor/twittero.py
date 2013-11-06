@@ -132,9 +132,12 @@ class OOV(Token):
         self.set_OOV_status(True)
 
     safecorr = None
+    recorr = None
 
     def set_safecorr(self, corr):
         self.safecorr = corr
+    def set_recorr(self, corr):
+        self.recorr = corr
     def set_correction(self, corr):
         self.correction = corr
     

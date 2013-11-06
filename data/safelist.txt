@@ -58,7 +58,7 @@
 27	^face$	abbrev for facebook, but as per devset, leave as is. Here so that dosnt' go to "hace"
 28	^twe+t+$	tweet
 29	^twe+t+s+$	tweets
-
+30	^ttal$	total
 
 # emoticon tokens that are not caught by Freeling mapper
 MA100	^(x[d]+)$	\\1	#turn into raw string before compiling
