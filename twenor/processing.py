@@ -81,11 +81,12 @@ def main():
 
     global tweet
     global clargs
+    global ref_OOVs # debug
     global all_tweets # debug
     global safe_rules # debug
     global ppro # debug
     global edi # debug
-    all_tweets = []
+    all_tweets = [] # debug
     
     # logger
     logfile_name = os.path.join(tc.LOGDIR, "run_%s.log" % prep.find_run_id())
@@ -192,7 +193,12 @@ def main():
                 #TODO: some side-effects of regexes, treat them (list-based if need be)
                 edcorr = edi.redist(oov.form)
                 if len(edcorr) > 0:
-                    print oov.form, edcorr
+                    for res in edcorr:
+                        cand = editor.Candidate(res)
+                        cand.set_dista(edcorr[res][0])
+                        cand.set_candtype("re")
+                        oov.add_cand(cand)
+                    print tweet.tid, oov.form, cand.form, cand.dista
             
             # populate outdico =================================================
             if oov.safecorr is not None:

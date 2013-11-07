@@ -30,7 +30,7 @@ class Tweet:
         self.set_found_OOVs([])
 
     hasOOVs = None
-    foundOOVs = None
+    found_OOVs = None
     par_cor = [] # partially corrected tweet
     
     def find_toks_and_OOVs(self):
@@ -79,10 +79,14 @@ class Tweet:
                 self.tid, repr(self.ref_OOVs), repr(found_OOV_forms)))
 
     def find_OOV_status(self, ref_OOVs):
-        if self.tid not in ref_OOVs:
+        try:
+            if ref_OOVs[self.tid] == []:
+            #if self.tid not in ref_OOVs:
+                self.hasOOVs = False
+            else:
+                self.hasOOVs = True
+        except KeyError:
             self.hasOOVs = False
-        else:
-            self.hasOOVs = True
 
     def set_toks(self, toks):
         self.toks = toks
@@ -130,9 +134,14 @@ class OOV(Token):
         Token.__init__(self, form)
         # isOOV always True
         self.set_OOV_status(True)
+        self.cands = []
 
     safecorr = None
     recorr = None
+    #cands = [] # Q: need to put in constructor?
+
+    def add_cand(self, cand):
+        self.cands.append(cand)
 
     def set_safecorr(self, corr):
         self.safecorr = corr
@@ -140,4 +149,5 @@ class OOV(Token):
         self.recorr = corr
     def set_correction(self, corr):
         self.correction = corr
+        
     

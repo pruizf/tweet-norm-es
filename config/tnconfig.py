@@ -1,4 +1,4 @@
-import inspect
+﻿import inspect
 import os
 import re
 import sys
@@ -36,7 +36,6 @@ DATA = os.path.join(APPDIR, "data")
 LOGDIR = os.path.join(APPDIR, "logs")
 if not os.path.exists(LOGDIR):
     os.makedirs(LOGDIR)
-
 
 # I/O --------------------------------------------------------------------------
 RUNID_FILE = APPDIR + "/config/" + "runid"
@@ -96,6 +95,13 @@ doubledchar_dico = APPDIR + r"/data/" + "doubledchar-dic.txt"
 IVDICO = APPDIR + r"/data/" + "aspell-es-expanded.dic"
 SAFETOKENS = APPDIR + r"/data/" + "safelist.txt"
 REGPREPRO = APPDIR + r"/data/" + "preprocessing.txt"
+
+# EDIT-DISTANCE
+    #TODO: if costs ever get expressed with positive values,
+    #      insert_accent_penalty would need to be positive to penalize
+    #      (negative would promote)
+acc_ins_penalty = -0.5 # for now negative values penalize. 
+alphabet = ('bcdfghjklmnpqrstvwxyzaeiou', ['á', 'é', 'í', 'ó', 'ú', 'ü', 'ñ'])
 
 # EVALUATION -------------------------------------------------------------------
 evalscript = APPDIR + "/scripts/" + "new-tweet-norm-eval.py"
