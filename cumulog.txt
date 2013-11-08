@@ -1,0 +1,138 @@
+Run ID [155], RevNum [db3a423] ==================================================
+RunComment: baseline
+ERR: 0 
+POS: 131 
+NEG: 531 
+ACCUR: 19.7885196375 
+Run ID [156], RevNum [db3a423] ==================================================
+RunComment: test safetokens
+ERR: 0 
+POS: 143 
+NEG: 519 
+ACCUR: 21.6012084592 
+Run ID [157], RevNum [5e80136] ==================================================
+RunComment: test safetokens, no diff in code but db3a423 missed preprocessing.py (forgot)
+ERR: 0 
+POS: 143 
+NEG: 519 
+ACCUR: 21.6012084592 
+Run ID [194], RevNum [2cb2327] ==================================================
+RunComment: test regexes not over safetooken (don't undo result of safetokens)
+ERR: 0 
+POS: 253 
+NEG: 409 
+ACCUR: 38.2175226586 
+Run ID [235], RevNum [e8eae3e] ==================================================
+RunComment: test regex-based edit distance (wout appending to final dico)
+ERR: 0 
+POS: 253 
+NEG: 409 
+ACCUR: 38.2175226586 
+Run ID [239], RevNum [e8eae3e] ==================================================
+RunComment: test regex-based edit distance (wout appending to final dico)
+ERR: 0 
+POS: 253 
+NEG: 409 
+ACCUR: 38.2175226586 
+Run ID [241], RevNum [e8eae3e] ==================================================
+RunComment: test regex-based edit distance (wout appending to final dico)
+ERR: 0 
+POS: 253 
+NEG: 409 
+ACCUR: 38.2175226586 
+Run ID [242], RevNum [e8eae3e] ==================================================
+RunComment: test regex-based edit distance (wout appending to final dico)
+ERR: 0 
+POS: 253 
+NEG: 409 
+ACCUR: 38.2175226586 
+Run ID [244], RevNum [e8eae3e] ==================================================
+RunComment: test regex-based edit distance (wout appending to final dico)
+ERR: 0 
+POS: 253 
+NEG: 409 
+ACCUR: 38.2175226586 
+Run ID [245], RevNum [e8eae3e] ==================================================
+RunComment: test regex-based edit distance (wout appending to final dico)
+ERR: 0 
+POS: 253 
+NEG: 409 
+ACCUR: 38.2175226586 
+Run ID [246], RevNum [e8eae3e] ==================================================
+RunComment: test regex-based edit distance (wout appending to final dico)
+ERR: 0 
+POS: 253 
+NEG: 409 
+ACCUR: 38.2175226586 
+Run ID [247], RevNum [e8eae3e] ==================================================
+RunComment: test regex-based edit distance (wout appending to final dico)
+ERR: 0 
+POS: 253 
+NEG: 409 
+ACCUR: 38.2175226586 
+Run ID [269], RevNum [7b111d0] ==================================================
+RunComment: test regex-based edit distance (wout appending to final dico)
+ERR: 0 
+POS: 253 
+NEG: 409 
+ACCUR: 38.2175226586 
+Run ID [282], RevNum [7b111d0] ==================================================
+RunComment: test regex-based edit distance (wout appending to final dico)
+ERR: 0 
+POS: 253 
+NEG: 409 
+ACCUR: 38.2175226586 
+Run ID [287], RevNum [7b111d0] ==================================================
+RunComment: test regex-based edit distance (wout appending to final dico)
+ERR: 0 
+POS: 253 
+NEG: 409 
+ACCUR: 38.2175226586 
+Run ID [289], RevNum [7b111d0] ==================================================
+RunComment: test regex-based edit distance (wout appending to final dico)
+ERR: 0 
+POS: 253 
+NEG: 409 
+ACCUR: 38.2175226586 
+Run ID [290], RevNum [7b111d0] ==================================================
+RunComment: test regex-based edit distance (wout appending to final dico)
+ERR: 0 
+POS: 253 
+NEG: 409 
+ACCUR: 38.2175226586 
+Run ID [292], RevNum [7b111d0] ==================================================
+RunComment: test regex-based edit distance (wout appending to final dico)
+ERR: 0 
+POS: 253 
+NEG: 409 
+ACCUR: 38.2175226586 
+Run ID [295], RevNum [7b111d0] ==================================================
+RunComment: test regex-based edit distance (wout appending to final dico)
+ERR: 16 
+POS: 272 
+NEG: 350 
+ACCUR: 41.0876132931 
+Run ID [298], RevNum [7b111d0] ==================================================
+RunComment: test regex-based edit distance (wout appending to final dico)
+ERR: 16 
+POS: 268 
+NEG: 354 
+ACCUR: 40.4833836858 
+Run ID [299], RevNum [7b111d0] ==================================================
+RunComment: test regex-based edit distance (wout appending to final dico)
+ERR: 0 
+POS: 1 
+NEG: 3 
+ACCUR: 0.151057401813 
+Run ID [303], RevNum [7b111d0] ==================================================
+RunComment: test regex-based edit distance (wout appending to final dico)
+ERR: 0 
+POS: 2 
+NEG: 2 
+ACCUR: 0.302114803625 
+Run ID [305], RevNum [7b111d0] ==================================================
+RunComment: test regex-based edit distance (wout appending to final dico)
+ERR: 16 
+POS: 287 
+NEG: 335 
+ACCUR: 43.3534743202 
