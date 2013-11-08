@@ -14,6 +14,10 @@ import subprocess
 import sys
 import time
 
+import profile
+
+# app-specific imports =========================================================
+
 # set PYTHONPATH
 curdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 if not curdir in sys.path:
@@ -26,7 +30,6 @@ if not os.path.join(os.path.join(parentdir, "data")) in sys.path:
 if not os.path.join(os.path.join(parentdir, "scripts")) in sys.path:
     sys.path.append(os.path.join(parentdir, "scripts"))
  
-# app-specific imports
 if "prep" in dir(): reload(prep)
 if "fl" in dir(): reload(fl)
 if "twittero" in dir(): reload(twittero)
@@ -41,8 +44,9 @@ from twittero import Tweet, Token, OOV
 import neweval as neval
 import preprocessing as ppr
 import editor
+import edcosts
 
-# aux functions
+# aux functions ================================================================
 
 def set_option_parser():
     parser = argparse.ArgumentParser(prog='processing.py')
@@ -75,7 +79,7 @@ def write_to_cumulog(clargs=None):
             cumu_res.write("".join(done_res.readlines()[-4:]))
 
 
-# MAIN -------------------------------------------------------------------------
+# MAIN =========================================================================
 
 def main():
 
@@ -88,6 +92,7 @@ def main():
     global edi # debug
     all_tweets = [] # debug
     
+    # prep ---------------------------------------------------------------------
     # logger
     logfile_name = os.path.join(tc.LOGDIR, "run_%s.log" % prep.find_run_id())
     lgr, lfh = prep.set_log(__name__, logfile_name, False)
@@ -99,7 +104,8 @@ def main():
     elif clargs is not None and not clargs.tag:
         tc.TAG = False
 
-    # processing
+    # processing ---------------------------------------------------------------
+    print "Start {}".format(time.asctime(time.localtime()))
     print "Run ID: %s" % prep.find_run_id()
     lgr.info("Run {0} START | Rev [{1}] {2}".format(tc.RUNID, prep.find_git_revnum(), "="*60))
     id_order = prep.find_id_order()
@@ -114,28 +120,37 @@ def main():
     if tc.TAG:
         fl.tag_texts(textdico)
 
-    # prepare pre-processing
+    # prepare pre-processing ---------------------------------------------------
     ppro = ppr.Prepro()
     safe_rules = ppro.load_safetokens()
     rerules = ppro.load_regexes()
     global dc_dico
     if "dc_dico" not in dir(sys.modules["__main__"]):
-        print "= prepro: Doubled-char dico"
+        print "= prepro: Doubled-char dico, {}".format((time.asctime(time.localtime())))
         dc_dico = ppro.create_doubledchar_dico()
+        print "Done {}".format((time.asctime(time.localtime())))
     #Q: need to set here cos recreating ppro above?
     ppro.set_doubledchar_dico(dc_dico)
 
-    # prepare edit-distance modules
+    # prepare edit-distance modules --------------------------------------------
+        # prepare cost-matrix first cos Editor needs it for initiation
+    lev_score_mat = editor.EdScoreMatrix(edcosts)
+    lev_score_mat.read_cost_matrix()
+    lev_score_mat.find_matrix_stats()
+    lev_score_mat_hash = lev_score_mat.create_matrix_hash()
+        # can initiate Editor now
     global ivs
-    edi = editor.Editor("", tc.IVDICO)
+    edimgr = editor.EdManager(lev_score_mat_hash, tc.IVDICO)
     # don't recreate IV dico if in dir for this module
     if "ivs" not in dir(sys.modules["__main__"]):
-        print "= editor: Hashing IV dico"
-        ivs = edi.generate_and_set_known_words()
+        print "= editor: Hashing IV dico, {}".format(time.asctime(time.localtime()))
+        ivs = edimgr.generate_and_set_known_words()
+        print "Done {}".format(time.asctime(time.localtime()))
     #Q: need to set here cos recreating edi above?
-    edi.set_ivdico(ivs)
+    edimgr.set_ivdico(ivs)
+    edimgr.prep_alphabet()
 
-    # read text and token tags into Tweet and Token objects
+    # read text and token tags into Tweet and Token objects --------------------
     all_tweeto = {}
     baseline_dico = {}
     outdico = {}
@@ -188,27 +203,59 @@ def main():
                 recorr = ppro.find_rematch(oov.form, rerules)
                 if recorr[1] is True:
                     oov.set_recorr(recorr[0])
-            # edit candidates ==================================================
-            if oov.safecorr is None and oov.safecorr is None:
+            # edit candidates ==================================================            
+            re_corr_forms = {} # TODO: correct side-effects of regexes
+            if oov.safecorr is None and oov.recorr is None:
+                # Regex-based
                 #TODO: some side-effects of regexes, treat them (list-based if need be)
-                edcorr = edi.redist(oov.form)
-                if len(edcorr) > 0:
-                    for res in edcorr:
-                        cand = editor.Candidate(res)
-                        cand.set_dista(edcorr[res][0])
-                        cand.set_candtype("re")
-                        oov.add_cand(cand)
-                    print tweet.tid, oov.form, cand.form, cand.dista
-            
+                re_corr_cands = edimgr.redist(oov.form)
+                if len(re_corr_cands[0]) > 0:
+                        # recorr[1] has how many times a rule has applied to a cand, for logging
+                    for rcc in re_corr_cands[0]:
+                        recando = editor.Candidate(rcc)
+                        recando.set_dista(re_corr_cands[0][rcc])
+                        recando.set_candtype("re")
+                        oov.add_cand(recando)
+                    #print tweet.tid, oov.form, recando.form, recando.dista
+                    re_corr_forms[oov.form] = True
+                # Lev Distance based
+                if oov.form not in re_corr_forms:
+                    lev_corr_cands = edimgr.generate_candidates(oov.form)
+                    if len(lev_corr_cands) > 0:
+                        for lcc in lev_corr_cands:
+                            levcando = editor.Candidate(lcc)
+                            levcando.set_dista(edimgr.levdist(lcc, oov.form))
+                            levcando.set_candtype("lev")
+                            oov.add_cand(levcando)
+                # rank candidates
+                if len(oov.cands) == 0:
+                    continue
+                ranked_candos = sorted(oov.cands, key=lambda x: x.dista, reverse=True)
+                ranked_filtered = [cand for cand in ranked_candos if cand.dista >= -1.5]
+                lgr.debug("Ranked {}".format([rc.form for rc in ranked_candos]))
+                if len(ranked_filtered) > 0:
+                    oov.cands_ranked = ranked_filtered
+                    oov.bestedcando = ranked_filtered[0]
+                    lgr.debug("OOV [{}], BestEdCand [{}]".format(repr(oov.form), repr(oov.bestedcando.form)))
+                else:
+                    oov.cands_ranked = []
+                    lgr.debug("OOV [{}], No Edit Cands".format(repr(oov.form)))
+                    
+                
             # populate outdico =================================================
             if oov.safecorr is not None:
                 outdico[tid].append((oov.form, oov.safecorr))
             elif oov.recorr is not None:
                 outdico[tid].append((oov.form, oov.recorr))
+            elif len(oov.cands_ranked) > 0:
+                outdico[tid].append((oov.form, oov.bestedcando.form))
             else:
                 outdico[tid].append((oov.form, oov.form))                    
 
         lgr.info("@ Done @")
+
+        if x % 100 == 0:
+            print "Done {} tweets, {}".format(x, time.asctime(time.localtime()))
         if x == 999:
             break
 
@@ -225,6 +272,10 @@ def main():
     write_to_cumulog(clargs=clargs)
 
     lgr.removeHandler(lfh)
+
+
+    print "End {}".format(time.asctime(time.localtime()))
     
 if __name__ == "__main__":
+    #profile.run("main()")
     main()

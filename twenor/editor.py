@@ -11,7 +11,7 @@ import preparation as prep
 logfile_name = os.path.join(tc.LOGDIR, "run_%s.log" % prep.find_run_id())
 lgr, lfh = prep.set_log(__name__, logfile_name, False)
 
-class EdScores:
+class EdScoreMatrix:
     """Methods to read cost matrix from module in arg cost_module
        and to find costs for individual character-edits."""
 
@@ -118,7 +118,7 @@ class Candidate:
         self.candtype = typ
 
 
-class Editor:
+class EdManager:
     """Computes correction-candidates for a term, and edit-distances between
        the term and the candidate. Requires info about correction weights (arg cws)
        and an IV dictionary (ivdico)"""
@@ -187,12 +187,12 @@ class Editor:
                 except KeyError:
                     pass
                 result.setdefault(cand, 0)
-                result[cand] = (-0.5 * apptimes[cand], apptimes)
+                result[cand] = -0.5 * apptimes[cand]
         for cand in result.keys():
             if cand not in self.ivdico:
                 del result[cand]
-        lgr.debug(repr({"res": result, "tim": apptimes}))
-        return result
+        lgr.debug(repr({"result": result, "apptimes": apptimes}))        
+        return (result, {"apptimes" : apptimes})
     
     def edits1(self, word):
         """Generate candidates at Lev distance 1. From Norvig speller."""
@@ -200,42 +200,35 @@ class Editor:
         deletes    = [a + b[1:] for a, b in splits if b]
         replaces   = [a + c + b[1:] for a, b in splits for c in self.alphabet if b]
         inserts    = [a + c + b     for a, b in splits for c in self.alphabet]
-        generated_edits1 = set(deletes + replaces + inserts)
+        edits1 = set(deletes + replaces + inserts)
         #lgr.debug("++ All generated Edits1: %s" % repr(generated_edits1)) #large
-        return generated_edits1
+        return edits1
 
-    def known_edits2(self, word):
+    def generate_candidates(self, word):
         """Generate candidates at Lev distance 2 based on distance 1 edits,
-           and return only those in known-words dictionary. From Norvig."""
-        lgr.debug(">> OOV: |%s|" % word)
-        generated_known2 = set(e2 for e1 in self.edits1(word) for e2 in self.edits1(e1) if e2 in self.ivdico)
-        lgr.debug("++ All known Edits2: %s" % repr(sorted(list(generated_known2))))
-        return generated_known2
+           and return only those in known-words dictionary. Based on Norvig."""
+        lgr.debug("OOV [%s]" % word)
+        known2 = set([e2 for e1 in self.edits1(word) for e2 in self.edits1(e1)
+                  if e2 in self.ivdico])
+        cands = self.known(self.edits1(word)).union(known2)
+        cands = [cand.decode("utf8") if type(cand) is str else cand for cand in cands]
+        lgr.debug("Candset %s" % repr(sorted(list(known2))))
+        return cands
 
     def known(self, words):
         """Filter a list of words, returning only those in known-words dico.
            From Norvig."""
-        #words are supposed to be unicode objects?
         return set(w for w in words if w in self.ivdico)
-
-    def generate_candidates(self, word):
-        """Return IV edit-candidates up to two edit-operations
-           Based on Norvig's "correct" function"""
-        candidates = self.known([word]).\
-                     union(self.known(self.edits1(word))).\
-                     union(self.known_edits2(word))
-        lgr.debug("++ All generated candidates: |%s| |%s|" % (word, repr(sorted(list(candidates)))))
-        return candidates
 
     def find_cost(self, a,b):
         """Return single-character-edit cost for changing
            'b' (from oov under study) into 'a' (from edit-candidate under study)
            The cost-matrix is organized as mat[corr][incorr]
            Assumes that "a" and "b" are utf8-decoded"""
-        if type(a) is not unicode:
+        if type(a) is not unicode and a != "zero":
             lgr.warn("Not unicode: [{}]".format(repr(a)))
 
-        elif type(b) is not unicode:
+        elif type(b) is not unicode and b != "zero":
             lgr.warn("Not unicode: [{}]".format(repr(b)))
             
         if a == b:
@@ -246,7 +239,8 @@ class Editor:
             try:
                 cost = self.editcosts[a.lower()][b.lower()]
             except KeyError, msg:
-                print "KeyError, a: %s, b: %s || Bad Key: %s" % (a, b, msg) #debug
+                #if a != "zero" and b != "zero":
+                #    print "KeyError, a: %s, b: %s || Bad Key: %s" % (a, b, msg) #debug
                 cost = -1
         #print "looking for costs between", repr(a), repr(b) #debug
         return 0 - cost # matrix has neg numbers, min() below won't work if not do "0 -" here
@@ -255,7 +249,6 @@ class Editor:
         """Create edit candidates and give Lev distance between them and arg oov.
            Lev dista computed with weights, given in constructor for class
            s1 is the candidate under consideration, s2 is the oov under study"""
-        global d
         d = {}
         lenstr1 = len(s1)
         lenstr2 = len(s2)
@@ -263,7 +256,6 @@ class Editor:
             d[(i,-1)] = i+1
         for j in xrange(-1,lenstr2+1):
             d[(-1,j)] = j+1
-     
         for i in xrange(lenstr1):
             for j in xrange(lenstr2):                
                 d[(i,j)] = min(

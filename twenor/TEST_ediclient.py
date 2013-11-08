@@ -25,11 +25,11 @@ if "edi2" in dir(sys.modules["__main__"]): reload(edi2)
 import editor as edi2
 reload(edi2.tc)
 
-edisco = edi2.EdScores(edcosts)
+edisco = edi2.EdScoreMatrix(edcosts)
 edisco.read_cost_matrix()
 edisco.find_matrix_stats()
 exm = edisco.create_matrix_hash()
-myeditor = edi2.Editor(exm, tc.IVDICO)
+myeditor = edi2.EdManager(exm, tc.IVDICO)
 myeditor.prep_alphabet()
 myeditor.generate_and_set_known_words()
 
