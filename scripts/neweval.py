@@ -99,6 +99,7 @@ def getReferencePair(line):
 
 
 def main(goldStandard, resultFile):
+  #global evalfh
   evalfh = open(tc.EVALFN.format(prep.find_run_id()), "w")
 
   # variables: 

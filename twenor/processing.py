@@ -57,11 +57,14 @@ def set_option_parser():
     return args
 
 def write_out(corr_dico):
+    with codecs.open(tc.id_order, "r", "utf8") as idor:
+        orderlist = [idn.strip() for idn in idor.readlines()]    
     with codecs.open(tc.OUTFN.format(prep.find_run_id()), "w", "utf8") as outfh:
-        for tid in corr_dico:
-            outfh.write("%s\n" % tid)
-            for oov_corr in corr_dico[tid]:
-                outfh.write("\t%s\t%s\n" % (oov_corr[0], oov_corr[1]))
+        for tid in orderlist:
+            if tid in corr_dico:
+                outfh.write("%s\n" % tid)
+                for oov_corr in corr_dico[tid]:
+                    outfh.write("\t%s\t%s\n" % (oov_corr[0], oov_corr[1]))
 
 def write_to_cumulog(clargs=None):
     inf = {}
@@ -137,6 +140,7 @@ def main():
     lev_score_mat = editor.EdScoreMatrix(edcosts)
     lev_score_mat.read_cost_matrix()
     lev_score_mat.find_matrix_stats()
+    global lev_score_mat_hash #debug
     lev_score_mat_hash = lev_score_mat.create_matrix_hash()
         # can initiate Editor now
     global ivs
@@ -180,7 +184,7 @@ def main():
             # better than tok.isOOV cos no ref. vs. found err w isinstance
             if isinstance(tok, OOV):
                 baseline_dico[tid].append((tok.form, tok.form))
-        # pre-processing =======================================================
+        # PRE-PROCESSING =======================================================
         logmes = {"st":0, "re":0, "ab":0}
         for tok in tweet.toks:
             if not isinstance(tok, OOV):
@@ -189,12 +193,12 @@ def main():
             if logmes["st"] == 0:
                 lgr.debug("# Safetokens #")
                 logmes["st"] = 1
-            # safetokens -------------------------------------------------------
+            # Safetokens -------------------------------------------------------
             safecorr = ppro.find_safetoken(oov.form, safe_rules)
             if safecorr is not False and safecorr[1] is True:
                 oov.set_safecorr(safecorr[0])
                 tweet.set_par_cor(safecorr, posi=oov.posi)
-            # regexes ----------------------------------------------------------
+            # Regexes ----------------------------------------------------------
             if logmes["re"] == 0:
                 lgr.debug("# Regexes #")
                 logmes["re"] = 1
@@ -203,7 +207,14 @@ def main():
                 recorr = ppro.find_rematch(oov.form, rerules)
                 if recorr[1] is True:
                     oov.set_recorr(recorr[0])
-            # edit candidates ==================================================            
+            # TODO: check here if recorr is IV, if so, see if accept or what
+            #       or, at least, see if the form to base edit-candidates on
+            #       should be the regex-preprocessed one (likely, since regexes
+            #       remove v. unlikely sequences), or the original oov.
+            #       Likely the regex-preprocessed, cos we're not introducing garbage
+            #       with them, rather, removing them. 
+            
+            # EDIT CANDIDATES ==================================================            
             re_corr_forms = {} # TODO: correct side-effects of regexes
             if oov.safecorr is None and oov.recorr is None:
                 # Regex-based
@@ -219,6 +230,9 @@ def main():
                     #print tweet.tid, oov.form, recando.form, recando.dista
                     re_corr_forms[oov.form] = True
                 # Lev Distance based
+                #if oov.form == 'boorroh' or tid == '318742118996774913':
+                #    import pdb
+                #    pdb.set_trace()
                 if oov.form not in re_corr_forms:
                     lev_corr_cands = edimgr.generate_candidates(oov.form)
                     if len(lev_corr_cands) > 0:
@@ -228,21 +242,25 @@ def main():
                             levcando.set_candtype("lev")
                             oov.add_cand(levcando)
                 # rank candidates
-                if len(oov.cands) == 0:
-                    continue
-                ranked_candos = sorted(oov.cands, key=lambda x: x.dista, reverse=True)
-                ranked_filtered = [cand for cand in ranked_candos if cand.dista >= -1.5]
-                lgr.debug("Ranked {}".format([rc.form for rc in ranked_candos]))
-                if len(ranked_filtered) > 0:
-                    oov.cands_ranked = ranked_filtered
-                    oov.bestedcando = ranked_filtered[0]
-                    lgr.debug("OOV [{}], BestEdCand [{}]".format(repr(oov.form), repr(oov.bestedcando.form)))
+                if len(oov.cands) > 0:
+                    ranked_candos = sorted(oov.cands, key=lambda x: x.dista, reverse=True)
+                    ranked_filtered = [cand for cand in ranked_candos if cand.dista >= -1.5]
+                    lgr.debug("Ranked {}".format([rc.form for rc in ranked_candos]))
+                    if len(ranked_filtered) > 0:
+                        oov.cands_ranked = ranked_filtered
+                        oov.bestedcando = ranked_filtered[0]
+                        lgr.debug("OOV [{}], BestEdCand [{}]".format(repr(oov.form), repr(oov.bestedcando.form)))
+                    else:
+                        oov.cands_ranked = []
+                        lgr.debug("OOV [{}], No Edit Cands".format(repr(oov.form)))
                 else:
                     oov.cands_ranked = []
                     lgr.debug("OOV [{}], No Edit Cands".format(repr(oov.form)))
-                    
                 
-            # populate outdico =================================================
+            # POPULATE OUTDICO =================================================
+            #if oov.form.lower().startswith("ibra"):
+            #    import pdb
+            #    pdb.set_trace()
             if oov.safecorr is not None:
                 outdico[tid].append((oov.form, oov.safecorr))
             elif oov.recorr is not None:
@@ -272,7 +290,6 @@ def main():
     write_to_cumulog(clargs=clargs)
 
     lgr.removeHandler(lfh)
-
 
     print "End {}".format(time.asctime(time.localtime()))
     

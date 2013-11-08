@@ -136,3 +136,159 @@ ERR: 16
 POS: 287 
 NEG: 335 
 ACCUR: 43.3534743202 
+Run ID [308], RevNum [46eaae6] ==================================================
+RunComment: first version w lev-distance cands in results
+ERR: 16 
+POS: 291 
+NEG: 331 
+ACCUR: 43.9577039275 
+Run ID [309], RevNum [46eaae6] ==================================================
+RunComment: first version w lev-distance cands in results
+ERR: 16 
+POS: 291 
+NEG: 331 
+ACCUR: 43.9577039275 
+Run ID [310], RevNum [46eaae6] ==================================================
+RunComment: first version w lev-distance cands in results
+ERR: 16 
+POS: 278 
+NEG: 315 
+ACCUR: 41.9939577039 
+Run ID [311], RevNum [46eaae6] ==================================================
+RunComment: first version w lev-distance cands in results
+ ERR: 0 
+POS: 0 
+NEG: 0 
+ACCUR: 0.0 
+Run ID [312], RevNum [46eaae6] ==================================================
+RunComment: first version w lev-distance cands in results
+ ERR: 0 
+POS: 0 
+NEG: 0 
+ACCUR: 0.0 
+Run ID [313], RevNum [46eaae6] ==================================================
+RunComment: first version w lev-distance cands in results
+ ERR: 0 
+POS: 0 
+NEG: 0 
+ACCUR: 0.0 
+Run ID [314], RevNum [46eaae6] ==================================================
+RunComment: first version w lev-distance cands in results
+ERR: 16 
+POS: 288 
+NEG: 334 
+ACCUR: 43.5045317221 
+Run ID [316], RevNum [46eaae6] ==================================================
+RunComment: first version w lev-distance cands in results
+ERR: 16 
+POS: 277 
+NEG: 316 
+ACCUR: 41.8429003021 
+Run ID [317], RevNum [46eaae6] ==================================================
+RunComment: first version w lev-distance cands in results
+ERR: 16 
+POS: 288 
+NEG: 334 
+ACCUR: 43.5045317221 
+Run ID [318], RevNum [46eaae6] ==================================================
+RunComment: first version w lev-distance cands in results
+ERR: 16 
+POS: 289 
+NEG: 333 
+ACCUR: 43.6555891239 
+Run ID [319], RevNum [46eaae6] ==================================================
+RunComment: first version w lev-distance cands in results
+ERR: 16 
+POS: 288 
+NEG: 334 
+ACCUR: 43.5045317221 
+Run ID [320], RevNum [46eaae6] ==================================================
+RunComment: first version w lev-distance cands in results
+ERR: 16 
+POS: 291 
+NEG: 331 
+ACCUR: 43.9577039275 
+Run ID [321], RevNum [46eaae6] ==================================================
+RunComment: first version w lev-distance cands in results
+ERR: 16 
+POS: 292 
+NEG: 330 
+ACCUR: 44.1087613293 
+Run ID [322], RevNum [46eaae6] ==================================================
+RunComment: first version w lev-distance cands in results
+ERR: 16 
+POS: 285 
+NEG: 337 
+ACCUR: 43.0513595166 
+Run ID [323], RevNum [46eaae6] ==================================================
+RunComment: first version w lev-distance cands in results
+ERR: 16 
+POS: 291 
+NEG: 331 
+ACCUR: 43.9577039275 
+Run ID [324], RevNum [46eaae6] ==================================================
+RunComment: first version w lev-distance cands in results
+ERR: 16 
+POS: 289 
+NEG: 333 
+ACCUR: 43.6555891239 
+Run ID [325], RevNum [46eaae6] ==================================================
+RunComment: first version w lev-distance cands in results
+ERR: 16 
+POS: 290 
+NEG: 332 
+ACCUR: 43.8066465257 
+Run ID [326], RevNum [46eaae6] ==================================================
+RunComment: first version w lev-distance cands in results
+ERR: 16 
+POS: 288 
+NEG: 334 
+ACCUR: 43.5045317221 
+Run ID [327], RevNum [46eaae6] ==================================================
+RunComment: first version w lev-distance cands in results
+ERR: 16 
+POS: 286 
+NEG: 336 
+ACCUR: 43.2024169184 
+Run ID [328], RevNum [46eaae6] ==================================================
+RunComment: first version w lev-distance cands in results
+ERR: 16 
+POS: 288 
+NEG: 334 
+ACCUR: 43.5045317221 
+Run ID [329], RevNum [46eaae6] ==================================================
+RunComment: first version w lev-distance cands in results
+ERR: 16 
+POS: 291 
+NEG: 331 
+ACCUR: 43.9577039275 
+Run ID [330], RevNum [46eaae6] ==================================================
+RunComment: first version w lev-distance cands in results
+ERR: 16 
+POS: 284 
+NEG: 338 
+ACCUR: 42.9003021148 
+Run ID [331], RevNum [46eaae6] ==================================================
+RunComment: first version w lev-distance cands in results
+ERR: 16 
+POS: 291 
+NEG: 331 
+ACCUR: 43.9577039275 
+Run ID [332], RevNum [46eaae6] ==================================================
+RunComment: first version w lev-distance cands in results
+ERR: 16 
+POS: 291 
+NEG: 331 
+ACCUR: 43.9577039275 
+Run ID [335], RevNum [46eaae6] ==================================================
+RunComment: first version w lev-distance cands in results
+ERR: 0 
+POS: 305 
+NEG: 357 
+ACCUR: 46.0725075529 
+Run ID [336], RevNum [46eaae6] ==================================================
+RunComment: first version w lev-distance cands in results
+ERR: 0 
+POS: 310 
+NEG: 352 
+ACCUR: 46.8277945619 
