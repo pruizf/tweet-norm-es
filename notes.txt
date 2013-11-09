@@ -1,0 +1,33 @@
+Kenlm vs. SRILM scoring
+
+>>> sentence2 = "Est es un casa"
+>>> words = ['<s>'] + sentence2.split() + ['</s>']
+>>> for i, (prob, length) in enumerate(klm.full_scores(sentence2)):
+	print "{} {}:{}".format(prob, length, ' '.join(words[i+2-length:i+2]))
+	
+-6.54681587219 2:<s> Est
+-0.934829890728 2:Est es
+-1.33603322506 2:es un
+-5.18935441971 2:un casa
+-1.61485874653 2:casa </s>
+
+>>> import srilm
+>>> slm.total_logprob_strings(["Est", "es", "un", "casa"])
+-14.00703340768814
+>>> -6.54681587219 + -0.934829890728 + -1.33603322506 + -5.18935441971 + -1.61485874653
+-15.621892154218001
+>>> -1.61485874653 + -14.00703340768814
+-15.621892154218141
+>>> 
+
+>>> slm.logprob_strings("</s>", ["casa", "un", "es", "<s>"])
+-1.6148587465286255
+>>> slm.total_logprob_strings(["es", "un", "casa"])
+-8.953945636749268
+>>> klm.score("es un casa")
+-10.568803787231445
+>>> slm.total_logprob_strings(["es", "un", "casa", "</s>"])
+-10.568804383277893
+>>> slm.total_logprob_strings(["<s>", "es", "un", "casa", "</s>"])
+-inf
+

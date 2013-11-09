@@ -45,6 +45,7 @@ import neweval as neval
 import preprocessing as ppr
 import editor
 import edcosts
+import lmmgr
 
 # aux functions ================================================================
 
@@ -153,6 +154,14 @@ def main():
     #Q: need to set here cos recreating edi above?
     edimgr.set_ivdico(ivs)
     edimgr.prep_alphabet()
+
+    # prepare LM module --------------------------------------------------------
+    global slmmgr #debug
+    global bslm #debug
+    slmmgr = lmmgr.SLM()
+    if not "bslm" in dir(sys.modules["__main__"]):
+        bslm = slmmgr.create_bin_lm()
+    slmmgr.set_slmbin(bslm)    
 
     # read text and token tags into Tweet and Token objects --------------------
     all_tweeto = {}

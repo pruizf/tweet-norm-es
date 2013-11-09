@@ -96,12 +96,16 @@ IVDICO = APPDIR + r"/data/" + "aspell-es-expanded.dic"
 SAFETOKENS = APPDIR + r"/data/" + "safelist.txt"
 REGPREPRO = APPDIR + r"/data/" + "preprocessing.txt"
 
-# EDIT-DISTANCE
+# EDIT-DISTANCE ----------------------------------------------------------------
     #TODO: if costs ever get expressed with positive values,
     #      insert_accent_penalty would need to be positive to penalize
     #      (negative would promote)
 acc_ins_penalty = -0.5 # for now negative values penalize. 
 alphabet = ('bcdfghjklmnpqrstvwxyzaeiou', ['á', 'é', 'í', 'ó', 'ú', 'ü', 'ñ'])
+
+# LANGUAGE MODELS --------------------------------------------------------------
+lmpath = APPDIR + "/data/" + "SUMATCasedLM_kenlm_es.arpa"
+lm_window = 2
 
 # EVALUATION -------------------------------------------------------------------
 evalscript = APPDIR + "/scripts/" + "new-tweet-norm-eval.py"
