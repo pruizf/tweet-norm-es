@@ -1,4 +1,5 @@
 import inspect
+import logging
 import os
 import sys
 import time
@@ -18,10 +19,15 @@ if not os.path.join(os.path.join(parentdir, "scripts")) in sys.path:
     sys.path.append(os.path.join(parentdir, "scripts"))
 
 import tnconfig as tc
+import preparation as prep
 
 #import kenlm
 #if "klm" not in sys.modules["__main__"]:
 #    klm = kenlm.LanguageModel(tc.lmpath)
+
+logfile_name = os.path.join(tc.LOGDIR, "run_%s.log" % prep.find_run_id())
+lgr, lfh = prep.set_log(__name__, logfile_name, False)
+
 
 class SLM:
     def __init__(self, arpa_path=tc.lmpath):
@@ -51,9 +57,11 @@ class SLM:
         return leftcon
 
     def find_logprog_in_ctx(self, tok, context):
-        """Srilm-logprob_strings score for tok and context"""
+        """Srilm-logprob_strings score for tok and context.
+           Encode in utf8 since model contains no unicode objects"""
+        context = [t.encode("utf8") for t in context]
         context.reverse()
-        return self.slmbin.logprob_strings(tok, context)
+        return self.slmbin.logprob_strings(tok.encode("utf8"), context)
 
     def set_slmbin(self, lm):
         self.slmbin = lm

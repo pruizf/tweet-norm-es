@@ -4,6 +4,7 @@
 import argparse
 import codecs
 from collections import defaultdict
+import copy
 import inspect
 import logging
 import os
@@ -133,6 +134,8 @@ def main():
         print "= prepro: Doubled-char dico, {}".format((time.asctime(time.localtime())))
         dc_dico = ppro.create_doubledchar_dico()
         print "Done {}".format((time.asctime(time.localtime())))
+    else:
+        print "= prepro: Skip creating doubled-char dico"
     #Q: need to set here cos recreating ppro above?
     ppro.set_doubledchar_dico(dc_dico)
 
@@ -151,17 +154,21 @@ def main():
         print "= editor: Hashing IV dico, {}".format(time.asctime(time.localtime()))
         ivs = edimgr.generate_and_set_known_words()
         print "Done {}".format(time.asctime(time.localtime()))
+    else:
+        print "= editor: Skip creating IV dico"
     #Q: need to set here cos recreating edi above?
     edimgr.set_ivdico(ivs)
     edimgr.prep_alphabet()
 
     # prepare LM module --------------------------------------------------------
     global slmmgr #debug
-    global bslm #debug
+    global binslm #debug
     slmmgr = lmmgr.SLM()
-    if not "bslm" in dir(sys.modules["__main__"]):
-        bslm = slmmgr.create_bin_lm()
-    slmmgr.set_slmbin(bslm)    
+    if not "binslm" in dir(sys.modules["__main__"]):
+        binslm = slmmgr.create_bin_lm()
+    else:
+        print "= LM: Skip creating binary LM"
+    slmmgr.set_slmbin(binslm)
 
     # read text and token tags into Tweet and Token objects --------------------
     all_tweeto = {}
@@ -186,7 +193,14 @@ def main():
             tweet.set_ref_OOVs(ref_OOVs[tid])
             tweet.find_toks_and_OOVs()
             tweet.cf_OOVs_found_vs_ref()
-            tweet.set_par_cor(tweet.toks)
+                # Q: This (below) was set as set_par_corr(tweet.toks)
+                #    *Bad idea*, cos this creates identity of reference
+                #    between tweet.toks and tweet.par_corr (just a new label for same ref)
+                #    and then when altering tweet.par_corr (below) i was altering
+                #    tweet.toks unwittingly.
+                #    Since the *list contains objects*, use deepcopy
+            # Copy the token-list so that .toks is not altered when altering .par_corr
+            tweet.set_par_corr(copy.deepcopy(tweet.toks))
             all_tweets.append(tweet) #debug
         # baseline-populate output dico ---------------------------------------
         for tok in tweet.toks:
@@ -203,10 +217,16 @@ def main():
                 lgr.debug("# Safetokens #")
                 logmes["st"] = 1
             # Safetokens -------------------------------------------------------
+            #if tid == u'319028060852740099':
+            #    import pdb
+            #    pdb.set_trace()
             safecorr = ppro.find_safetoken(oov.form, safe_rules)
+            # TODO: instead of these tuples, can i add attributes so that i can access
+            #       whether safecorr applied by attribute, not by an index the existence of which
+            #       i'll forget in a couple days?
             if safecorr is not False and safecorr[1] is True:
                 oov.set_safecorr(safecorr[0])
-                tweet.set_par_cor(safecorr, posi=oov.posi)
+                tweet.set_par_corr(safecorr[0], posi=oov.posi)
             # Regexes ----------------------------------------------------------
             if logmes["re"] == 0:
                 lgr.debug("# Regexes #")
@@ -251,7 +271,18 @@ def main():
                             levcando.set_candtype("lev")
                             oov.add_cand(levcando)
                 # rank candidates
-                if len(oov.cands) > 0:
+                if oov.set_has_cands():
+                #if len(oov.cands) > 0:
+                    someLMCand = False
+                    for cand in oov.cands:
+                        cand_in_lm = cand.is_inLM(binslm)
+                        if cand_in_lm:
+                            lmlcon = slmmgr.find_left_context(oov.posi, [tok.form for tok in tweet.toks])
+                            lmsco = slmmgr.find_logprog_in_ctx(cand.form, lmlcon)
+                            cand.set_lmsco(lmsco)
+                            cand.set_lmctxt(lmlcon)
+                            someLMCand = True
+                            oov.set_has_LM_cands(someLMCand)
                     ranked_candos = sorted(oov.cands, key=lambda x: x.dista, reverse=True)
                     ranked_filtered = [cand for cand in ranked_candos if cand.dista >= -1.5]
                     lgr.debug("Ranked {}".format([rc.form for rc in ranked_candos]))

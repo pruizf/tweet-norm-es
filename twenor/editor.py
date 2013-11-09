@@ -111,11 +111,26 @@ class Candidate:
     dista = None
     apptimes = None
     candtype = None # "re", "lev" (regex or lev-distance based)
+    lmsco = None
+    lmctx = None # context for LM score
+    inLM = None
+
+    def is_inLM(self, binlm):
+        """Encode form in utf8 before lookup since LM has no unicode objects"""
+        if binlm.vocab.intern(self.form.encode("utf-8")) == 0:
+            return False
+        return True
 
     def set_dista(self, dista):
         self.dista = dista
     def set_candtype(self, typ):
         self.candtype = typ
+    def set_lmsco(self, sco):
+        self.lmsco = sco
+    def set_lmctxt(self, ctx):
+        self.lmctx = ctx
+    def set_inLM(self):
+        self.inLM = self.is_inLM(self, binlm)
 
 
 class EdManager:
@@ -155,17 +170,19 @@ class EdManager:
         # Ordered regexes. Format: (incorrect, correct)
         # TODO: treat side effects like laa=>lada, mia=>mía, solaa=>solada
         #       any stats (even unigram freq) may get rid of it wout extra lists
+        # TODO: more precise regexes cos some (those w "h") are unlikely to bring good
+        #       candidates
         subs_tups = [('gi', 'gui'), ('ge', 'gue'),
                      ('q(?!ui)', 'que'),
                      ('qe', 'que'), ('qi', 'qui'), ('ke', 'que'), ('ki', 'qui'),
-                     ('g', 'ge'), ('d', 'de'), ('p', 'pe'), ('t','te'),
-                     ('b','be'), ('q(?!u)','qu'), ('k','ca'), ('k', 'qu'), 
                      ('nio', u'ño'), ('nia', u'ña'), ('nyo', u'ño'), ('nya', u'ña'),
                      ('x','ch'), ('y', 'll'), ('ll', 'y'),
                      ('ao$','ado'),('io$','ido'),('aa$','ada'),('ia$','ida'),
                      ('(?<!h)a','ha'), ('(?<!h)e','he'), ('(?<!h)i','hi'),
                      ('(?<!h)o','ho'),('(?<!h)u','hu'),
                      ('h$','s'),
+                     ('g', 'ge'), ('d', 'de'), ('p', 'pe'), ('t','te'),
+                     ('b','be'), ('q(?!u)','qu'), ('k','ca'), ('k', 'qu'), 
                      ('oy', 'oi'), ('ay', 'ai')]
         subs = dict(subs_tups)
 

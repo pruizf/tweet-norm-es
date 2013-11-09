@@ -40,21 +40,27 @@ ERR: 0
 POS: 305 
 NEG: 357 
 ACCUR: 46.0725075529 
-Run ID [338], RevNum [04556f2] ==================================================
+Run ID [345], RevNum [1fdb81a] ==================================================
+RunComment: first version with LM scores, although they're not being factored into final results yet
+ERR: 0 
+POS: 308 
+NEG: 354 
+ACCUR: 46.5256797583 
+Run ID [350], RevNum [1fdb81a] ==================================================
 RunComment: first version w lev-distance cands in results
 ERR: 0 
 POS: 3 
 NEG: 2 
 ACCUR: 0.453172205438 
-Run ID [340], RevNum [04556f2] ==================================================
+Run ID [368], RevNum [1fdb81a] ==================================================
 RunComment: first version w lev-distance cands in results
 ERR: 0 
-POS: 3 
-NEG: 2 
-ACCUR: 0.453172205438 
-Run ID [342], RevNum [04556f2] ==================================================
+POS: 306 
+NEG: 356 
+ACCUR: 46.2235649547 
+Run ID [369], RevNum [1fdb81a] ==================================================
 RunComment: first version w lev-distance cands in results
 ERR: 0 
-POS: 305 
-NEG: 357 
-ACCUR: 46.0725075529 
+POS: 310 
+NEG: 352 
+ACCUR: 46.8277945619 
