@@ -138,6 +138,7 @@ class OOV(Token):
 
     safecorr = None
     recorr = None
+    lmsco = None
 
     def add_cand(self, cand):
         self.cands[cand] = True
@@ -161,4 +162,6 @@ class OOV(Token):
         self.recorr = corr
     def set_correction(self, corr):
         self.correction = corr
+    def set_lmsco(self, sco):
+        self.lmsco = sco
         

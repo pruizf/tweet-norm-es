@@ -11,12 +11,10 @@ import os
 import pprint
 import re
 import shutil
+import string
 import subprocess
 import sys
 import time
-
-
-#import profile
 
 # app-specific imports =========================================================
 
@@ -31,7 +29,9 @@ if not os.path.join(os.path.join(parentdir, "data")) in sys.path:
     sys.path.append(os.path.join(parentdir, "data"))
 if not os.path.join(os.path.join(parentdir, "scripts")) in sys.path:
     sys.path.append(os.path.join(parentdir, "scripts"))
- 
+
+
+if "tc" in dir(): reload(tc)
 if "prep" in dir(): reload(prep)
 if "fl" in dir(): reload(fl)
 if "twittero" in dir(): reload(twittero)
@@ -57,6 +57,11 @@ def set_option_parser():
     parser.add_argument("-t", "--tag", action="store_true", help="tag with FreeLing")
     parser.add_argument("-c", "--comment", help="comment for run (shown in cumulog.txt)")
     parser.add_argument("-b", "--baseline", action="store_true",  help="baseline run: accept all OOV")
+    parser.add_argument("-x", "--maxdista", help="maximum edit distance above which candidate is filtered")
+    parser.add_argument("-d", "--distaw", help="weight for edit-distance scores")
+    parser.add_argument("-l", "--lmw", help="weight for language model scores")
+    parser.add_argument("-p", "--lmpath", help="path to Arpa file for language model")
+    parser.add_argument("-w", "--lm_window", help="left-window for context lookup in language model")
     args = parser.parse_args()
     return args
 
@@ -71,6 +76,13 @@ def preliminary_preps():
         tc.TAG = True
     elif clargs is not None and not clargs.tag:
         tc.TAG = False
+    #TODO: options below don't seem to be able to affect tc other than for writing to the cumulog
+    elif clargs.maxdista is not None:
+        tc.maxdista = clargs.maxdista
+    elif clargs.distaw is not None:
+        tc.distaw = clargs.distaw
+    elif clargs.lmw is not None:
+        tc.lmw = clargs.lmw
     return lgr, lfh, clargs
 
 def call_freeling(textdico):
@@ -102,19 +114,19 @@ def load_preprocessing():
         print "= prepro: Skip creating doubled-char dico"
     #Q: need to set here cos recreating ppro above?
     ppro.set_doubledchar_dico(dc_dico)
-    return safe_rules, rerules
+    return ppro, safe_rules, rerules
 
 def load_distance_editor():
     """Instantiate EdScoreMatrix and EdManager instances, returning the latter"""
     global lev_score_mat_hash #debug
     global ivs #debug
 
-    # prepare cost-matrix first cos Editor needs it for initiation
+    # prepare cost-matrix first cos EdManager needs it for initiation
     lev_score_mat = editor.EdScoreMatrix(edcosts)
     lev_score_mat.read_cost_matrix()
     lev_score_mat.find_matrix_stats()
     lev_score_mat_hash = lev_score_mat.create_matrix_hash()
-    # can initiate Editor now
+    # can initiate EdManager now
     edimgr = editor.EdManager(lev_score_mat_hash, tc.IVDICO)
     # don't recreate IV dico if in dir for this module
     if "ivs" not in dir(sys.modules["__main__"]):
@@ -169,6 +181,7 @@ def get_baseline_results(all_tweeto):
     baseline_dico = {}
     for tid in all_tweeto:
         baseline_dico[tid] = []
+        tweet = all_tweeto[tid]
         for tok in tweet.toks:
             # better than tok.isOOV, to keep ref. and found apart)
             if isinstance(tok, OOV):
@@ -178,6 +191,7 @@ def get_baseline_results(all_tweeto):
 def preprocess(oov):
     global lgr
     global tweet
+    global ppro
     # Safetokens -------------------------------------------------------
     safecorr = ppro.find_safetoken(oov.form, safe_rules)
     # TODO: instead of these tuples, can i add attributes so that i can access
@@ -220,37 +234,81 @@ def create_edit_candidates(oov):
             lev_corr_cands = edimgr.generate_candidates(oov.form)
             if len(lev_corr_cands) > 0:
                 for lcc in lev_corr_cands:
+                    if lcc == oov.form:
+                        #Q: why were there cases like this at all? (ca. 6)
+                        continue
                     levcando = editor.Candidate(lcc)
                     levcando.set_dista(edimgr.levdist(lcc, oov.form))
                     levcando.set_candtype("lev")
                     oov.add_cand(levcando)
 
-def rank_candidates(oov):
+def find_lm_scores(oov):
+    """Compute and set LM logprobs for <oov>'s candidates, and also for oov.form itself"""
     global lgr
+    lmlcon = slmmgr.find_left_context(oov.posi, [tok.form for tok in tweet.toks])
     if oov.set_has_cands():
         someLMCand = False
         for cand in oov.cands:
-            cand_in_lm = cand.is_inLM(binslm)
+            cand_in_lm = slmmgr.check_is_inLM(cand.form)
             if cand_in_lm:
-                lmlcon = slmmgr.find_left_context(oov.posi, [tok.form for tok in tweet.toks])
                 lmsco = slmmgr.find_logprog_in_ctx(cand.form, lmlcon)
                 cand.set_lmsco(lmsco)
                 cand.set_lmctx(lmlcon)
+                cand.set_inLM(cand_in_lm)              
                 someLMCand = True
                 oov.set_has_LM_cands(someLMCand)
-        ranked_candos = sorted(oov.cands, key=lambda x: x.dista, reverse=True)
-        ranked_filtered = [cand for cand in ranked_candos if cand.dista >= -1.5]
-        lgr.debug("RegED Ranked {}".format([rc.form for rc in ranked_candos]))
-        if len(ranked_filtered) > 0:
-            oov.cands_ranked = ranked_filtered
-            oov.bestedcando = ranked_filtered[0]
-            lgr.debug("+ OOV [{}], BestEdCand [{}]".format(repr(oov.form), repr(oov.bestedcando.form)))
-        else:
-            oov.cands_ranked = []
-            lgr.debug("+ OOV [{}], No Edit Cands".format(repr(oov.form)))
+        if slmmgr.check_is_inLM(oov.form):
+            oov.set_lmsco(slmmgr.find_logprog_in_ctx(oov.form, lmlcon))
+
+def cand_scorer(orca, scoretype="cand"):
+    """Score OOV or candidate <orca> given distance (not for OOV)
+       and lm scores and their weights. Cands with lmsco None
+       will be filtered later, so ok to return a score for them."""
+    #if form.form == 'sic': # debug: test cases of lmsco is None
+    #    import pdb
+    #    pdb.set_trace()
+    if orca.lmsco is not None:
+        if scoretype == "cand":
+            return orca.dista * tc.distaw + orca.lmsco * tc.lmw
+        elif scoretype == "oov":
+            return orca.lmsco * tc.lmw
     else:
-        oov.cands_ranked = []
-        lgr.debug("+ OOV [{}], No Edit Cands".format(repr(oov.form)))
+        if scoretype == "cand":
+            return orca.dista * tc.distaw
+        elif scoretype == "oov":
+            return None
+
+def rank_candidates(oov):
+    global lgr
+    if oov.lmsco is not None:
+        oov.wlmsco = cand_scorer(oov, scoretype="oov")
+    if oov.has_cands:
+        for cand in oov.cands:
+            cand.dislmsco = cand_scorer(cand)
+        # >= cos negative distances
+        oov.cands_filtered = [cand for cand in oov.cands
+                              if cand.dista >= tc.maxdista
+                              and cand.form != oov.form
+                              and cand.lmsco is not None]
+        oov.ed_filtered_ranked = sorted(oov.cands_filtered, key=lambda x: x.dislmsco, reverse=True)
+        lgr.debug("FltED Ranked {}".format([rc.form for rc in oov.ed_filtered_ranked]))
+        if len(oov.ed_filtered_ranked) > 0:
+            for cand in oov.ed_filtered_ranked:
+                lgr.debug("O [{0}], C [{1}], ED {2}| LM {3}| T {4}".format(
+                    string.ljust(repr(oov.form), 15),
+                    string.ljust(repr(cand.form), 15),
+                    string.rjust(str(cand.dista), 4),
+                    string.rjust(str(cand.lmsco), 15),
+                    string.rjust(str(cand.dislmsco), 15)))
+            oov.best_ed_cando = oov.ed_filtered_ranked[0]
+            lgr.debug("+ OOV [{}], BestEdCand [{}], {}".format(
+                repr(oov.form), repr(oov.best_ed_cando.form), repr(oov.best_ed_cando.dislmsco)))
+        else:
+            oov.ed_filtered_ranked = []
+            lgr.debug("+ OOV [{}], No Edit Cands, Reason: [Filtering]".format(repr(oov.form)))
+    else:
+        oov.ed_filtered_ranked = []
+        lgr.debug("+ OOV [{}], No Edit Cands, Reason: [No IV Intersection]".format(repr(oov.form)))
 
 def populate_outdico(all_tweeto, outdico):
     for tid in all_tweeto:
@@ -263,8 +321,8 @@ def populate_outdico(all_tweeto, outdico):
                 outdico[tid].append((oov.form, oov.safecorr))
             elif oov.recorr is not None:
                 outdico[tid].append((oov.form, oov.recorr))
-            elif len(oov.cands_ranked) > 0:
-                outdico[tid].append((oov.form, oov.bestedcando.form))
+            elif len(oov.ed_filtered_ranked) > 0:
+                outdico[tid].append((oov.form, oov.best_ed_cando.form))
             else:
                 outdico[tid].append((oov.form, oov.form))
     return outdico
@@ -287,11 +345,33 @@ def write_to_cumulog(clargs=None):
         inf["run_comment"] = clargs.comment
     else:
         inf["run_comment"] = tc.COMMENT
+    if clargs.maxdista is not None:
+        inf["maxdista"] = clargs.maxdsita
+    else:
+        inf["maxdista"] = tc.maxdista
+    if clargs.distaw is not None:
+        inf["distaw"] = clargs.distaw
+    else:
+        inf["distaw"] = tc.distaw
+    if clargs.lmw is not None:
+        inf["lmw"] = clargs.lmw
+    else:
+        inf["lmw"] = tc.lmw
+    if clargs.lmpath is not None:
+        inf["lmpath"] = os.path.basename(clargs.lmpath)
+    else:
+        inf["lmpath"] = os.path.basename(tc.lmpath)
+    if clargs.lm_window is not None:
+        inf["lm_window"] = tc.lm_window
+    else:
+        inf["lm_window"] = tc.lm_window
     outhead = "Run ID [{0}], RevNum [{1}] {2}\n".format(inf["run_id"], inf["revnum"], "="*50)
     with codecs.open(tc.EVALFN.format(prep.find_run_id()), "r", "utf8") as done_res:
         with codecs.open(tc.CUMULOG, "a", "utf8") as cumu_res:
             cumu_res.write(outhead)
             cumu_res.write("RunComment: {}\n".format(inf["run_comment"]))
+            for key in ["maxdista", "distaw", "lmw", "lmpath"]:
+                cumu_res.write("{}: {}\n".format(key, inf[key]))
             cumu_res.write("".join(done_res.readlines()[-4:]))
 
     
@@ -303,7 +383,7 @@ def main():
     global clargs
     global ref_OOVs # debug
     global all_tweets # debug
-    global safe_rules # debug
+    global safe_rules
     global rerules
     global ppro
     global edimgr
@@ -326,7 +406,7 @@ def main():
     call_freeling(textdico)
 
     print "= main: load analyzers"
-    safe_rules, rerules = load_preprocessing()
+    ppro, safe_rules, rerules = load_preprocessing()
     edimgr = load_distance_editor()
     slmmgr, binslm = load_lm()
 
@@ -347,6 +427,7 @@ def main():
             oov = tok # easier label
             preprocess(oov)
             create_edit_candidates(oov)
+            find_lm_scores(oov)
             rank_candidates(oov)
         x += 1
         if x % 100 == 0:

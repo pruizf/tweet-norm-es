@@ -18,3 +18,12 @@
 ##        generated_known2 = set(e2 if e2 in self.ivdico
 ##                               for e1 in self.edits1(word)
 ##                               for e2 in self.edits1(e1))
+
+##def cand_scorer(form, scoretype="cand"):
+##    """Score candidate given distance and lm scores and their weights"""
+##    if form.lmsco is None:
+##        form.lmsco = 0
+##    if scoretype == "cand":
+##        return form.dista * tc.distaw + form.lmsco * tc.lmw
+##    if scoretype == "oov":
+##        return form.lmsco * tc.lmw       

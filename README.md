@@ -24,7 +24,8 @@ Options can be specified in config.py, but some of the settings in that file can
 # If using command line arguments
 
 
-usage: processing.py [-h] [-t] [-c COMMENT] [-b]
+  age: processing.py [-h] [-t] [-c COMMENT] [-b] [-x MAXDISTA] [-d DISTAW]
+                     [-l LMW] [-p LMPATH] [-w LM_WINDOW]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -32,7 +33,18 @@ optional arguments:
   -c COMMENT, --comment COMMENT
                         comment for run (shown in cumulog.txt)
   -b, --baseline        baseline run: accept all OOV
+  -x MAXDISTA, --maxdista MAXDISTA
+                        maximum edit distance above which candidate is
+                        filtered
+  -d DISTAW, --distaw DISTAW
+                        weight for edit-distance scores
+  -l LMW, --lmw LMW     weight for language model scores
+  -p LMPATH, --lmpath LMPATH
+                        path to Arpa file for language model
+  -w LM_WINDOW, --lm_window LM_WINDOW
+                        left-window for context lookup in language model
 
+E.g.
 
 >>> sys.argv = ["", "--comment", "testing baseline settings", "--tag"]
 >>> execfile("/path/to/tnor2/twenor/processing.py")
@@ -54,15 +66,17 @@ Structure
 ```
 tnor2
  |_ config
-    |_ tnconfig.py		Config file
+    |_ tnconfig.py              Config file
  |_ scripts
-    |_ neweval.py		Tweet-Norm workshop's evaluation script
+    |_ neweval.py               Tweet-Norm workshop's evaluation script
  |_ twenor
-    |_ preparation.py		Common preparation functions
-    |_ freelmgr.py		Freeling Analyzer calls
-    |_ twittero.py		Basic tweet analysis objects: Tweet, Token, OOV, ...
-    |_ processing.py		Main Program
-    #TODO: spell-checking modules themselves
+    |_ preparation.py           Common preparation functions
+    |_ freelmgr.py              Freeling Analyzer calls
+    |_ twittero.py              Basic tweet analysis objects: Tweet, Token, OOV, ...
+    |_ preprocessing.py         OOV preprocessing with regexes and lists
+    |_ editor.py                Candidate Generation and Distance-Scoring
+    |_ lmmgr.py                 Language Model creation, candidate lookup and scoring
+    |_ processing.py            Main program
  |_ data			Regex lists, entity lists, correction model data, LMs etc.
  |_ evaluation
     |_ dev			devset texts and annotations

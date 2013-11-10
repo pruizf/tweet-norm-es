@@ -4,7 +4,7 @@ import re
 import sys
 
 # BASIC ========================================================================
-COMMENT = "first version w lev-distance cands in results"
+COMMENT = "Main split, norm at oov level, LM scores not yet in ranking"
 RUNID = None
 TAG = False                    # Tag with Freeling (1) or read tags from TAGSDIR (0)
 ENV = "H"                   # Work, Home, Server
@@ -102,10 +102,13 @@ REGPREPRO = APPDIR + r"/data/" + "preprocessing.txt"
     #      (negative would promote)
 acc_ins_penalty = -0.5 # for now negative values penalize. 
 alphabet = ('bcdfghjklmnpqrstvwxyzaeiou', ['á', 'é', 'í', 'ó', 'ú', 'ü', 'ñ'])
+maxdista = -1.5
+distaw = 0.7 # weight for distance scores
 
 # LANGUAGE MODELS --------------------------------------------------------------
 lmpath = APPDIR + "/data/" + "SUMATCasedLM_kenlm_es.arpa"
 lm_window = 2
+lmw = 0.3 # weight for lm scores
 
 # EVALUATION -------------------------------------------------------------------
 evalscript = APPDIR + "/scripts/" + "new-tweet-norm-eval.py"

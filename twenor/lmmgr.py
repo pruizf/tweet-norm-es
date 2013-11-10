@@ -46,6 +46,12 @@ class SLM:
             print msg ; lgr.debug(msg)
         return slmbin
 
+    def check_is_inLM(self, form):
+        """Encode form in utf8 before lookup since LM has no unicode objects"""
+        if self.slmbin.vocab.intern(form.encode("utf-8")) == 0:
+            return False
+        return True
+
     def find_left_context(self, idx, toks, window=tc.lm_window):
         """Find left-context from index <idx> in token list <toks>, for a
            window of <window> prior tokens"""

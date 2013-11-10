@@ -115,12 +115,6 @@ class Candidate:
     lmctx = None # context for LM score
     inLM = None
 
-    def is_inLM(self, binlm):
-        """Encode form in utf8 before lookup since LM has no unicode objects"""
-        if binlm.vocab.intern(self.form.encode("utf-8")) == 0:
-            return False
-        return True
-
     def set_dista(self, dista):
         self.dista = dista
     def set_candtype(self, typ):
@@ -129,8 +123,8 @@ class Candidate:
         self.lmsco = sco
     def set_lmctx(self, ctx):
         self.lmctx = ctx
-    def set_inLM(self):
-        self.inLM = self.is_inLM(self, binlm)
+    def set_inLM(self, boolean):
+        self.inLM = boolean
 
 
 class EdManager:
@@ -208,6 +202,8 @@ class EdManager:
         for cand in result.keys():
             if cand not in self.ivdico:
                 del result[cand]
+            elif cand == oov:
+                del result[cand]
         lgr.debug("RED RES {}, APPT {}".format(repr(result), repr(apptimes)))
         return (result, {"apptimes" : apptimes})
     
@@ -229,7 +225,7 @@ class EdManager:
                   if e2 in self.ivdico])
         cands = self.known(self.edits1(word)).union(known2)
         cands = [cand.decode("utf8") if type(cand) is str else cand for cand in cands]
-        lgr.debug("DisED Candset %s" % repr(sorted(list(known2))))
+        lgr.debug("DisED Candset %s" % repr(sorted(list(cands))))
         return cands
 
     def known(self, words):

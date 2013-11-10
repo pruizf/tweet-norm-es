@@ -46,69 +46,99 @@ ERR: 0
 POS: 308 
 NEG: 354 
 ACCUR: 46.5256797583 
-Run ID [369], RevNum [090db18] ==================================================
+Run ID [389], RevNum [b2d960c] ==================================================
 RunComment: first version with LM scores, now assigned to each candidate, but not yet factored into final results. Also some changes in regex ordering for regex-based editing
 ERR: 0 
 POS: 310 
 NEG: 352 
 ACCUR: 46.8277945619 
-Run ID [371], RevNum [090db18] ==================================================
-RunComment: first version w lev-distance cands in results
-ERR: 0 
-POS: 311 
-NEG: 351 
-ACCUR: 46.9788519637 
-Run ID [372], RevNum [090db18] ==================================================
-RunComment: first version w lev-distance cands in results
-ERR: 0 
-POS: 308 
-NEG: 354 
-ACCUR: 46.5256797583 
-Run ID [373], RevNum [090db18] ==================================================
-RunComment: first version w lev-distance cands in results
-ERR: 0 
-POS: 315 
-NEG: 347 
-ACCUR: 47.583081571 
-Run ID [374], RevNum [090db18] ==================================================
-RunComment: first version w lev-distance cands in results
+Run ID [410], RevNum [b2d960c] ==================================================
+RunComment: Config for distance and lm weights ready
+maxdista: -1.5
+distaw: 1.0
+lmw: 0.0
+lmpath: SUMATCasedLM_kenlm_es.arpa
 ERR: 0 
 POS: 313 
 NEG: 349 
 ACCUR: 47.2809667674 
-Run ID [381], RevNum [090db18] ==================================================
-RunComment: first version w lev-distance cands in results
+Run ID [426], RevNum [b2d960c] ==================================================
+RunComment: trying LM 100% and dista 100%
+maxdista: -1.5
+distaw: 1
+lmw: 1
+lmpath: SUMATCasedLM_kenlm_es.arpa
 ERR: 0 
-POS: 311 
-NEG: 351 
-ACCUR: 46.9788519637 
-Run ID [384], RevNum [a3f1edd] ==================================================
-RunComment: first version w lev-distance cands in results
+POS: 315 
+NEG: 347 
+ACCUR: 47.583081571 
+Run ID [427], RevNum [b2d960c] ==================================================
+RunComment: testing 0.7 Dista and 0.3 LM
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
 ERR: 0 
-POS: 311 
-NEG: 351 
-ACCUR: 46.9788519637 
-Run ID [385], RevNum [a3f1edd] ==================================================
-RunComment: first version w lev-distance cands in results
+POS: 324 
+NEG: 338 
+ACCUR: 48.9425981873 
+Run ID [428], RevNum [b2d960c] ==================================================
+RunComment: testing 0.7 Dista and 0.3 LM again
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+ERR: 0 
+POS: 324 
+NEG: 338 
+ACCUR: 48.9425981873 
+Run ID [430], RevNum [b2d960c] ==================================================
+RunComment: testing 1 dista and 1 LM again
+maxdista: -1.5
+distaw: 1.0
+lmw: 1.0
+lmpath: SUMATCasedLM_kenlm_es.arpa
+ERR: 0 
+POS: 315 
+NEG: 347 
+ACCUR: 47.583081571 
+Run ID [431], RevNum [b2d960c] ==================================================
+RunComment: testing 1 dista and 1 LM again
+maxdista: -1.5
+distaw: 1.0
+lmw: 1.0
+lmpath: SUMATCasedLM_kenlm_es.arpa
+ERR: 0 
+POS: 315 
+NEG: 347 
+ACCUR: 47.583081571 
+Run ID [434], RevNum [b2d960c] ==================================================
+RunComment: testing removing candidates taht are equal to the OOV, for reasons i don't get
+maxdista: -1.5
+distaw: 1
+lmw: 1
+lmpath: SUMATCasedLM_kenlm_es.arpa
 ERR: 0 
 POS: 314 
 NEG: 348 
 ACCUR: 47.4320241692 
-Run ID [386], RevNum [a3f1edd] ==================================================
-RunComment: first version w lev-distance cands in results
+Run ID [435], RevNum [b2d960c] ==================================================
+RunComment: testing removing candidates taht are equal to the OOV, for reasons i don't get
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
 ERR: 0 
-POS: 312 
-NEG: 350 
-ACCUR: 47.1299093656 
-Run ID [387], RevNum [a3f1edd] ==================================================
-RunComment: first version w lev-distance cands in results
+POS: 322 
+NEG: 340 
+ACCUR: 48.6404833837 
+Run ID [436], RevNum [b2d960c] ==================================================
+RunComment: testing removing candidates taht are equal to the OOV, for reasons i don't get. Outcome is taht you always lose two correct OOVs (Madrid and Europa i think)
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
 ERR: 0 
-POS: 307 
-NEG: 355 
-ACCUR: 46.3746223565 
-Run ID [388], RevNum [a3f1edd] ==================================================
-RunComment: first version w lev-distance cands in results
-ERR: 0 
-POS: 310 
-NEG: 352 
-ACCUR: 46.8277945619 
+POS: 322 
+NEG: 340 
+ACCUR: 48.6404833837 
