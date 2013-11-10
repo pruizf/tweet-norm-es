@@ -4,6 +4,7 @@ import os
 import logging
 import psutil
 import sys
+import time
 
 import preparation as prep
 import tnconfig as tc
@@ -50,6 +51,7 @@ def tag_texts(txtdico):
     if not os.path.exists(tc.TAGSDIR):
         os.makedirs(tc.TAGSDIR)
     tempfn = os.path.join(tc.TAGSDIR, "temp")
+    tnbr = 0
     for tid in txtdico:
         lgr.info("Tagging %s" % tid)
         temp = codecs.open(tempfn, "w", "utf8")
@@ -58,4 +60,7 @@ def tag_texts(txtdico):
         outfn = os.path.join(tc.TAGSDIR, "%s.tags" % tid)
         # tag
         run_fl_client(tempfn, outfn)
+        tnbr += 1
+        if tnbr % 100 == 0:
+            print "Tagged {}".format(time.asctime(time.localtime()))
     os.remove(tempfn)

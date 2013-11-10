@@ -41,26 +41,44 @@ POS: 305
 NEG: 357 
 ACCUR: 46.0725075529 
 Run ID [345], RevNum [1fdb81a] ==================================================
-RunComment: first version with LM scores, although they're not being factored into final results yet
+RunComment: first version with LM scores, although they're not being  assigned to each candidate or factored into final results yet
 ERR: 0 
 POS: 308 
 NEG: 354 
 ACCUR: 46.5256797583 
-Run ID [350], RevNum [1fdb81a] ==================================================
-RunComment: first version w lev-distance cands in results
-ERR: 0 
-POS: 3 
-NEG: 2 
-ACCUR: 0.453172205438 
-Run ID [368], RevNum [1fdb81a] ==================================================
-RunComment: first version w lev-distance cands in results
-ERR: 0 
-POS: 306 
-NEG: 356 
-ACCUR: 46.2235649547 
-Run ID [369], RevNum [1fdb81a] ==================================================
-RunComment: first version w lev-distance cands in results
+Run ID [369], RevNum [090db18] ==================================================
+RunComment: first version with LM scores, now assigned to each candidate, but not yet factored into final results. Also some changes in regex ordering for regex-based editing
 ERR: 0 
 POS: 310 
 NEG: 352 
 ACCUR: 46.8277945619 
+Run ID [371], RevNum [090db18] ==================================================
+RunComment: first version w lev-distance cands in results
+ERR: 0 
+POS: 311 
+NEG: 351 
+ACCUR: 46.9788519637 
+Run ID [372], RevNum [090db18] ==================================================
+RunComment: first version w lev-distance cands in results
+ERR: 0 
+POS: 308 
+NEG: 354 
+ACCUR: 46.5256797583 
+Run ID [373], RevNum [090db18] ==================================================
+RunComment: first version w lev-distance cands in results
+ERR: 0 
+POS: 315 
+NEG: 347 
+ACCUR: 47.583081571 
+Run ID [374], RevNum [090db18] ==================================================
+RunComment: first version w lev-distance cands in results
+ERR: 0 
+POS: 313 
+NEG: 349 
+ACCUR: 47.2809667674 
+Run ID [381], RevNum [090db18] ==================================================
+RunComment: first version w lev-distance cands in results
+ERR: 0 
+POS: 311 
+NEG: 351 
+ACCUR: 46.9788519637 
