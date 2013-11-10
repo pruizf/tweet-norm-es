@@ -142,3 +142,13 @@ ERR: 0
 POS: 322 
 NEG: 340 
 ACCUR: 48.6404833837 
+Run ID [439], RevNum [af4ca32] ==================================================
+RunComment: Main split, norm at oov level, LM scores not yet in ranking
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+ERR: 0 
+POS: 322 
+NEG: 340 
+ACCUR: 48.6404833837 
