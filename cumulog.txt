@@ -82,3 +82,33 @@ ERR: 0
 POS: 311 
 NEG: 351 
 ACCUR: 46.9788519637 
+Run ID [384], RevNum [a3f1edd] ==================================================
+RunComment: first version w lev-distance cands in results
+ERR: 0 
+POS: 311 
+NEG: 351 
+ACCUR: 46.9788519637 
+Run ID [385], RevNum [a3f1edd] ==================================================
+RunComment: first version w lev-distance cands in results
+ERR: 0 
+POS: 314 
+NEG: 348 
+ACCUR: 47.4320241692 
+Run ID [386], RevNum [a3f1edd] ==================================================
+RunComment: first version w lev-distance cands in results
+ERR: 0 
+POS: 312 
+NEG: 350 
+ACCUR: 47.1299093656 
+Run ID [387], RevNum [a3f1edd] ==================================================
+RunComment: first version w lev-distance cands in results
+ERR: 0 
+POS: 307 
+NEG: 355 
+ACCUR: 46.3746223565 
+Run ID [388], RevNum [a3f1edd] ==================================================
+RunComment: first version w lev-distance cands in results
+ERR: 0 
+POS: 310 
+NEG: 352 
+ACCUR: 46.8277945619 

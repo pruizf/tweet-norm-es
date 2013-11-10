@@ -64,14 +64,14 @@ class Prepro:
                     if str(rule[0][0:2]) in ["MA", "ma"]:
                         corr = match.group(0)
                         applied = True
-                        lgr.debug("> OOV: |%s| Matched Rgx (gr0) Safetoken |%s| Gives |%s| ~ [Rule %s]" %\
+                        lgr.debug("ST OOV |%s| Matched Rgx (gr0) Safetoken |%s| Gives |%s| ~ [Rule %s]" %\
                                   (oov, match.group(0), rule[2], rule[0]))
                     #TODO: add a third type: ^SU, where you re.sub??
                     else:
                         #safe[2] is correct
                         corr = rule[2]
                         applied = True
-                        lgr.debug("> OOV: |%s| Matched Rgx (gr0) Safetoken |%s| Gives |%s| ~ [Rule %s]" %\
+                        lgr.debug("ST OOV |%s| Matched Rgx (gr0) Safetoken |%s| Gives |%s| ~ [Rule %s]" %\
                                   (oov, match.group(0), rule[2], rule[0]))    
             # token-type rules
             else:
@@ -85,7 +85,7 @@ class Prepro:
                 else:
                     corr = oov
                     applied = True
-                    lgr.debug("> OOV: |%s| Matched Str Safetoken ~ |%s| ~ [Rule %s]" % \
+                    lgr.debug("ST OOV |%s| Matched Str Safetoken ~ |%s| ~ [Rule %s]" % \
                               (oov, match.group(0), rule[0]))
         return (corr, applied)
 
@@ -104,7 +104,6 @@ class Prepro:
 
     def find_rematch(self, oov, rules):
         # mbe should take the safe dico as argument
-        # or group it all into a class, so that can have self.X() access to it <- lks cleanest
         """Check OOV against regexes. Rules are from a utf8 file
            utf8 decoded and so are dico contents, so can run as-is """
         # apply rules sequentially and recursively
@@ -122,7 +121,6 @@ class Prepro:
                 if not corr_before in self.doubledchar_dico:
                     lgr.debug("RE Ph1, Initial: [%s], Before: [%s], After: [%s] || Rule [%s]: [%s]" % \
                                   (oov, corr_before, corr, rule[0], repr([rule[1].pattern, rule[2]])))
-                    # here could prevent the 'leer' -> 'ler' case checking against doubledchar_dico
                     applied = True
                 else:
                     # revert rule application
@@ -141,10 +139,10 @@ class Prepro:
                     corr = re.sub(rule[1], rule[2], corr)
                     if corr != corr_before:
                         applied = True
-                        lgr.debug("Ph2, Initial: [%s], Ph1: [%s], Before: [%s], After: [%s] || Rule [%s]: [%s]" % \
+                        lgr.debug("RE Ph2, Initial: [%s], Ph1: [%s], Before: [%s], After: [%s] || Rule [%s]: [%s]" % \
                                       (oov, ph1corr, corr_before, corr, rule[0], repr([rule[1].pattern, rule[2]])))
                 else:
-                    lgr.debug("Ph2 NOT applying to |%s| , |%s|: is in doubledchar_dico" % (ph1corr, corr_before))
+                    lgr.debug("RE Ph2 NOT applying to |%s| , |%s|: is in doubledchar_dico" % (ph1corr, corr_before))
         return (corr, applied)
 
     def set_doubledchar_dico(self, dc):

@@ -15,7 +15,8 @@ import subprocess
 import sys
 import time
 
-import profile
+
+#import profile
 
 # app-specific imports =========================================================
 
@@ -59,37 +60,11 @@ def set_option_parser():
     args = parser.parse_args()
     return args
 
-def write_out(corr_dico):
-    with codecs.open(tc.id_order, "r", "utf8") as idor:
-        orderlist = [idn.strip() for idn in idor.readlines()]    
-    with codecs.open(tc.OUTFN.format(prep.find_run_id()), "w", "utf8") as outfh:
-        for tid in orderlist:
-            if tid in corr_dico:
-                outfh.write("%s\n" % tid)
-                for oov_corr in corr_dico[tid]:
-                    outfh.write("\t%s\t%s\n" % (oov_corr[0], oov_corr[1]))
-
-def write_to_cumulog(clargs=None):
-    inf = {}
-    inf["run_id"] = prep.find_run_id()
-    inf["revnum"] = prep.find_git_revnum()
-    if clargs.comment is not None and clargs.comment != "":
-        inf["run_comment"] = clargs.comment
-    else:
-        inf["run_comment"] = tc.COMMENT
-    outhead = "Run ID [{0}], RevNum [{1}] {2}\n".format(inf["run_id"], inf["revnum"], "="*50)
-    with codecs.open(tc.EVALFN.format(prep.find_run_id()), "r", "utf8") as done_res:
-        with codecs.open(tc.CUMULOG, "a", "utf8") as cumu_res:
-            cumu_res.write(outhead)
-            cumu_res.write("RunComment: {}\n".format(inf["run_comment"]))
-            cumu_res.write("".join(done_res.readlines()[-4:]))
-
 def preliminary_preps():
     """Set up logger and read command line arguments"""
     # logger
     logfile_name = os.path.join(tc.LOGDIR, "run_%s.log" % prep.find_run_id())
     lgr, lfh = prep.set_log(__name__, logfile_name, False)
-
     # cl options
     clargs = set_option_parser()
     if clargs is not None and clargs.tag:
@@ -172,12 +147,10 @@ def parse_tweets(textdico):
     all_tweeto = {}
     outdico = {}
     for tid in textdico:
-        # prep =================================================================
-        lgr.info("# Start [%s] #" % tid)
-        # dico for final outputs
+        # get Freeling-tags
         if "%s.tags" % tid not in os.listdir(tc.TAGSDIR):
             lgr.error("Missing tags for %s" % tid)
-        # create tweet objs ====================================================
+        # create tweet objs
         all_tweeto[tid] = Tweet(tid, textdico[tid])
         tweet = all_tweeto[tid]
         # add OOVs if applies
@@ -186,13 +159,7 @@ def parse_tweets(textdico):
             tweet.set_ref_OOVs(ref_OOVs[tid])
             tweet.find_toks_and_OOVs()
             tweet.cf_OOVs_found_vs_ref()
-                # Q: This (below) was set as set_par_corr(tweet.toks)
-                #    *Bad idea*, cos this creates identity of reference
-                #    between tweet.toks and tweet.par_corr (just a new label for same ref)
-                #    and then when altering tweet.par_corr (below) i was altering
-                #    tweet.toks unwittingly.
-                #    Since the *list contains objects*, use deepcopy
-            # Copy the token-list so that .toks is not altered when altering .par_corr
+            # Deepcopy token-objects to not change them when changing .par_corr
             tweet.set_par_corr(copy.deepcopy(tweet.toks))
             all_tweets.append(tweet) #debug
         outdico[tid] = []
@@ -203,126 +170,87 @@ def get_baseline_results(all_tweeto):
     for tid in all_tweeto:
         baseline_dico[tid] = []
         for tok in tweet.toks:
-            # better than tok.isOOV cos no ref. vs. found err w isinstance
+            # better than tok.isOOV, to keep ref. and found apart)
             if isinstance(tok, OOV):
                 baseline_dico[tid].append((tok.form, tok.form))
     return baseline_dico
 
-def preprocess(all_tweeto):
+def preprocess(oov):
     global lgr
-    for tid in all_tweeto:
-        tweet = all_tweeto[tid]
-        logmes = {"st":0, "re":0, "ab":0}
-        for tok in tweet.toks:
-            if not isinstance(tok, OOV):
-                continue
-            oov = tok # oov label easier            
-            if logmes["st"] == 0:
-                lgr.debug("# Safetokens #")
-                logmes["st"] = 1
-            # Safetokens -------------------------------------------------------
-            #if tid == u'319028060852740099':
-            #    import pdb
-            #    pdb.set_trace()
-            safecorr = ppro.find_safetoken(oov.form, safe_rules)
-            # TODO: instead of these tuples, can i add attributes so that i can access
-            #       whether safecorr applied by attribute, not by an index the existence of which
-            #       i'll forget in a couple days?
-            if safecorr is not False and safecorr[1] is True:
-                oov.set_safecorr(safecorr[0])
-                tweet.set_par_corr(safecorr[0], posi=oov.posi)
-            # Regexes ----------------------------------------------------------
-            if logmes["re"] == 0:
-                lgr.debug("# Regexes #")
-                logmes["re"] = 1
-              # only if not safecorr for token
-            if oov.safecorr is None:
-                recorr = ppro.find_rematch(oov.form, rerules)
-                if recorr[1] is True:
-                    oov.set_recorr(recorr[0])
-            # TODO: check here if recorr is IV, if so, see if accept or what
-            #       or, at least, see if the form to base edit-candidates on
-            #       should be the regex-preprocessed one (likely, since regexes
-            #       remove v. unlikely sequences), or the original oov.
-            #       Likely the regex-preprocessed, cos we're not introducing garbage
-            #       with them, rather, removing them.
-    return all_tweeto
+    global tweet
+    # Safetokens -------------------------------------------------------
+    safecorr = ppro.find_safetoken(oov.form, safe_rules)
+    # TODO: instead of these tuples, can i add attributes so that i can access
+    #       whether safecorr applied by attribute, not by a forgettable index the existence of which
+    if safecorr is not False and safecorr[1] is True:
+        oov.set_safecorr(safecorr[0])
+        tweet.set_par_corr(safecorr[0], posi=oov.posi)
+    # Regexes ----------------------------------------------------------
+      # only if not safecorr for token
+    if oov.safecorr is None:
+        recorr = ppro.find_rematch(oov.form, rerules)
+        if recorr[1] is True:
+            oov.set_recorr(recorr[0])
+    # TODO: check here if recorr is IV, if so, see if accept or what
+    #       or, at least, see if the form to base edit-candidates on
+    #       should be the regex-preprocessed one (likely, since regexes
+    #       remove v. unlikely sequences), or the original oov.
+    #       Likely the regex-preprocessed, cos we're not introducing garbage
+    #       with them, rather, removing them.
+    
 
-def create_edit_candidates(all_tweeto):
+def create_edit_candidates(oov):
     """Create and score edit-candidates obtained with regexes and with edit-distance"""
-    x = 0
-    for tid in all_tweeto:
-        tweet = all_tweeto[tid]
-        for tok in tweet.toks:
-            if not isinstance(tok, OOV):
-                continue
-            oov = tok # oov label easier            
-            re_corr_forms = {} # TODO: correct side-effects of regexes
-            if oov.safecorr is None and oov.recorr is None:
-                # Regex-based
-                #TODO: some side-effects of regexes, treat them (list-based if need be)
-                re_corr_cands = edimgr.redist(oov.form)
-                if len(re_corr_cands[0]) > 0:
-                        # recorr[1] has how many times a rule has applied to a cand, for logging
-                    for rcc in re_corr_cands[0]:
-                        recando = editor.Candidate(rcc)
-                        recando.set_dista(re_corr_cands[0][rcc])
-                        recando.set_candtype("re")
-                        oov.add_cand(recando)
-                    #print tweet.tid, oov.form, recando.form, recando.dista
-                    re_corr_forms[oov.form] = True
-                # Lev Distance based
-                #if oov.form == 'boorroh' or tid == '318742118996774913':
-                #    import pdb
-                #    pdb.set_trace()
-                if oov.form not in re_corr_forms:
-                    lev_corr_cands = edimgr.generate_candidates(oov.form)
-                    if len(lev_corr_cands) > 0:
-                        for lcc in lev_corr_cands:
-                            levcando = editor.Candidate(lcc)
-                            levcando.set_dista(edimgr.levdist(lcc, oov.form))
-                            levcando.set_candtype("lev")
-                            oov.add_cand(levcando)
-        x += 1
-        if x % 100 == 0:
-            print "Done {} tweets, {}".format(x, time.asctime(time.localtime()))
-    return all_tweeto
 
-def rank_candidates(all_tweeto):
+    re_corr_forms = {} # TODO: correct side-effects of regexes
+    if oov.safecorr is None and oov.recorr is None:
+        # Regex-based -------------------
+        #TODO: some side-effects of regexes, treat them (list-based if need be)
+        re_corr_cands = edimgr.redist(oov.form)
+        if len(re_corr_cands[0]) > 0:
+                # recorr[1] has how many times a rule has applied to a cand, for logging
+            for rcc in re_corr_cands[0]:
+                recando = editor.Candidate(rcc)
+                recando.set_dista(re_corr_cands[0][rcc])
+                recando.set_candtype("re")
+                oov.add_cand(recando)
+            re_corr_forms[oov.form] = True
+        # Lev Distance based -----------
+        if oov.form not in re_corr_forms:
+            lev_corr_cands = edimgr.generate_candidates(oov.form)
+            if len(lev_corr_cands) > 0:
+                for lcc in lev_corr_cands:
+                    levcando = editor.Candidate(lcc)
+                    levcando.set_dista(edimgr.levdist(lcc, oov.form))
+                    levcando.set_candtype("lev")
+                    oov.add_cand(levcando)
+
+def rank_candidates(oov):
     global lgr
-    for tid in all_tweeto:
-        tweet = all_tweeto[tid]
-        for tok in tweet.toks:
-            if not isinstance(tok, OOV):
-                continue
-            oov = tok # oov label easier            
-            # rank candidates
-            if oov.set_has_cands():
-            #if len(oov.cands) > 0:
-                someLMCand = False
-                for cand in oov.cands:
-                    cand_in_lm = cand.is_inLM(binslm)
-                    if cand_in_lm:
-                        lmlcon = slmmgr.find_left_context(oov.posi, [tok.form for tok in tweet.toks])
-                        lmsco = slmmgr.find_logprog_in_ctx(cand.form, lmlcon)
-                        cand.set_lmsco(lmsco)
-                        cand.set_lmctxt(lmlcon)
-                        someLMCand = True
-                        oov.set_has_LM_cands(someLMCand)
-                ranked_candos = sorted(oov.cands, key=lambda x: x.dista, reverse=True)
-                ranked_filtered = [cand for cand in ranked_candos if cand.dista >= -1.5]
-                lgr.debug("Ranked {}".format([rc.form for rc in ranked_candos]))
-                if len(ranked_filtered) > 0:
-                    oov.cands_ranked = ranked_filtered
-                    oov.bestedcando = ranked_filtered[0]
-                    lgr.debug("OOV [{}], BestEdCand [{}]".format(repr(oov.form), repr(oov.bestedcando.form)))
-                else:
-                    oov.cands_ranked = []
-                    lgr.debug("OOV [{}], No Edit Cands".format(repr(oov.form)))
-            else:
-                oov.cands_ranked = []
-                lgr.debug("OOV [{}], No Edit Cands".format(repr(oov.form)))
-    return all_tweeto
+    if oov.set_has_cands():
+        someLMCand = False
+        for cand in oov.cands:
+            cand_in_lm = cand.is_inLM(binslm)
+            if cand_in_lm:
+                lmlcon = slmmgr.find_left_context(oov.posi, [tok.form for tok in tweet.toks])
+                lmsco = slmmgr.find_logprog_in_ctx(cand.form, lmlcon)
+                cand.set_lmsco(lmsco)
+                cand.set_lmctx(lmlcon)
+                someLMCand = True
+                oov.set_has_LM_cands(someLMCand)
+        ranked_candos = sorted(oov.cands, key=lambda x: x.dista, reverse=True)
+        ranked_filtered = [cand for cand in ranked_candos if cand.dista >= -1.5]
+        lgr.debug("RegED Ranked {}".format([rc.form for rc in ranked_candos]))
+        if len(ranked_filtered) > 0:
+            oov.cands_ranked = ranked_filtered
+            oov.bestedcando = ranked_filtered[0]
+            lgr.debug("+ OOV [{}], BestEdCand [{}]".format(repr(oov.form), repr(oov.bestedcando.form)))
+        else:
+            oov.cands_ranked = []
+            lgr.debug("+ OOV [{}], No Edit Cands".format(repr(oov.form)))
+    else:
+        oov.cands_ranked = []
+        lgr.debug("+ OOV [{}], No Edit Cands".format(repr(oov.form)))
 
 def populate_outdico(all_tweeto, outdico):
     for tid in all_tweeto:
@@ -341,6 +269,31 @@ def populate_outdico(all_tweeto, outdico):
                 outdico[tid].append((oov.form, oov.form))
     return outdico
 
+def write_out(corr_dico):
+    with codecs.open(tc.id_order, "r", "utf8") as idor:
+        orderlist = [idn.strip() for idn in idor.readlines()]    
+    with codecs.open(tc.OUTFN.format(prep.find_run_id()), "w", "utf8") as outfh:
+        for tid in orderlist:
+            if tid in corr_dico:
+                outfh.write("%s\n" % tid)
+                for oov_corr in corr_dico[tid]:
+                    outfh.write("\t%s\t%s\n" % (oov_corr[0], oov_corr[1]))
+
+def write_to_cumulog(clargs=None):
+    inf = {}
+    inf["run_id"] = prep.find_run_id()
+    inf["revnum"] = prep.find_git_revnum()
+    if clargs.comment is not None and clargs.comment != "":
+        inf["run_comment"] = clargs.comment
+    else:
+        inf["run_comment"] = tc.COMMENT
+    outhead = "Run ID [{0}], RevNum [{1}] {2}\n".format(inf["run_id"], inf["revnum"], "="*50)
+    with codecs.open(tc.EVALFN.format(prep.find_run_id()), "r", "utf8") as done_res:
+        with codecs.open(tc.CUMULOG, "a", "utf8") as cumu_res:
+            cumu_res.write(outhead)
+            cumu_res.write("RunComment: {}\n".format(inf["run_comment"]))
+            cumu_res.write("".join(done_res.readlines()[-4:]))
+
     
 # MAIN =========================================================================
 
@@ -352,7 +305,7 @@ def main():
     global all_tweets # debug
     global safe_rules # debug
     global rerules
-    global ppro # debug
+    global ppro
     global edimgr
     global lgr
     all_tweets = [] # debug
@@ -364,32 +317,41 @@ def main():
     print "Start {}".format(time.asctime(time.localtime()))
     print "Run ID: %s" % prep.find_run_id()
     lgr.info("Run {0} START | Rev [{1}] {2}".format(tc.RUNID, prep.find_git_revnum(), "="*60))
-      # prelim
+
     print "= main: preliminary preps"
     id_order = prep.find_id_order()
     ref_OOVs = prep.find_ref_OOVs(tc.ANNOTS)
     textdico = prep.grab_texts(tc.TEXTS)
-      # freeling
+
     call_freeling(textdico)
-      # instantiate analyzers
+
     print "= main: load analyzers"
     safe_rules, rerules = load_preprocessing()
     edimgr = load_distance_editor()
     slmmgr, binslm = load_lm()
-      # create tweet objs
+
     print "= twittero: creating Tweet instances"
     all_tweeto, outdico = parse_tweets(textdico)
-      # populate baseline dico
+
     print "= main: create baseline"
     baseline_dico = get_baseline_results(all_tweeto)
-      # TWEET NORMALIZATION
-    print "= preprocessing"
-    all_tweeto = preprocess(all_tweeto)
-    print "= editor"
-    all_tweeto = create_edit_candidates(all_tweeto)
-    print "= ranking"
-    all_tweeto = rank_candidates(all_tweeto)                
-      # prepare for output
+
+    print "= main: NORMALIZATION"
+    x = 0 
+    for tid in all_tweeto:
+        lgr.debug("NORMALIZING, TID [{}]".format(tid))
+        tweet = all_tweeto[tid]
+        for tok in tweet.toks:
+            if not isinstance(tok, OOV):
+                continue
+            oov = tok # easier label
+            preprocess(oov)
+            create_edit_candidates(oov)
+            rank_candidates(oov)
+        x += 1
+        if x % 100 == 0:
+            print("Done {} tweets, {}".format(x, time.asctime(time.localtime())))
+
     outdico = populate_outdico(all_tweeto, outdico)
 
     # write-out ----------------------------------------------------------------
@@ -401,7 +363,7 @@ def main():
         chosen_outdico = outdico
     write_out(chosen_outdico)
 
-    # write eval ---------------------------------------------------------------
+    # evaluation ---------------------------------------------------------------
     print "= evaluation"
     lgr.info("Running evaluation")
     neval.main(tc.ANNOTS, tc.OUTFN.format(prep.find_run_id()))

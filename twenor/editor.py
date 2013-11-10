@@ -127,7 +127,7 @@ class Candidate:
         self.candtype = typ
     def set_lmsco(self, sco):
         self.lmsco = sco
-    def set_lmctxt(self, ctx):
+    def set_lmctx(self, ctx):
         self.lmctx = ctx
     def set_inLM(self):
         self.inLM = self.is_inLM(self, binlm)
@@ -208,7 +208,7 @@ class EdManager:
         for cand in result.keys():
             if cand not in self.ivdico:
                 del result[cand]
-        lgr.debug(repr({"result": result, "apptimes": apptimes}))        
+        lgr.debug("RED RES {}, APPT {}".format(repr(result), repr(apptimes)))
         return (result, {"apptimes" : apptimes})
     
     def edits1(self, word):
@@ -224,12 +224,12 @@ class EdManager:
     def generate_candidates(self, word):
         """Generate candidates at Lev distance 2 based on distance 1 edits,
            and return only those in known-words dictionary. Based on Norvig."""
-        lgr.debug("OOV [%s]" % word)
+        lgr.debug("# OOV [%s], Candidate Generation" % word)
         known2 = set([e2 for e1 in self.edits1(word) for e2 in self.edits1(e1)
                   if e2 in self.ivdico])
         cands = self.known(self.edits1(word)).union(known2)
         cands = [cand.decode("utf8") if type(cand) is str else cand for cand in cands]
-        lgr.debug("Candset %s" % repr(sorted(list(known2))))
+        lgr.debug("DisED Candset %s" % repr(sorted(list(known2))))
         return cands
 
     def known(self, words):

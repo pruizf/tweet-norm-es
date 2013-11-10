@@ -58,8 +58,8 @@ class Tweet:
                 if tok.isOOV:
                     # create OOV instance only if in reference annotations
                     if tok.form not in self.ref_OOVs:
-                        lgr.warn("Skipping found OOV [{}], posi [{}], TID [{}], reason [Not in Ref]".format(
-                            repr(tok.form), idx, self.tid))
+                        lgr.warn("TID [{}]: Skipping found OOV [{}], posi [{}], reason [Not in Ref]".format(
+                            self.tid, repr(tok.form), idx))
                         continue
                     self.toks[idx] = OOV(tok.form)
                     self.toks[idx].set_lemma(tok.lemma)
