@@ -420,6 +420,7 @@ def write_to_cumulog(clargs=None):
     try:
         inf["revnum"] = prep.find_git_revnum()
     except OSError:
+        print "- Can't get git revision number (OSError)"
         inf["revnum"] = "XXXXX"
     if clargs.comment is not None and clargs.comment != "":
         inf["run_comment"] = clargs.comment
