@@ -280,19 +280,26 @@ def cand_scorer(orca, scoretype="cand"):
 
 def rank_candidates(oov):
     global lgr
+    oov.best = None
     if oov.lmsco is not None:
         oov.wlmsco = cand_scorer(oov, scoretype="oov")
     if oov.has_cands:
         for cand in oov.cands:
             cand.dislmsco = cand_scorer(cand)
-        # >= cos negative distances
+        # use >=, since using negative distances
         oov.cands_filtered = [cand for cand in oov.cands
                               if cand.dista >= tc.maxdista
                               and cand.form != oov.form
                               and cand.lmsco is not None]
-        oov.ed_filtered_ranked = sorted(oov.cands_filtered, key=lambda x: x.dislmsco, reverse=True)
+        oov.ed_filtered_ranked = sorted(oov.cands_filtered,
+                                        key=lambda x: x.dislmsco, reverse=True)
         lgr.debug("FltED Ranked {}".format([rc.form for rc in oov.ed_filtered_ranked]))
         if len(oov.ed_filtered_ranked) > 0:
+            if oov.lmsco >= oov.ed_filtered_ranked[0].lmsco:
+                oov.best = oov
+                lgr.debug("O [{}], LM {} >> Cmax [{}], LM {}, Keeping OOV, Reason [LM]".format(
+                    repr(oov.form), oov.lmsco, repr(oov.ed_filtered_ranked[0].form),
+                    oov.ed_filtered_ranked[0].lmsco))                                                           
             for cand in oov.ed_filtered_ranked:
                 lgr.debug("O [{0}], C [{1}], ED {2}| LM {3}| T {4}".format(
                     string.ljust(repr(oov.form), 15),
@@ -300,9 +307,11 @@ def rank_candidates(oov):
                     string.rjust(str(cand.dista), 4),
                     string.rjust(str(cand.lmsco), 15),
                     string.rjust(str(cand.dislmsco), 15)))
-            oov.best_ed_cando = oov.ed_filtered_ranked[0]
-            lgr.debug("+ OOV [{}], BestEdCand [{}], {}".format(
-                repr(oov.form), repr(oov.best_ed_cando.form), repr(oov.best_ed_cando.dislmsco)))
+            if oov.best is None:
+                #TODO: redo in more natural conditions (ranking and oov.best use or not ...)
+                oov.best_ed_cando = oov.ed_filtered_ranked[0]
+                lgr.debug("+ OOV [{}], BestEdCand [{}], {}".format(
+                    repr(oov.form), repr(oov.best_ed_cando.form), repr(oov.best_ed_cando.dislmsco)))
         else:
             oov.ed_filtered_ranked = []
             lgr.debug("+ OOV [{}], No Edit Cands, Reason: [Filtering]".format(repr(oov.form)))
@@ -321,8 +330,12 @@ def populate_outdico(all_tweeto, outdico):
                 outdico[tid].append((oov.form, oov.safecorr))
             elif oov.recorr is not None:
                 outdico[tid].append((oov.form, oov.recorr))
+            # choose best edit candidate if its LM score worse than OOV's
             elif len(oov.ed_filtered_ranked) > 0:
-                outdico[tid].append((oov.form, oov.best_ed_cando.form))
+                if oov.best: # way to express that oov's LM score better than scor for any candidate
+                    outdico[tid].append((oov.form, oov.form))
+                else:
+                    outdico[tid].append((oov.form, oov.best_ed_cando.form))                    
             else:
                 outdico[tid].append((oov.form, oov.form))
     return outdico
