@@ -105,7 +105,10 @@ def load_preprocessing():
     ppro = ppr.Prepro()
     safe_rules = ppro.load_safetokens()
     rerules = ppro.load_regexes()
+
     global dc_dico
+    global ivs
+
     if "dc_dico" not in dir(sys.modules["__main__"]):
         print "= prepro: Doubled-char dico, {}".format((time.asctime(time.localtime())))
         dc_dico = ppro.create_doubledchar_dico()
@@ -114,12 +117,22 @@ def load_preprocessing():
         print "= prepro: Skip creating doubled-char dico"
     #Q: need to set here cos recreating ppro above?
     ppro.set_doubledchar_dico(dc_dico)
+
+    # don't recreate IV dico if in dir for this module
+    if "ivs" not in dir(sys.modules["__main__"]):
+        print "= prepro: Hashing IV dico, {}".format(time.asctime(time.localtime()))
+        ivs = ppro.generate_known_words()
+        print "Done {}".format(time.asctime(time.localtime()))
+    else:
+        print "= editor: Skip creating IV dico"
+    #Q: need to set here cos recreating ppro above?
+    ppro.set_ivdico(ivs)
     return ppro, safe_rules, rerules
 
 def load_distance_editor():
     """Instantiate EdScoreMatrix and EdManager instances, returning the latter"""
     global lev_score_mat_hash #debug
-    global ivs #debug
+    global ivs
 
     # prepare cost-matrix first cos EdManager needs it for initiation
     lev_score_mat = editor.EdScoreMatrix(edcosts)
@@ -127,16 +140,7 @@ def load_distance_editor():
     lev_score_mat.find_matrix_stats()
     lev_score_mat_hash = lev_score_mat.create_matrix_hash()
     # can initiate EdManager now
-    edimgr = editor.EdManager(lev_score_mat_hash, tc.IVDICO)
-    # don't recreate IV dico if in dir for this module
-    if "ivs" not in dir(sys.modules["__main__"]):
-        print "= editor: Hashing IV dico, {}".format(time.asctime(time.localtime()))
-        ivs = edimgr.generate_and_set_known_words()
-        print "Done {}".format(time.asctime(time.localtime()))
-    else:
-        print "= editor: Skip creating IV dico"
-    #Q: need to set here cos recreating edi above?
-    edimgr.set_ivdico(ivs)
+    edimgr = editor.EdManager(lev_score_mat_hash, ivs)
     edimgr.prep_alphabet()
     return edimgr
 
@@ -195,7 +199,7 @@ def preprocess(oov):
     # Safetokens -------------------------------------------------------
     safecorr = ppro.find_safetoken(oov.form, safe_rules)
     # TODO: instead of these tuples, can i add attributes so that i can access
-    #       whether safecorr applied by attribute, not by a forgettable index the existence of which
+    #       whether safecorr applied by attribute, not by a forgettable index
     if safecorr is not False and safecorr[1] is True:
         oov.set_safecorr(safecorr[0])
         tweet.set_par_corr(safecorr[0], posi=oov.posi)
@@ -329,6 +333,8 @@ def populate_outdico(all_tweeto, outdico):
             if oov.safecorr is not None:
                 outdico[tid].append((oov.form, oov.safecorr))
             elif oov.recorr is not None:
+                # TODO: Need to assess this output. Some re-based corrections are worse than
+                #       the original
                 outdico[tid].append((oov.form, oov.recorr))
             # choose best edit candidate if its LM score worse than OOV's
             elif len(oov.ed_filtered_ranked) > 0:

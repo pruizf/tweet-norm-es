@@ -23,6 +23,7 @@ class Prepro:
     
     blanklines = tc.BLANKLINES_RE
     doubledchar_dico = None
+    ivdico = None
 
     def create_doubledchar_dico(self):
         """Create a dico with IV words that contained doubled characters"""
@@ -33,6 +34,15 @@ class Prepro:
             doubledchar_dico[line.rstrip()] #unicodes utf8-decoded
         self.set_doubledchar_dico(doubledchar_dico)
         return doubledchar_dico
+
+    def generate_known_words(self, ivdico_f=tc.IVDICO):
+        """Hash dico of known words. Input file is utf8 to be opened with codecs
+           Generates hash with IV words, and sets instance to it."""
+        ivdico = defaultdict(lambda: 1)
+        for line in codecs.open(ivdico_f, "r", "utf-8"):
+            ivdico[line.rstrip()]
+        self.set_ivdico(ivdico)
+        return ivdico
     
     def load_safetokens(self, infile=tc.SAFETOKENS):
         """Parse safelist tokens, that can be promoted as-is to output"""
@@ -104,7 +114,7 @@ class Prepro:
 
     def find_rematch(self, oov, rules):
         # mbe should take the safe dico as argument
-        """Check OOV against regexes. Rules are from a utf8 file
+        """Check OOV's form <oov> against regexes. Rules are from a utf8 file
            utf8 decoded and so are dico contents, so can run as-is """
         # apply rules sequentially and recursively
         applied = False
@@ -118,6 +128,8 @@ class Prepro:
                 # rather than doubledchar_dico maybe the choice should be:
                 # if corr_before IV and corr not IV, take corr_before
                 # requires accessing the IV dico from here
+                # TODO: consider checking RE output against an EN IV dico,
+                #       Would avoid overcorrection like "Shopping" > "Shoping"
                 if not corr_before in self.doubledchar_dico:
                     lgr.debug("RE Ph1, Initial: [%s], Before: [%s], After: [%s] || Rule [%s]: [%s]" % \
                                   (oov, corr_before, corr, rule[0], repr([rule[1].pattern, rule[2]])))
@@ -143,9 +155,15 @@ class Prepro:
                                       (oov, ph1corr, corr_before, corr, rule[0], repr([rule[1].pattern, rule[2]])))
                 else:
                     lgr.debug("RE Ph2 NOT applying to |%s| , |%s|: is in doubledchar_dico" % (ph1corr, corr_before))
+        if applied:
+            lgr.debug("RE Out, OOV |{}|, recorr |{}| [RE_Changed]".format(repr(oov), repr(corr)))
+        else:
+            lgr.debug("RE Out, OOV |{}|, recorr |{}| [RE_Unchanged]".format(repr(oov), repr(corr)))
         return (corr, applied)
 
     def set_doubledchar_dico(self, dc):
         self.doubledchar_dico = dc
         
+    def set_ivdico(self, ivdico):
+        self.ivdico = ivdico
 

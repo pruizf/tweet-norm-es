@@ -132,12 +132,11 @@ class EdManager:
        the term and the candidate. Requires info about correction weights (arg cws)
        and an IV dictionary (ivdico)"""
 
-    def __init__(self, editcosts, ivdicof):
+    def __init__(self, editcosts, ivdico):
         self.editcosts = editcosts
-        self.ivdicof = ivdicof
+        self.ivdico = ivdico
 
     alphabet = None
-    ivdico = None
 
     def prep_alphabet(self, alphabet=tc.alphabet):
         """ """ 
@@ -147,15 +146,15 @@ class EdManager:
         alphabet_all.extend([a.decode("utf-8") for a in alphabet[1]])
         self.alphabet = alphabet_all
 
-    def generate_and_set_known_words(self, ivdico_f=None):
-        """Hash dico of known words. Input file is utf8 to be opened with codecs"""
-        if ivdico_f is None:
-            ivdico_f = self.ivdicof
-        ivdico = defaultdict(lambda: 1)
-        for line in codecs.open(ivdico_f, "r", "utf-8"):
-            ivdico[line.rstrip()]
-        self.set_ivdico(ivdico)
-        return ivdico
+##    def generate_and_set_known_words(self, ivdico_f=None):
+##        """Hash dico of known words. Input file is utf8 to be opened with codecs"""
+##        if ivdico_f is None:
+##            ivdico_f = self.ivdicof
+##        ivdico = defaultdict(lambda: 1)
+##        for line in codecs.open(ivdico_f, "r", "utf-8"):
+##            ivdico[line.rstrip()]
+##        self.set_ivdico(ivdico)
+##        return ivdico
 
     def redist(self, oov):
         """Regex-based distance. If OOV matches certain contexts, some candidates
@@ -280,4 +279,5 @@ class EdManager:
         return 0 - d[lenstr1-1,lenstr2-1]
 
     def set_ivdico(self, ivdico):
+        """# TODO: Not coherent cos using ivdico for initiation"""
         self.ivdico = ivdico
