@@ -20,6 +20,7 @@ if not os.path.join(os.path.join(parentdir, "scripts")) in sys.path:
 
 import tnconfig as tc
 import preparation as prep
+import editor as editest
 
 #import kenlm
 #if "klm" not in sys.modules["__main__"]:

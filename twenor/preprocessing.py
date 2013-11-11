@@ -97,7 +97,8 @@ class Prepro:
                     applied = True
                     lgr.debug("ST OOV |%s| Matched Str Safetoken ~ |%s| ~ [Rule %s]" % \
                               (oov, match.group(0), rule[0]))
-        return (corr, applied)
+        #return (corr, applied)
+        return {"corr": corr, "applied": applied}
 
     def load_regexes(self, infile=tc.REGPREPRO):
         """Load regexes that will be used to correct OOVs
@@ -128,7 +129,7 @@ class Prepro:
                 # rather than doubledchar_dico maybe the choice should be:
                 # if corr_before IV and corr not IV, take corr_before
                 # requires accessing the IV dico from here
-                # TODO: consider checking RE output against an EN IV dico,
+                # TODO: consider checking RE output against an EN IV dico (or entity dico)
                 #       Would avoid overcorrection like "Shopping" > "Shoping"
                 if not corr_before in self.doubledchar_dico:
                     lgr.debug("RE Ph1, Initial: [%s], Before: [%s], After: [%s] || Rule [%s]: [%s]" % \
@@ -156,10 +157,19 @@ class Prepro:
                 else:
                     lgr.debug("RE Ph2 NOT applying to |%s| , |%s|: is in doubledchar_dico" % (ph1corr, corr_before))
         if applied:
-            lgr.debug("RE Out, OOV |{}|, recorr |{}| [RE_Changed]".format(repr(oov), repr(corr)))
+            if corr in self.ivdico:
+                IVflag = True
+            else:
+                IVflag = False
+            lgr.debug("RE Out, OOV |{}|, recorr |{}| , IVFlag |{}|, [RE_Changed]".format(
+                repr(oov), repr(corr), IVflag))
         else:
+            IVflag = None
             lgr.debug("RE Out, OOV |{}|, recorr |{}| [RE_Unchanged]".format(repr(oov), repr(corr)))
-        return (corr, applied)
+            
+        #return (corr, applied)
+        return {"corr": corr, "applied": applied, "IVflag": IVflag}
+                      
 
     def set_doubledchar_dico(self, dc):
         self.doubledchar_dico = dc

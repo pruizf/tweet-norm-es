@@ -192,3 +192,153 @@ ERR: 0
 POS: 333 
 NEG: 329 
 ACCUR: 50.3021148036 
+Run ID [471], RevNum [80bb6e0] ==================================================
+RunComment: Main split, norm at oov level, LM scores not yet in ranking
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+ERR: 0 
+POS: 253 
+NEG: 409 
+ACCUR: 38.2175226586 
+Run ID [477], RevNum [80bb6e0] ==================================================
+RunComment: Main split, norm at oov level, LM scores not yet in ranking
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+ERR: 0 
+POS: 334 
+NEG: 328 
+ACCUR: 50.4531722054 
+Run ID [478], RevNum [XXXXX] ==================================================
+RunComment: Main split, norm at oov level, LM scores not yet in ranking
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+ERR: 0 
+POS: 334 
+NEG: 328 
+ACCUR: 50.4531722054 
+Run ID [480], RevNum [XXXXX] ==================================================
+RunComment: Main split, norm at oov level, LM scores not yet in ranking
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+ERR: 45 
+POS: 325 
+NEG: 259 
+ACCUR: 49.0936555891 
+Run ID [482], RevNum [XXXXX] ==================================================
+RunComment: Main split, norm at oov level, LM scores not yet in ranking
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+ERR: 45 
+POS: 325 
+NEG: 259 
+ACCUR: 49.0936555891 
+Run ID [484], RevNum [XXXXX] ==================================================
+RunComment: Main split, norm at oov level, LM scores not yet in ranking
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+ERR: 0 
+POS: 334 
+NEG: 328 
+ACCUR: 50.4531722054 
+Run ID [486], RevNum [XXXXX] ==================================================
+RunComment: Main split, norm at oov level, LM scores not yet in ranking
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+ERR: 95 
+POS: 155 
+NEG: 114 
+ACCUR: 23.413897281 
+Run ID [488], RevNum [XXXXX] ==================================================
+RunComment: Main split, norm at oov level, LM scores not yet in ranking
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+ERR: 0 
+POS: 340 
+NEG: 322 
+ACCUR: 51.3595166163 
+Run ID [490], RevNum [XXXXX] ==================================================
+RunComment: Testing getting context from tweet with partial correction
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+ERR: 0 
+POS: 341 
+NEG: 321 
+ACCUR: 51.5105740181 
+Run ID [492], RevNum [XXXXX] ==================================================
+RunComment: Testing getting context from tweet with partial correction and window of 4
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+ERR: 0 
+POS: 341 
+NEG: 321 
+ACCUR: 51.5105740181 
+Run ID [499], RevNum [XXXXX] ==================================================
+RunComment: Testing getting context from tweet with MORE partial correction and window of 4
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+ERR: 0 
+POS: 342 
+NEG: 320 
+ACCUR: 51.6616314199 
+Run ID [501], RevNum [XXXXX] ==================================================
+RunComment: Testing getting context from tweet with MORE partial correction and window of 4
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+ERR: 0 
+POS: 342 
+NEG: 320 
+ACCUR: 51.6616314199 
+Run ID [504], RevNum [XXXXX] ==================================================
+RunComment: Testing getting context from tweet with MORE partial correction and window of 4
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+ERR: 0 
+POS: 342 
+NEG: 320 
+ACCUR: 51.6616314199 
+Run ID [506], RevNum [XXXXX] ==================================================
+RunComment: Testing getting context from tweet with MORE partial correction and window of 4
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+ERR: 0 
+POS: 342 
+NEG: 320 
+ACCUR: 51.6616314199 
+Run ID [515], RevNum [XXXXX] ==================================================
+RunComment: Testing getting context from tweet with MORE partial correction and window of 4
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+ERR: 0 
+POS: 342 
+NEG: 320 
+ACCUR: 51.6616314199 

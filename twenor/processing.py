@@ -16,9 +16,9 @@ import subprocess
 import sys
 import time
 
-# app-specific imports =========================================================
+# setup  =========================================================
 
-# set PYTHONPATH
+# PYTHONPATH
 curdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 if not curdir in sys.path:
     sys.path.append(curdir)
@@ -30,7 +30,7 @@ if not os.path.join(os.path.join(parentdir, "data")) in sys.path:
 if not os.path.join(os.path.join(parentdir, "scripts")) in sys.path:
     sys.path.append(os.path.join(parentdir, "scripts"))
 
-
+# app-specific imports
 if "tc" in dir(): reload(tc)
 if "prep" in dir(): reload(prep)
 if "fl" in dir(): reload(fl)
@@ -102,13 +102,12 @@ def call_freeling(textdico):
 def load_preprocessing():
     """Return Rule-sets for safe-tokens, regex-based prepro and abbreviations
        TODO: abbreviations"""
-    ppro = ppr.Prepro()
-    safe_rules = ppro.load_safetokens()
-    rerules = ppro.load_regexes()
-
     global dc_dico
     global ivs
 
+    ppro = ppr.Prepro()
+    safe_rules = ppro.load_safetokens()
+    rerules = ppro.load_regexes()
     if "dc_dico" not in dir(sys.modules["__main__"]):
         print "= prepro: Doubled-char dico, {}".format((time.asctime(time.localtime())))
         dc_dico = ppro.create_doubledchar_dico()
@@ -177,6 +176,10 @@ def parse_tweets(textdico):
             tweet.cf_OOVs_found_vs_ref()
             # Deepcopy token-objects to not change them when changing .par_corr
             tweet.set_par_corr(copy.deepcopy(tweet.toks))
+            if type(tweet.par_corr) is not list:
+                print "!! par_corr not list"
+                import pdb
+                pdb.set_trace()
             all_tweets.append(tweet) #debug
         outdico[tid] = []
     return all_tweeto, outdico
@@ -200,56 +203,68 @@ def preprocess(oov):
     safecorr = ppro.find_safetoken(oov.form, safe_rules)
     # TODO: instead of these tuples, can i add attributes so that i can access
     #       whether safecorr applied by attribute, not by a forgettable index
-    if safecorr is not False and safecorr[1] is True:
-        oov.set_safecorr(safecorr[0])
-        tweet.set_par_corr(safecorr[0], posi=oov.posi)
+    if safecorr is not False and safecorr["applied"] is True:
+        oov.set_safecorr(safecorr["corr"])
+        tweet.set_par_corr(safecorr["corr"], posi=oov.posi)
     # Regexes ----------------------------------------------------------
       # only if not safecorr for token
     if oov.safecorr is None:
-        recorr = ppro.find_rematch(oov.form, rerules)
-        if recorr[1] is True:
-            oov.set_recorr(recorr[0])
-    # TODO: check here if recorr is IV, if so, see if accept or what
-    #       or, at least, see if the form to base edit-candidates on
-    #       should be the regex-preprocessed one (likely, since regexes
-    #       remove v. unlikely sequences), or the original oov.
-    #       Likely the regex-preprocessed, cos we're not introducing garbage
-    #       with them, rather, removing them.
-    
+        ppro_recorr = ppro.find_rematch(oov.form, rerules)
+        oov.set_ppro_recorr_IV(ppro_recorr["IVflag"])
+        if ppro_recorr["applied"] is True:
+            if oov.ppro_recorr_IV:
+                tweet.set_par_corr(ppro_recorr["corr"], posi=oov.posi)                
+            oov.set_ppro_recorr(ppro_recorr["corr"]) 
 
 def create_edit_candidates(oov):
     """Create and score edit-candidates obtained with regexes and with edit-distance"""
+       # TODO: correct side-effects of regexes
 
-    re_corr_forms = {} # TODO: correct side-effects of regexes
-    if oov.safecorr is None and oov.recorr is None:
+    # hash for regex-based candidates
+    rged_cand_forms = {}
+
+    # Determine form to base edit-candidates on    
+    if oov.safecorr is None:
+        if oov.ppro_recorr is None:
+            edbase = oov.form
+        else:
+            edbase = oov.ppro_recorr
+        oov.edbase = edbase
+
         # Regex-based -------------------
         #TODO: some side-effects of regexes, treat them (list-based if need be)
-        re_corr_cands = edimgr.redist(oov.form)
-        if len(re_corr_cands[0]) > 0:
-                # recorr[1] has how many times a rule has applied to a cand, for logging
-            for rcc in re_corr_cands[0]:
+        rged_corr_cands = edimgr.rgdist(edbase) #edbase, not oov.form
+        if len(rged_corr_cands["cands"]) > 0:
+            for rcc in rged_corr_cands["cands"]:
                 recando = editor.Candidate(rcc)
-                recando.set_dista(re_corr_cands[0][rcc])
+                # dista is value of hash rged_corr_cands, indexed by cand
+                recando.set_dista(rged_corr_cands["cands"][rcc])
                 recando.set_candtype("re")
                 oov.add_cand(recando)
-            re_corr_forms[oov.form] = True
+            rged_cand_forms[oov.form] = True
+
         # Lev Distance based -----------
-        if oov.form not in re_corr_forms:
-            lev_corr_cands = edimgr.generate_candidates(oov.form)
-            if len(lev_corr_cands) > 0:
-                for lcc in lev_corr_cands:
-                    if lcc == oov.form:
-                        #Q: why were there cases like this at all? (ca. 6)
-                        continue
-                    levcando = editor.Candidate(lcc)
-                    levcando.set_dista(edimgr.levdist(lcc, oov.form))
-                    levcando.set_candtype("lev")
-                    oov.add_cand(levcando)
+        lev_corr_cands = edimgr.generate_candidates(oov.edbase)
+        if len(lev_corr_cands) > 0:
+            for lcc in lev_corr_cands:
+                if lcc == oov.form:
+                    #Q: why were there cases like this at all? (ca. 6)
+                    continue
+                if lcc == oov.edbase:
+                    continue
+                # skip cand-object creation if regex-based distance exists for cand
+                if lcc in rged_cand_forms:
+                    continue
+                levcando = editor.Candidate(lcc)
+                levcando.set_dista(edimgr.levdist(lcc, oov.form))
+                levcando.set_candtype("lev")
+                oov.add_cand(levcando)
 
 def find_lm_scores(oov):
     """Compute and set LM logprobs for <oov>'s candidates, and also for oov.form itself"""
     global lgr
-    lmlcon = slmmgr.find_left_context(oov.posi, [tok.form for tok in tweet.toks])
+    #lmlcon = slmmgr.find_left_context(oov.posi, [tok.form for tok in tweet.toks])
+    lmlcon = slmmgr.find_left_context(oov.posi, [tok.form for tok in tweet.par_corr])
     if oov.set_has_cands():
         someLMCand = False
         for cand in oov.cands:
@@ -285,8 +300,23 @@ def cand_scorer(orca, scoretype="cand"):
 def rank_candidates(oov):
     global lgr
     oov.best = None
+    
     if oov.lmsco is not None:
         oov.wlmsco = cand_scorer(oov, scoretype="oov")
+
+    # TODO: begins to be crap
+    if oov.edbase is not None:
+        if slmmgr.check_is_inLM(oov.edbase):
+            edbase_lcon = slmmgr.find_left_context(oov.posi, [tok.form for tok in tweet.toks])
+            oov.edbase_lmsco = slmmgr.find_logprog_in_ctx(oov.edbase, edbase_lcon)
+
+    # TODO: more examples of crap
+    use_edbase = False
+    oov.edbase_best = False
+    if oov.lmsco <= oov.edbase_lmsco:
+        use_edbase = True
+    lgr.debug("RK use_edbase is {}: edbase, LM {}| oov, LM {}, ".format(use_edbase, oov.edbase_lmsco, oov.lmsco))
+
     if oov.has_cands:
         for cand in oov.cands:
             cand.dislmsco = cand_scorer(cand)
@@ -299,11 +329,22 @@ def rank_candidates(oov):
                                         key=lambda x: x.dislmsco, reverse=True)
         lgr.debug("FltED Ranked {}".format([rc.form for rc in oov.ed_filtered_ranked]))
         if len(oov.ed_filtered_ranked) > 0:
-            if oov.lmsco >= oov.ed_filtered_ranked[0].lmsco:
-                oov.best = oov
-                lgr.debug("O [{}], LM {} >> Cmax [{}], LM {}, Keeping OOV, Reason [LM]".format(
-                    repr(oov.form), oov.lmsco, repr(oov.ed_filtered_ranked[0].form),
-                    oov.ed_filtered_ranked[0].lmsco))                                                           
+            # Compare OOV LM score and edbase lm score
+            if not use_edbase:
+                if oov.lmsco >= oov.ed_filtered_ranked[0].lmsco:
+                    oov.best = oov
+                    #Q: why is this branch never visited now?
+                    lgr.debug("O [{}], LM {} >> Cmax [{}], LM {}, Keeping OOV, Reason [LM]".format(
+                        repr(oov.form), oov.lmsco, repr(oov.ed_filtered_ranked[0].form),
+                        oov.ed_filtered_ranked[0].lmsco))
+            else:
+                if oov.edbase_lmsco >= oov.ed_filtered_ranked[0].lmsco:
+                    oov.edbase_best = True
+                    lgr.debug("O [{}], LM {} << EDBASE [{}], LM {} >> Cmax [{}], LM {}, Using Edbase, Reason [LM]".format(
+                        repr(oov.form), oov.lmsco, repr(oov.edbase), oov.edbase_lmsco,
+                        repr(oov.ed_filtered_ranked[0].form), oov.ed_filtered_ranked[0].lmsco))
+                    # partial correction
+                    tweet.set_par_corr(oov.edbase, oov.posi)
             for cand in oov.ed_filtered_ranked:
                 lgr.debug("O [{0}], C [{1}], ED {2}| LM {3}| T {4}".format(
                     string.ljust(repr(oov.form), 15),
@@ -311,11 +352,14 @@ def rank_candidates(oov):
                     string.rjust(str(cand.dista), 4),
                     string.rjust(str(cand.lmsco), 15),
                     string.rjust(str(cand.dislmsco), 15)))
-            if oov.best is None:
-                #TODO: redo in more natural conditions (ranking and oov.best use or not ...)
-                oov.best_ed_cando = oov.ed_filtered_ranked[0]
-                lgr.debug("+ OOV [{}], BestEdCand [{}], {}".format(
-                    repr(oov.form), repr(oov.best_ed_cando.form), repr(oov.best_ed_cando.dislmsco)))
+            if oov.best is None: # means some cand's lm score is better than the OOV's
+                if not oov.edbase_best:
+                    oov.best_ed_cando = oov.ed_filtered_ranked[0]
+                    lgr.debug("+ OOV [{}], BestEdCand [{}], {}".format(
+                        repr(oov.form), repr(oov.best_ed_cando.form), repr(oov.best_ed_cando.dislmsco)))
+                    # partial correction
+                    tweet.set_par_corr(oov.best_ed_cando.form, oov.posi)
+                    
         else:
             oov.ed_filtered_ranked = []
             lgr.debug("+ OOV [{}], No Edit Cands, Reason: [Filtering]".format(repr(oov.form)))
@@ -332,18 +376,32 @@ def populate_outdico(all_tweeto, outdico):
             oov = tok # oov label easier    
             if oov.safecorr is not None:
                 outdico[tid].append((oov.form, oov.safecorr))
-            elif oov.recorr is not None:
-                # TODO: Need to assess this output. Some re-based corrections are worse than
-                #       the original
-                outdico[tid].append((oov.form, oov.recorr))
-            # choose best edit candidate if its LM score worse than OOV's
-            elif len(oov.ed_filtered_ranked) > 0:
-                if oov.best: # way to express that oov's LM score better than scor for any candidate
-                    outdico[tid].append((oov.form, oov.form))
+            elif oov.ppro_recorr is not None:
+                if oov.ppro_recorr_IV:
+                    outdico[tid].append((oov.form, oov.ppro_recorr))
                 else:
-                    outdico[tid].append((oov.form, oov.best_ed_cando.form))                    
+                    #outdico[tid].append((oov.form, oov.form))
+                    if len(oov.ed_filtered_ranked) > 0:
+                        if oov.edbase_best:
+                            lgr.debug("WR Using the edbase, [{}]".format(oov.edbase))
+                            outdico[tid].append((oov.form, oov.edbase))
+                        elif oov.best: # way to express that oov's LM score better than scor for any candidate
+                            outdico[tid].append((oov.form, oov.form))
+                        else:
+                            outdico[tid].append((oov.form, oov.best_ed_cando.form))                    
+                    else:
+                        outdico[tid].append((oov.form, oov.form))
             else:
-                outdico[tid].append((oov.form, oov.form))
+                if len(oov.ed_filtered_ranked) > 0:
+                    if oov.edbase_best:
+                        outdico[tid].append((oov.form, oov.edbase))
+                    elif oov.best: # way to express that oov's LM score better than scor for any candidate
+                        outdico[tid].append((oov.form, oov.form))
+                    else:
+                        outdico[tid].append((oov.form, oov.best_ed_cando.form))                    
+                else:
+                    outdico[tid].append((oov.form, oov.form))
+              
     return outdico
 
 def write_out(corr_dico):
@@ -359,7 +417,10 @@ def write_out(corr_dico):
 def write_to_cumulog(clargs=None):
     inf = {}
     inf["run_id"] = prep.find_run_id()
-    inf["revnum"] = prep.find_git_revnum()
+    try:
+        inf["revnum"] = prep.find_git_revnum()
+    except OSError:
+        inf["revnum"] = "XXXXX"
     if clargs.comment is not None and clargs.comment != "":
         inf["run_comment"] = clargs.comment
     else:

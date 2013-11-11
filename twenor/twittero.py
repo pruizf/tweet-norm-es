@@ -97,12 +97,19 @@ class Tweet:
         self.found_OOVs = found_OOVs
 
     def set_par_corr(self, tok_or_tweet, posi=None):
-        """Set tok_or_tweet as a partially corrected version for the Tweet obj,
-           or set tok_or_tweet at par_cor's position given in kw argument posi"""
-        if posi:
+        """Set <tok_or_tweet> as a partially corrected version for the Tweet obj,
+           or set <tok_or_tweet> as tok.form at par_cor's position <posi>"""
+        if posi is not None:
             self.par_corr[posi].form = tok_or_tweet
         else:
             self.par_corr = tok_or_tweet
+        par_out = []
+        for idx, tok in enumerate(self.par_corr):
+            if idx == posi:
+                par_out.append("**{}".format(repr(tok.form)))
+            else:
+                par_out.append(tok.form)
+        lgr.debug("par_corr {}".format(repr(par_out)))
 
 class Token:
     def __init__(self, form):
@@ -130,6 +137,7 @@ class Token:
 class OOV(Token):
     def __init__(self, form):
         Token.__init__(self, form)
+        self.form = form
         # isOOV always True
         self.set_OOV_status(True)
         self.cands = {}
@@ -137,7 +145,10 @@ class OOV(Token):
         self.has_LM_cands = None
 
     safecorr = None
-    recorr = None
+    ppro_recorr = None
+    ppro_recorr_IV = True
+    edbase = None
+    edbase_lmsco = None
     lmsco = None
 
     def add_cand(self, cand):
@@ -158,8 +169,10 @@ class OOV(Token):
 
     def set_safecorr(self, corr):
         self.safecorr = corr
-    def set_recorr(self, corr):
-        self.recorr = corr
+    def set_ppro_recorr(self, corr):
+        self.ppro_recorr = corr
+    def set_ppro_recorr_IV(self, boolean):
+        self.ppro_recorr_IV = boolean
     def set_correction(self, corr):
         self.correction = corr
     def set_lmsco(self, sco):

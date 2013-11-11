@@ -146,20 +146,14 @@ class EdManager:
         alphabet_all.extend([a.decode("utf-8") for a in alphabet[1]])
         self.alphabet = alphabet_all
 
-##    def generate_and_set_known_words(self, ivdico_f=None):
-##        """Hash dico of known words. Input file is utf8 to be opened with codecs"""
-##        if ivdico_f is None:
-##            ivdico_f = self.ivdicof
-##        ivdico = defaultdict(lambda: 1)
-##        for line in codecs.open(ivdico_f, "r", "utf-8"):
-##            ivdico[line.rstrip()]
-##        self.set_ivdico(ivdico)
-##        return ivdico
-
-    def redist(self, oov):
+    def rgdist(self, oov):
         """Regex-based distance. If OOV matches certain contexts, some candidates
            need special weights. E.g. "ao$ => ado" should cost little. Calculate
-           these special weights"""
+           these special weights. 
+           Return tuple with
+               [1] hash, keys: candidates, values: distances
+               [2] hash, keys: candidates, values: times cand has been matched by a regex
+        """
         # Ordered regexes. Format: (incorrect, correct)
         # TODO: treat side effects like laa=>lada, mia=>mía, solaa=>solada
         #       any stats (even unigram freq) may get rid of it wout extra lists
@@ -204,7 +198,7 @@ class EdManager:
             elif cand == oov:
                 del result[cand]
         lgr.debug("RED RES {}, APPT {}".format(repr(result), repr(apptimes)))
-        return (result, {"apptimes" : apptimes})
+        return {"cands": result, "apptimes" : apptimes}
     
     def edits1(self, word):
         """Generate candidates at Lev distance 1. From Norvig speller."""

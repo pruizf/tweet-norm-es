@@ -4,7 +4,7 @@ import re
 import sys
 
 # BASIC ========================================================================
-COMMENT = "Main split, norm at oov level, LM scores not yet in ranking"
+COMMENT = "Testing getting context from tweet with MORE partial correction and window of 4"
 RUNID = None
 TAG = False                    # Tag with Freeling (1) or read tags from TAGSDIR (0)
 ENV = "W"                   # Work, Home, Server
@@ -13,6 +13,8 @@ if ENV == "W":
     RESDIR = "/home/pruiz/DATA/projects/Tweet-Norm/results2"
 elif ENV == "H":
     RESDIR = "/home/ps/DATA/wk/VT/projects/Tweet-Norm/results2"
+elif ENV == "S":
+    RESDIR = "/home/VICOMTECH/pruiz/results2"
 if not os.path.exists(RESDIR):
     os.makedirs(RESDIR)
 BASELINE = False
@@ -67,6 +69,9 @@ if ENV == "W":
 elif ENV == "H":
     ANACLI = "/home/ps/tools/freeling-3.0/freeling/bin/analyzer_client"
     ANA = "/home/ps/tools/freeling-3.0/freeling/bin/analyze"
+elif ENV == "S":
+    ANACLI = "/usr/local/smtdev/freeling/bin/analyzer_client"
+    ANA = "/usr/local/smtdev/freeling/bin/analyze"
 
 USERTOK = os.path.join(DATA, "es-twit-tok.dat")
 USERMAP = os.path.join(DATA, "es-twit-map.dat")
@@ -107,7 +112,7 @@ distaw = 0.7 # weight for distance scores
 
 # LANGUAGE MODELS --------------------------------------------------------------
 lmpath = APPDIR + "/data/" + "SUMATCasedLM_kenlm_es.arpa"
-lm_window = 2
+lm_window = 4
 lmw = 0.3 # weight for lm scores
 
 # EVALUATION -------------------------------------------------------------------
