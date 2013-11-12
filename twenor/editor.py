@@ -213,12 +213,11 @@ class EdManager:
     def generate_candidates(self, word):
         """Generate candidates at Lev distance 2 based on distance 1 edits,
            and return only those in known-words dictionary. Based on Norvig."""
-        lgr.debug("# OOV [%s], Candidate Generation" % word)
         known2 = set([e2 for e1 in self.edits1(word) for e2 in self.edits1(e1)
                   if e2 in self.ivdico])
         cands = self.known(self.edits1(word)).union(known2)
         cands = [cand.decode("utf8") if type(cand) is str else cand for cand in cands]
-        lgr.debug("DisED Candset %s" % repr(sorted(list(cands))))
+        lgr.debug("DisED Candset %s: %s" % (repr(word), repr(sorted(list(cands)))))
         return cands
 
     def known(self, words):

@@ -27,3 +27,35 @@
 ##        return form.dista * tc.distaw + form.lmsco * tc.lmw
 ##    if scoretype == "oov":
 ##        return form.lmsco * tc.lmw       
+
+
+
+                if tc.accept_all_IV_regex_outputs:
+                    if oov.ppro_recorr_IV:
+                        outdico[tid].append((oov.form, oov.ppro_recorr))
+                    else:
+                        outdico[tid].append((oov.form, oov.form))
+                else:
+                    # new wf
+                    if oov.ppro_recorr_IV:
+                        # oov.edbase is synonym with oov.ppro_recorr
+                        if len(oov.ed_filtered_ranked) > 0:
+                            if oov.assess_edbase:
+                                outdico[tid].append((oov.form, oov.edbase))
+                            else:
+                                outdico[tid].append((oov.form, oov.best_ed_cando.form))
+                        else:
+                            outdico[tid].append((oov.form, oov.edbase))
+                    else:
+                        if len(oov.ed_filtered_ranked) > 0:
+                            outdico[tid].append((oov.form, oov.best_ed_cando.form))
+                        else:
+                            outdico[tid].append((oov.form, oov.form))                       
+            else:
+                if len(oov.ed_filtered_ranked) > 0:
+                    if oov.keep_orig:
+                        outdico[tid].append((oov.form, oov.form))
+                    else:
+                        outdico[tid].append((oov.form, oov.best_ed_cando.form))
+                else:
+                    outdico[tid].append((oov.form, oov.form))

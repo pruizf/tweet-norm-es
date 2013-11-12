@@ -111,7 +111,7 @@ def load_preprocessing():
     if "dc_dico" not in dir(sys.modules["__main__"]):
         print "= prepro: Doubled-char dico, {}".format((time.asctime(time.localtime())))
         dc_dico = ppro.create_doubledchar_dico()
-        print "Done {}".format((time.asctime(time.localtime())))
+        print "Done {0}".format((time.asctime(time.localtime())))
     else:
         print "= prepro: Skip creating doubled-char dico"
     #Q: need to set here cos recreating ppro above?
@@ -119,9 +119,9 @@ def load_preprocessing():
 
     # don't recreate IV dico if in dir for this module
     if "ivs" not in dir(sys.modules["__main__"]):
-        print "= prepro: Hashing IV dico, {}".format(time.asctime(time.localtime()))
+        print "= prepro: Hashing IV dico, {0}".format(time.asctime(time.localtime()))
         ivs = ppro.generate_known_words()
-        print "Done {}".format(time.asctime(time.localtime()))
+        print "Done {0}".format(time.asctime(time.localtime()))
     else:
         print "= editor: Skip creating IV dico"
     #Q: need to set here cos recreating ppro above?
@@ -176,10 +176,6 @@ def parse_tweets(textdico):
             tweet.cf_OOVs_found_vs_ref()
             # Deepcopy token-objects to not change them when changing .par_corr
             tweet.set_par_corr(copy.deepcopy(tweet.toks))
-            if type(tweet.par_corr) is not list:
-                print "!! par_corr not list"
-                import pdb
-                pdb.set_trace()
             all_tweets.append(tweet) #debug
         outdico[tid] = []
     return all_tweeto, outdico
@@ -253,7 +249,8 @@ def create_edit_candidates(oov):
                 if lcc in rgx_corr_cand_forms:
                     continue
                 levcando = editor.Candidate(lcc)
-                levcando.set_dista(edimgr.levdist(lcc, oov.form))
+                #levcando.set_dista(edimgr.levdist(lcc, oov.form))
+                levcando.set_dista(edimgr.levdist(lcc, oov.edbase))
                 levcando.set_candtype("lev")
                 oov.add_cand(levcando)
 
@@ -303,17 +300,24 @@ def rank_candidates(oov):
     if oov.has_cands:
         for cand in oov.cands:
             cand.dislmsco = cand_scorer(cand)
-
+        if oov.form == oov.edbase:
+            lgr.debug("RK_START: O [{0}], LM {1}, EB_SAME".format(repr(oov.form), oov.lmsco))
+        else:
+            lgr.debug("RK_START: O [{0}], LM {1}, EB [{2}], LM {3}".format(repr(oov.form), oov.lmsco,
+                                                                 repr(oov.edbase), oov.edbase_lmsco))
         # Filter and rank with dist + lm
             # Compare >=, since using negative distances
         oov.cands_filtered = [cand for cand in oov.cands if cand.dista >= tc.maxdista
                               and cand.form != oov.form and cand.lmsco is not None]
         oov.ed_filtered_ranked = sorted(oov.cands_filtered,
                                         key=lambda x: x.dislmsco, reverse=True)
-        lgr.debug("FltED Ranked {}".format([rc.form for rc in oov.ed_filtered_ranked]))
+        lgr.debug("FltED Ranked {0}".format([rc.form for rc in oov.ed_filtered_ranked]))
 
         # Compare oov.lmsco, oov.edbase_lmsco and lmsco for best candidate
         if len(oov.ed_filtered_ranked) > 0:
+            #if oov.edbase == 'si' and tweet.tid == '318707630908534784': #DEBUG
+            #    import pdb
+            #    pdb.set_trace()
             if oov.lmsco >= oov.edbase_lmsco:
                 oov.assess_edbase = False
                 if oov.form == oov.edbase:
@@ -322,24 +326,27 @@ def rank_candidates(oov):
                     reason = "LM"
                 if oov.lmsco >= oov.ed_filtered_ranked[0].lmsco: #oov
                     oov.keep_orig = True
-                    #Q: Make sure this branch is being visited
-                    lgr.debug(("O [{}], LM {} >> EB [{}], LM {} & >> Cmax [{}], LM {}, "+\
-                              "Keeping OOV, Reason [{}]").format(repr(oov.form), oov.lmsco,
+                    lgr.debug(("O [{0}], LM {1} >> EB [{2}], LM {3} & >> Cmax [{4}], LM {5}, "+\
+                              "Keeping OOV, Reason [{6}]").format(repr(oov.form), oov.lmsco,
                                                                 repr(oov.edbase), oov.edbase_lmsco, 
                                                                 repr(oov.ed_filtered_ranked[0].form),
                                                                 oov.ed_filtered_ranked[0].lmsco, reason))
                 else: #cand
                     oov.keep_orig = False
                     oov.best_ed_cando = oov.ed_filtered_ranked[0]
-                    lgr.debug("+ OOV [{}], BestEdCand [{}], {}, Reason [D+LMvsOOV]".format(
+                    lgr.debug("+ OOV [{0}], BestEdCand [{1}], {2}, Reason [D+LMvsOOV]".format(
                         repr(oov.form), repr(oov.best_ed_cando.form), repr(oov.best_ed_cando.dislmsco)))
                     # partial correction
                     tweet.set_par_corr(oov.best_ed_cando.form, oov.posi)
             else: 
                 oov.keep_orig = False
                 if oov.edbase_lmsco >= oov.ed_filtered_ranked[0].lmsco: #edbase (if IV later??)
+                    # assess_edbase can only be true when edbase is not equal to form
                     oov.assess_edbase = True
-                    lgr.debug(("O [{}], LM {} << EB [{}], LM {} >> Cmax [{}], LM {}, "+\
+                    if oov.assess_edbase is True and oov.edbase == oov.form:
+                        print "!! ERROR: assess_edbase when edbase equals form".format(
+                            oov.edbase, oov.form, tweet.tid)
+                    lgr.debug(("O [{0}], LM {1} << EB [{2}], LM {3} >> Cmax [{4}], LM {5}, "+\
                               "Assess Edbase, Reason [D+LMvsEB]").format(
                         repr(oov.form), oov.lmsco, repr(oov.edbase), oov.edbase_lmsco,
                         repr(oov.ed_filtered_ranked[0].form), oov.ed_filtered_ranked[0].lmsco))
@@ -349,7 +356,7 @@ def rank_candidates(oov):
                 else:
                     oov.assess_edbase = False
                     oov.best_ed_cando = oov.ed_filtered_ranked[0]
-                    lgr.debug("+ OOV [{}], BestEdCand [{}], {}, Reason [D+LMvsEB]".format(
+                    lgr.debug("+ OOV [{0}], BestEdCand [{1}], {2}, Reason [D+LMvsEB]".format(
                         repr(oov.form), repr(oov.best_ed_cando.form), repr(oov.best_ed_cando.dislmsco)))
                     # partial correction
                     tweet.set_par_corr(oov.best_ed_cando.form, oov.posi)
@@ -363,15 +370,19 @@ def rank_candidates(oov):
                     string.rjust(str(cand.dislmsco), 15)))
         else:
             oov.ed_filtered_ranked = []
-            lgr.debug("+ OOV [{}], No Edit Cands, Reason: [Filtering]".format(repr(oov.form)))
+            lgr.debug("+ OOV [{0}], No Edit Cands, Reason: [Filtering]".format(repr(oov.form)))
     else:
         oov.ed_filtered_ranked = []
-        lgr.debug("+ OOV [{}], No Edit Cands, Reason: [No IV Intersection]".format(repr(oov.form)))
+        lgr.debug("+ OOV [{0}], No Edit Cands, Reason: [No IV Intersection]".format(repr(oov.form)))
 
 def hash_final_form(oov, outdico, tid):
     """Choose among edbase, oov.form and best candidate form given OOV instance state"""
+    #if oov.edbase == 'si' and tid == '318707630908534784': #DEBUG
+    #if tid == '318707630908534784':
+    #    import pdb
+    #    pdb.set_trace()
     if oov.assess_edbase:
-        lgr.debug("WR O [{}], Using the EB [{}]".format(oov.form, oov.edbase))
+        lgr.debug("WR O [{0}], Using the EB [{1}]".format(oov.form, oov.edbase))
         outdico[tid].append((oov.form, oov.edbase))
     elif oov.keep_orig:
         outdico[tid].append((oov.form, oov.form))
@@ -385,16 +396,16 @@ def populate_outdico(all_tweeto, outdico):
         for tok in tweet.toks:
             if not isinstance(tok, OOV):
                 continue
-            oov = tok # easier label    
+            oov = tok
             if oov.safecorr is not None:
                 outdico[tid].append((oov.form, oov.safecorr))
-            elif oov.ppro_recorr is not None:
+            elif oov.ppro_recorr is not None:                        
                 # if verify IV status above could read from par_corr?
                 if oov.ppro_recorr_IV:
                     outdico[tid].append((oov.form, oov.ppro_recorr))
                 else:
                     if tc.accept_all_regex_modifs:
-                        outdico[tid].append((oov.form, oov.form))                    
+                        outdico[tid].append((oov.form, oov.ppro_recorr))                    
                     elif len(oov.ed_filtered_ranked) > 0:
                         hash_final_form(oov, outdico, tid)
                     else:
@@ -451,6 +462,7 @@ def write_to_cumulog(clargs=None):
     else:
         inf["lm_window"] = tc.lm_window
     inf["increment_norm"] = tc.increment_norm
+    inf["accept_all_IV_regex_outputs"] = tc.accept_all_IV_regex_outputs
     outhead = "Run ID [{0}], RevNum [{1}] {2}\n".format(inf["run_id"], inf["revnum"], "="*50)
     with codecs.open(tc.EVALFN.format(prep.find_run_id()), "r", "utf8") as done_res:
         with codecs.open(tc.CUMULOG, "a", "utf8") as cumu_res:
@@ -481,7 +493,7 @@ def main():
     lgr, lfh, clargs = preliminary_preps()
     
     # processing ---------------------------------------------------------------
-    print "Start {}".format(time.asctime(time.localtime()))
+    print "Start {0}".format(time.asctime(time.localtime()))
     print "Run ID: %s" % prep.find_run_id()
     lgr.info("Run {0} START | Rev [{1}] {2}".format(tc.RUNID, prep.find_git_revnum(), "="*60))
 
@@ -506,7 +518,7 @@ def main():
     print "= main: NORMALIZATION"
     x = 0 
     for tid in all_tweeto:
-        lgr.debug("NORMALIZING, TID [{}]".format(tid))
+        lgr.debug("NORMALIZING, TID [{0}]".format(tid))
         tweet = all_tweeto[tid]
         for tok in tweet.toks:
             if not isinstance(tok, OOV):
@@ -518,7 +530,7 @@ def main():
             rank_candidates(oov)
         x += 1
         if x % 100 == 0:
-            print("Done {} tweets, {}".format(x, time.asctime(time.localtime())))
+            print("Done {0} tweets, {1}".format(x, time.asctime(time.localtime())))
 
     outdico = populate_outdico(all_tweeto, outdico)
 
@@ -539,7 +551,7 @@ def main():
 
     lgr.removeHandler(lfh)
 
-    print "End {}".format(time.asctime(time.localtime()))
+    print "End {0}".format(time.asctime(time.localtime()))
     
 if __name__ == "__main__":
     #profile.run("main()")

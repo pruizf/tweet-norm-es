@@ -7,7 +7,7 @@ import sys
 COMMENT = "Testing rank and populate refactoring"
 RUNID = None
 TAG = False                    # Tag with Freeling (1) or read tags from TAGSDIR (0)
-ENV = "H"                   # Work, Home, Server
+ENV = "W"                   # Work, Home, Server
 EVAL = bool(1)              # test (1) vs. dev (0) sets
 if ENV == "W":
     RESDIR = "/home/pruiz/DATA/projects/Tweet-Norm/results2"
@@ -100,7 +100,7 @@ doubledchar_dico = APPDIR + r"/data/" + "doubledchar-dic.txt"
 IVDICO = APPDIR + r"/data/" + "aspell-es-expanded.dic"
 SAFETOKENS = APPDIR + r"/data/" + "safelist.txt"
 REGPREPRO = APPDIR + r"/data/" + "preprocessing.txt"
-accept_all_regex_modifs = False
+accept_all_IV_regex_outputs = False
 
 # EDIT-DISTANCE ----------------------------------------------------------------
     #TODO: if costs ever get expressed with positive values,
