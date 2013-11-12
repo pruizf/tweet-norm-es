@@ -38,6 +38,7 @@ if "twittero" in dir(): reload(twittero)
 if "ppro" in dir(): reload(ppr)
 if "editor" in dir(): reload(editor)
 if "lmmgr" in dir(): reload(lmmgr)
+if "posp" in dir(): reload(posp)
 
 import tnconfig as tc
 import preparation as prep
@@ -49,6 +50,7 @@ import preprocessing as ppr
 import editor
 import edcosts
 import lmmgr
+import postprocessing as posp
 
 # functions ================================================================
 
@@ -375,7 +377,7 @@ def rank_candidates(oov):
         oov.ed_filtered_ranked = []
         lgr.debug("+ OOV [{0}], No Edit Cands, Reason: [No IV Intersection]".format(repr(oov.form)))
 
-def hash_final_form(oov, outdico, tid):
+def hash_final_form(oov, outdico, tweet):
     """Choose among edbase, oov.form and best candidate form given OOV instance state"""
     #if oov.edbase == 'si' and tid == '318707630908534784': #DEBUG
     #if tid == '318707630908534784':
@@ -383,11 +385,13 @@ def hash_final_form(oov, outdico, tid):
     #    pdb.set_trace()
     if oov.assess_edbase:
         lgr.debug("WR O [{0}], Using the EB [{1}]".format(oov.form, oov.edbase))
-        outdico[tid].append((oov.form, oov.edbase))
+        oov.edbase_posp = posp.recase(oov.form, oov.edbase, tweet)
+        outdico[tweet.tid].append((oov.form, oov.edbase_posp))
     elif oov.keep_orig:
-        outdico[tid].append((oov.form, oov.form))
+        outdico[tweet.tid].append((oov.form, oov.form))
     else:
-        outdico[tid].append((oov.form, oov.best_ed_cando.form))                    
+        oov.best_ed_cando_posp = posp.recase(oov.form, oov.best_ed_cando.form, tweet)
+        outdico[tweet.tid].append((oov.form, oov.best_ed_cando_posp))                    
 
 def populate_outdico(all_tweeto, outdico):
     """Select candidates for final output filling a hash with them"""
@@ -398,21 +402,23 @@ def populate_outdico(all_tweeto, outdico):
                 continue
             oov = tok
             if oov.safecorr is not None:
-                outdico[tid].append((oov.form, oov.safecorr))
-            elif oov.ppro_recorr is not None:                        
+                oov.safecorr_posp = posp.recase(oov.form, oov.safecorr, tweet)
+                outdico[tid].append((oov.form, oov.safecorr_posp))
+            elif oov.ppro_recorr is not None:
+                oov.ppro_recorr_posp = posp.recase(oov.form, oov.ppro_recorr, tweet)
                 # if verify IV status above could read from par_corr?
                 if oov.ppro_recorr_IV:
-                    outdico[tid].append((oov.form, oov.ppro_recorr))
+                    outdico[tid].append((oov.form, oov.ppro_recorr_posp))
                 else:
                     if tc.accept_all_regex_modifs:
-                        outdico[tid].append((oov.form, oov.ppro_recorr))                    
+                        outdico[tid].append((oov.form, oov.ppro_recorr_posp))                    
                     elif len(oov.ed_filtered_ranked) > 0:
-                        hash_final_form(oov, outdico, tid)
+                        hash_final_form(oov, outdico, tweet)
                     else:
                         outdico[tid].append((oov.form, oov.form))
             else:
                 if len(oov.ed_filtered_ranked) > 0:
-                    hash_final_form(oov, outdico, tid)
+                    hash_final_form(oov, outdico, tweet)
                 else:
                     outdico[tid].append((oov.form, oov.form))              
     return outdico

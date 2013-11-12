@@ -516,3 +516,14 @@ ERR: 0
 POS: 351 
 NEG: 311 
 ACCUR: 53.0211480363 
+Run ID [550], RevNum [e28d3aa] ==================================================
+RunComment: Testing rank and populate refactoring
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+ERR: 0 
+POS: 373 
+NEG: 289 
+ACCUR: 56.3444108761 
