@@ -593,3 +593,36 @@ ERR: 0
 POS: 415 
 NEG: 247 
 ACCUR: 62.6888217523 
+Run ID [567], RevNum [f7f02b9] ==================================================
+RunComment: Testing rank and populate refactoring
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+ERR: 0 
+POS: 415 
+NEG: 247 
+ACCUR: 62.6888217523 
+Run ID [572], RevNum [f7f02b9] ==================================================
+RunComment: Abbrevs and run-in in output. Testing entity-hashing
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+ERR: 0 
+POS: 415 
+NEG: 247 
+ACCUR: 62.6888217523 
+Run ID [573], RevNum [f7f02b9] ==================================================
+RunComment: Abbrevs and run-in in output. Testing entity-hashing
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+ERR: 0 
+POS: 415 
+NEG: 247 
+ACCUR: 62.6888217523 

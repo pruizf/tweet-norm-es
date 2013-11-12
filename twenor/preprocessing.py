@@ -6,6 +6,7 @@ import logging
 from collections import defaultdict
 import os
 import re
+import time
 
 import preparation as prep
 import tnconfig as tc
@@ -24,6 +25,7 @@ class Prepro:
     blanklines = tc.BLANKLINES_RE
     doubledchar_dico = None
     ivdico = None
+    ent_files_active = None
 
     def create_doubledchar_dico(self):
         """Create a dico with IV words that contained doubled characters"""
@@ -171,9 +173,9 @@ class Prepro:
         return {"corr": corr, "applied": applied, "IVflag": IVflag}
 
     def find_prepro_general(self, oov, rules, ruletype=""):
-        """Apply preprocessing rules, returning result and result status
-           applied = True/False, indicating whether a rule has applied or not
-           <ruletype> "AB" | "RI" is for log messages"""
+        """Generic method to pply preprocessing rules, returning result
+           and result status (applied = True/False), indicating whether
+           a rule applied or not. <ruletype> "AB" | "RI" is for log messages"""
         if ruletype == "":
             print "WARNING: Specifiy preprocessing-rule types when calling"
         applied = False
@@ -185,9 +187,39 @@ class Prepro:
                 return {"corr": rule[2], "applied": True}
         return {"corr": oov, "applied" : False}
 
+    def find_ent_files_active(self):
+        """Return list of entity files to use"""
+        return [ef[1] for ef in tc.ent_use.values() if ef[0] == 1]
+
+    def hash_entity_files(self):
+        """Read entity dictionaries specified in config into a hash"""
+        #badents = badents = ["Pic", "Tio", "Stamos", "Tia", "Gili", "Mami",
+        #                     "Estaran", "Estaras", "Seran"]
+        ent_hash = defaultdict(lambda: 1)
+        for fn in os.listdir(tc.entdir):
+            if fn in self.ent_files_active:
+                lgr.info("EN Using entity file [%s]" % fn)
+                with codecs.open(os.path.join(tc.entdir, fn), "r", "utf8") as entfn:
+                    lgr.info("EN Hashing entity file: [%s]" % fn)
+                    print "+ Hashing: [%s], %s" % (fn, time.asctime(time.localtime()))
+                    for line in entfn:
+                        if re.match(tc.BLANKLINES_RE, line):
+                            continue
+                        elif re.match(tc.COMMENTLINES_RE, line):
+                            continue
+                        #elif line.strip() in badents:
+                        #    continue
+                        ent_hash[line.rstrip()]
+        lgr.info("EN Done hashing entities")
+        #print "= prepro: Done hashing entities, %s" % time.asctime(time.localtime())
+        return ent_hash
+
+
     def set_doubledchar_dico(self, dc):
         self.doubledchar_dico = dc
         
     def set_ivdico(self, ivdico):
         self.ivdico = ivdico
 
+    def set_ent_files_active(self, ent_file_list):
+        self.ent_files_active = ent_file_list

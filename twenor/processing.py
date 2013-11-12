@@ -55,6 +55,7 @@ import postprocessing as posp
 # functions ================================================================
 
 def set_option_parser():
+    """Set option parser and return command-line arguments"""
     parser = argparse.ArgumentParser(prog='processing.py')
     parser.add_argument("-t", "--tag", action="store_true", help="tag with FreeLing")
     parser.add_argument("-c", "--comment", help="comment for run (shown in cumulog.txt)")
@@ -127,6 +128,18 @@ def load_preprocessing():
         print "= editor: Skip creating IV dico"
     ppro.set_ivdico(ivs)
     return ppro, safe_rules, rerules, abbrules, rinrules
+
+def load_entities():
+    """Prepare entity-hashes"""
+    entity_config = ppro.find_ent_files_active()
+    ppro.set_ent_files_active(entity_config)
+    if "ent_hash" not in dir(sys.modules["__main__"]):
+        print "= prepro: Hashing entity files, {0}".format(time.asctime(time.localtime()))
+        ent_hash = ppro.hash_entity_files()
+        print "Done, {0}".format(time.asctime(time.localtime()))
+    else:
+        print "=prepro: Skip creating entity-hashes"
+    return ent_hash
 
 def load_distance_editor():
     """Instantiate EdScoreMatrix and EdManager instances, returning the latter"""
@@ -529,6 +542,7 @@ def main():
     global rerules
     global abbrules
     global rinrules
+    global ent_hash
     global ppro
     global edimgr
     global outdico
@@ -551,6 +565,7 @@ def main():
 
     print "= main: load analyzers"
     ppro, safe_rules, rerules, abbrules, rinrules = load_preprocessing()
+    ent_hash = load_entities()
     edimgr = load_distance_editor()
     slmmgr, binslm = load_lm()
 
