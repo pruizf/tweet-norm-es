@@ -90,7 +90,7 @@
 4000	capi	capital	#pb is that el capi => el capitán, la capi => la capital (or, la capitana, but that's a semantic WSD issue, not just morphology)
 
 # Standard abbreviations
-3000	^m[áa]x\.$	máxima	#real issue here is gender agreement (FreeLing's analysis is useful there)
-3001	^m[íi]n\.$	mínima
+#3000	^m[áa]x\.$	máxima	#real issue here is gender agreement (FreeLing's analysis is useful there)
+#3001	^m[íi]n\.$	mínima
 
 

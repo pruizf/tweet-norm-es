@@ -14,8 +14,8 @@ import tnconfig as tc
 logfile_name = os.path.join(tc.LOGDIR, "run_%s.log" % prep.find_run_id())
 lgr, lfh = prep.set_log(__name__, logfile_name)
 
-# globals
-#blanklines = tc.BLANKLINES_RE
+#TODO: improve logging of replaced sequences, now seems to be logging
+#      the replacement-expression from the rule, but need to log the resulting chain
 
 class Prepro:
     def __init__(self):
@@ -127,9 +127,8 @@ class Prepro:
             corr_before = corr
             corr = re.sub(rule[1], rule[2], corr)
             if corr != corr_before: # rule has changed it
-                # rather than doubledchar_dico maybe the choice should be:
-                # if corr_before IV and corr not IV, take corr_before
-                # requires accessing the IV dico from here
+                # TODO: rather than doubledchar_dico maybe the choice should be:
+                #       if corr_before IV and corr not IV, take corr_before
                 # TODO: consider checking RE output against an EN IV dico (or entity dico)
                 #       Would avoid overcorrection like "Shopping" > "Shoping"
                 if not corr_before in self.doubledchar_dico:
@@ -171,13 +170,18 @@ class Prepro:
         #return (corr, applied)
         return {"corr": corr, "applied": applied, "IVflag": IVflag}
 
-    def find_prepro_general(self, oov, rules):
+    def find_prepro_general(self, oov, rules, ruletype=""):
         """Apply preprocessing rules, returning result and result status
-           applied = True/False, indicating whether a rule has applied or not"""
+           applied = True/False, indicating whether a rule has applied or not
+           <ruletype> "AB" | "RI" is for log messages"""
+        if ruletype == "":
+            print "WARNING: Specifiy preprocessing-rule types when calling"
         applied = False
         for rule in rules:
             match = re.match(rule[1], oov)
             if match:
+                lgr.debug("%s O [%s] Matched Rgx |%s|, Gives |%s| ~ [Rule %s]" %\
+                          (ruletype, oov, match.group(0), rule[2], rule[0]))
                 return {"corr": rule[2], "applied": True}
         return {"corr": oov, "applied" : False}
 

@@ -214,13 +214,15 @@ def preprocess(oov):
             pprobase = oov.ppro_recorr
         else:
             pprobase = oov.form
-        abbrev = ppro.find_prepro_general(pprobase, abbrules)
+        abbrev = ppro.find_prepro_general(pprobase, abbrules, ruletype="AB")
         if abbrev["applied"] is True:
             oov.set_abbrev(abbrev["corr"])
+            tweet.set_par_corr(abbrev["corr"], posi=oov.posi)
         # Run-in Rules
-        runin = ppro.find_prepro_general(pprobase, rinrules)
+        runin = ppro.find_prepro_general(pprobase, rinrules, ruletype="RI")
         if runin["applied"] is True:
             oov.set_runin(runin["corr"])    
+            tweet.set_par_corr(runin["corr"], posi=oov.posi)
 
 def create_edit_candidates(oov):
     """Create and score edit-candidates obtained with regexes and with edit-distance"""
@@ -230,7 +232,7 @@ def create_edit_candidates(oov):
     rgx_corr_cand_forms = {}
 
     # Determine form to base edit-candidates on    
-    if oov.safecorr is None:
+    if oov.safecorr is None and oov.abbrev is None and oov.runin is None:
         if oov.ppro_recorr is None:
             oov.set_edbase(oov.form)
         else:
@@ -397,16 +399,23 @@ def hash_final_form(oov, outdico, tweet):
         lgr.debug("WR O [{0}], Using the EB [{1}]".format(oov.form, oov.edbase))
         oov.edbase_posp = posp.recase(oov.form, oov.edbase, tweet)
         outdico[tweet.tid].append((oov.form, oov.edbase_posp))
+        lgr.debug("WRF O [{0}], C [{1}], T [{2}]".format(
+            repr(oov.form), repr(oov.edbase_posp), "EB||Orig||BC"))
     elif oov.keep_orig:
         outdico[tweet.tid].append((oov.form, oov.form))
+        lgr.debug("WRF O [{0}], C [{1}], T [{2}]".format(
+            repr(oov.form), repr(oov.form), "Orig||EB||BC"))
     else:
         oov.best_ed_cando_posp = posp.recase(oov.form, oov.best_ed_cando.form, tweet)
-        outdico[tweet.tid].append((oov.form, oov.best_ed_cando_posp))                    
-
+        outdico[tweet.tid].append((oov.form, oov.best_ed_cando_posp))
+        lgr.debug("WRF O [{0}], C [{1}], T [{2}]".format(
+        repr(oov.form), repr(oov.best_ed_cando_posp), "BC||EB||Orig"))
+                  
 def populate_outdico(all_tweeto, outdico):
     """Select candidates for final output filling a hash with them"""
     for tid in all_tweeto:
         tweet = all_tweeto[tid]
+        lgr.debug("POPULATE FINAL DICO, TID [{0}]".format(tid))
         for tok in tweet.toks:
             if not isinstance(tok, OOV):
                 continue
@@ -414,14 +423,30 @@ def populate_outdico(all_tweeto, outdico):
             if oov.safecorr is not None:
                 oov.safecorr_posp = posp.recase(oov.form, oov.safecorr, tweet)
                 outdico[tid].append((oov.form, oov.safecorr_posp))
+                lgr.debug("WRF O [{0}], C [{1}], T [{2}]".format(
+                    repr(oov.form), repr(oov.safecorr_posp), "ST"))
+            elif oov.abbrev is not None:
+                oov.abbrev_posp = posp.recase(oov.form, oov.abbrev, tweet)
+                outdico[tid].append((oov.form, oov.abbrev_posp))
+                lgr.debug("WRF O [{0}], C [{1}], T [{2}]".format(
+                    repr(oov.form), repr(oov.abbrev_posp), "AB"))
+            elif oov.runin is not None:
+                oov.runin_posp = posp.recase(oov.form, oov.runin, tweet)
+                outdico[tid].append((oov.form, oov.runin_posp))
+                lgr.debug("WRF O [{0}], C [{1}], T [{2}]".format(
+                    repr(oov.form), repr(oov.runin_posp), "RI"))                
             elif oov.ppro_recorr is not None:
                 oov.ppro_recorr_posp = posp.recase(oov.form, oov.ppro_recorr, tweet)
                 # if verify IV status above could read from par_corr?
                 if oov.ppro_recorr_IV:
                     outdico[tid].append((oov.form, oov.ppro_recorr_posp))
+                    lgr.debug("WRF O [{0}], C [{1}], T [{2}]".format(
+                        repr(oov.form), repr(oov.ppro_recorr_posp), "PRE-IV"))
                 else:
                     if tc.accept_all_IV_regex_outputs:
-                        outdico[tid].append((oov.form, oov.ppro_recorr_posp))                    
+                        outdico[tid].append((oov.form, oov.ppro_recorr_posp))
+                        lgr.debug("WRF O [{0}], C [{1}], T [{2}]".format(
+                            repr(oov.form), repr(oov.ppro_recorr_posp), "PRE-Accept-All"))
                     elif len(oov.ed_filtered_ranked) > 0:
                         hash_final_form(oov, outdico, tweet)
                     else:
@@ -430,7 +455,9 @@ def populate_outdico(all_tweeto, outdico):
                 if len(oov.ed_filtered_ranked) > 0:
                     hash_final_form(oov, outdico, tweet)
                 else:
-                    outdico[tid].append((oov.form, oov.form))          
+                    outdico[tid].append((oov.form, oov.form))
+                    lgr.debug("WRF O [{0}], C [{1}], T [{2}]".format(
+                        repr(oov.form), repr(oov.form), "Orig-Default"))
     return outdico
 
 def write_out(corr_dico):
