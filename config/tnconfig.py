@@ -4,10 +4,10 @@ import re
 import sys
 
 # BASIC ========================================================================
-COMMENT = "Testing getting context from tweet with MORE partial correction and window of 4"
+COMMENT = "Testing rank and populate refactoring"
 RUNID = None
 TAG = False                    # Tag with Freeling (1) or read tags from TAGSDIR (0)
-ENV = "W"                   # Work, Home, Server
+ENV = "H"                   # Work, Home, Server
 EVAL = bool(1)              # test (1) vs. dev (0) sets
 if ENV == "W":
     RESDIR = "/home/pruiz/DATA/projects/Tweet-Norm/results2"
@@ -100,6 +100,7 @@ doubledchar_dico = APPDIR + r"/data/" + "doubledchar-dic.txt"
 IVDICO = APPDIR + r"/data/" + "aspell-es-expanded.dic"
 SAFETOKENS = APPDIR + r"/data/" + "safelist.txt"
 REGPREPRO = APPDIR + r"/data/" + "preprocessing.txt"
+accept_all_regex_modifs = False
 
 # EDIT-DISTANCE ----------------------------------------------------------------
     #TODO: if costs ever get expressed with positive values,
@@ -111,6 +112,7 @@ maxdista = -1.5
 distaw = 0.7 # weight for distance scores
 
 # LANGUAGE MODELS --------------------------------------------------------------
+increment_norm = True # ltr, use normalized tokens as context for later tokens
 lmpath = APPDIR + "/data/" + "SUMATCasedLM_kenlm_es.arpa"
 lm_window = 4
 lmw = 0.3 # weight for lm scores

@@ -201,8 +201,6 @@ def preprocess(oov):
     global ppro
     # Safetokens -------------------------------------------------------
     safecorr = ppro.find_safetoken(oov.form, safe_rules)
-    # TODO: instead of these tuples, can i add attributes so that i can access
-    #       whether safecorr applied by attribute, not by a forgettable index
     if safecorr is not False and safecorr["applied"] is True:
         oov.set_safecorr(safecorr["corr"])
         tweet.set_par_corr(safecorr["corr"], posi=oov.posi)
@@ -218,30 +216,29 @@ def preprocess(oov):
 
 def create_edit_candidates(oov):
     """Create and score edit-candidates obtained with regexes and with edit-distance"""
-       # TODO: correct side-effects of regexes
+    # TODO: correct side-effects of regexes
 
     # hash for regex-based candidates
-    rged_cand_forms = {}
+    rgx_corr_cand_forms = {}
 
     # Determine form to base edit-candidates on    
     if oov.safecorr is None:
         if oov.ppro_recorr is None:
-            edbase = oov.form
+            oov.set_edbase(oov.form)
         else:
-            edbase = oov.ppro_recorr
-        oov.edbase = edbase
+            oov.set_edbase(oov.ppro_recorr)
 
         # Regex-based -------------------
         #TODO: some side-effects of regexes, treat them (list-based if need be)
-        rged_corr_cands = edimgr.rgdist(edbase) #edbase, not oov.form
-        if len(rged_corr_cands["cands"]) > 0:
-            for rcc in rged_corr_cands["cands"]:
+        rgx_corr_cands = edimgr.rgdist(oov.edbase) #edbase, not oov.form
+        if len(rgx_corr_cands["cands"]) > 0:
+            for rcc in rgx_corr_cands["cands"]:
                 recando = editor.Candidate(rcc)
-                # dista is value of hash rged_corr_cands, indexed by cand
-                recando.set_dista(rged_corr_cands["cands"][rcc])
+                # rgx_corr_cands: distances indexed by cand
+                recando.set_dista(rgx_corr_cands["cands"][rcc])
                 recando.set_candtype("re")
                 oov.add_cand(recando)
-            rged_cand_forms[oov.form] = True
+            rgx_corr_cand_forms[oov.form] = True
 
         # Lev Distance based -----------
         lev_corr_cands = edimgr.generate_candidates(oov.edbase)
@@ -252,8 +249,8 @@ def create_edit_candidates(oov):
                     continue
                 if lcc == oov.edbase:
                     continue
-                # skip cand-object creation if regex-based distance exists for cand
-                if lcc in rged_cand_forms:
+                # skip cand-object creation if regex-based dista exists for cand
+                if lcc in rgx_corr_cand_forms:
                     continue
                 levcando = editor.Candidate(lcc)
                 levcando.set_dista(edimgr.levdist(lcc, oov.form))
@@ -261,10 +258,13 @@ def create_edit_candidates(oov):
                 oov.add_cand(levcando)
 
 def find_lm_scores(oov):
-    """Compute and set LM logprobs for <oov>'s candidates, and also for oov.form itself"""
+    """Compute and set LM logprobs for <oov>'s candidates, and also for oov.form itself
+       and oov.edbase"""
     global lgr
-    #lmlcon = slmmgr.find_left_context(oov.posi, [tok.form for tok in tweet.toks])
-    lmlcon = slmmgr.find_left_context(oov.posi, [tok.form for tok in tweet.par_corr])
+    if tc.increment_norm:
+        lmlcon = slmmgr.find_left_context(oov.posi, [tok.form for tok in tweet.par_corr])
+    else:
+        lmlcon = slmmgr.find_left_context(oov.posi, [tok.form for tok in tweet.toks])
     if oov.set_has_cands():
         someLMCand = False
         for cand in oov.cands:
@@ -278,14 +278,14 @@ def find_lm_scores(oov):
                 oov.set_has_LM_cands(someLMCand)
         if slmmgr.check_is_inLM(oov.form):
             oov.set_lmsco(slmmgr.find_logprog_in_ctx(oov.form, lmlcon))
+        if oov.edbase is not None:
+            if slmmgr.check_is_inLM(oov.edbase):
+                oov.set_edbase_lmsco(slmmgr.find_logprog_in_ctx(oov.edbase, lmlcon))
 
 def cand_scorer(orca, scoretype="cand"):
     """Score OOV or candidate <orca> given distance (not for OOV)
        and lm scores and their weights. Cands with lmsco None
        will be filtered later, so ok to return a score for them."""
-    #if form.form == 'sic': # debug: test cases of lmsco is None
-    #    import pdb
-    #    pdb.set_trace()
     if orca.lmsco is not None:
         if scoretype == "cand":
             return orca.dista * tc.distaw + orca.lmsco * tc.lmw
@@ -298,53 +298,62 @@ def cand_scorer(orca, scoretype="cand"):
             return None
 
 def rank_candidates(oov):
+    """Rank based on edit-distance and LM scores"""
     global lgr
-    oov.best = None
-    
-    if oov.lmsco is not None:
-        oov.wlmsco = cand_scorer(oov, scoretype="oov")
-
-    # TODO: begins to be crap
-    if oov.edbase is not None:
-        if slmmgr.check_is_inLM(oov.edbase):
-            edbase_lcon = slmmgr.find_left_context(oov.posi, [tok.form for tok in tweet.toks])
-            oov.edbase_lmsco = slmmgr.find_logprog_in_ctx(oov.edbase, edbase_lcon)
-
-    # TODO: more examples of crap
-    use_edbase = False
-    oov.edbase_best = False
-    if oov.lmsco <= oov.edbase_lmsco:
-        use_edbase = True
-    lgr.debug("RK use_edbase is {}: edbase, LM {}| oov, LM {}, ".format(use_edbase, oov.edbase_lmsco, oov.lmsco))
-
     if oov.has_cands:
         for cand in oov.cands:
             cand.dislmsco = cand_scorer(cand)
-        # use >=, since using negative distances
-        oov.cands_filtered = [cand for cand in oov.cands
-                              if cand.dista >= tc.maxdista
-                              and cand.form != oov.form
-                              and cand.lmsco is not None]
+
+        # Filter and rank with dist + lm
+            # Compare >=, since using negative distances
+        oov.cands_filtered = [cand for cand in oov.cands if cand.dista >= tc.maxdista
+                              and cand.form != oov.form and cand.lmsco is not None]
         oov.ed_filtered_ranked = sorted(oov.cands_filtered,
                                         key=lambda x: x.dislmsco, reverse=True)
         lgr.debug("FltED Ranked {}".format([rc.form for rc in oov.ed_filtered_ranked]))
+
+        # Compare oov.lmsco, oov.edbase_lmsco and lmsco for best candidate
         if len(oov.ed_filtered_ranked) > 0:
-            # Compare OOV LM score and edbase lm score
-            if not use_edbase:
-                if oov.lmsco >= oov.ed_filtered_ranked[0].lmsco:
-                    oov.best = oov
-                    #Q: why is this branch never visited now?
-                    lgr.debug("O [{}], LM {} >> Cmax [{}], LM {}, Keeping OOV, Reason [LM]".format(
-                        repr(oov.form), oov.lmsco, repr(oov.ed_filtered_ranked[0].form),
-                        oov.ed_filtered_ranked[0].lmsco))
-            else:
-                if oov.edbase_lmsco >= oov.ed_filtered_ranked[0].lmsco:
-                    oov.edbase_best = True
-                    lgr.debug("O [{}], LM {} << EDBASE [{}], LM {} >> Cmax [{}], LM {}, Using Edbase, Reason [LM]".format(
+            if oov.lmsco >= oov.edbase_lmsco:
+                oov.assess_edbase = False
+                if oov.form == oov.edbase:
+                    reason = "LM_NoPre"
+                else:
+                    reason = "LM"
+                if oov.lmsco >= oov.ed_filtered_ranked[0].lmsco: #oov
+                    oov.keep_orig = True
+                    #Q: Make sure this branch is being visited
+                    lgr.debug(("O [{}], LM {} >> EB [{}], LM {} & >> Cmax [{}], LM {}, "+\
+                              "Keeping OOV, Reason [{}]").format(repr(oov.form), oov.lmsco,
+                                                                repr(oov.edbase), oov.edbase_lmsco, 
+                                                                repr(oov.ed_filtered_ranked[0].form),
+                                                                oov.ed_filtered_ranked[0].lmsco, reason))
+                else: #cand
+                    oov.keep_orig = False
+                    oov.best_ed_cando = oov.ed_filtered_ranked[0]
+                    lgr.debug("+ OOV [{}], BestEdCand [{}], {}, Reason [D+LMvsOOV]".format(
+                        repr(oov.form), repr(oov.best_ed_cando.form), repr(oov.best_ed_cando.dislmsco)))
+                    # partial correction
+                    tweet.set_par_corr(oov.best_ed_cando.form, oov.posi)
+            else: 
+                oov.keep_orig = False
+                if oov.edbase_lmsco >= oov.ed_filtered_ranked[0].lmsco: #edbase (if IV later??)
+                    oov.assess_edbase = True
+                    lgr.debug(("O [{}], LM {} << EB [{}], LM {} >> Cmax [{}], LM {}, "+\
+                              "Assess Edbase, Reason [D+LMvsEB]").format(
                         repr(oov.form), oov.lmsco, repr(oov.edbase), oov.edbase_lmsco,
                         repr(oov.ed_filtered_ranked[0].form), oov.ed_filtered_ranked[0].lmsco))
                     # partial correction
+                       # shouldn't I check if edbase is IV here? (if wanna do without populate_dico at least)
                     tweet.set_par_corr(oov.edbase, oov.posi)
+                else:
+                    oov.assess_edbase = False
+                    oov.best_ed_cando = oov.ed_filtered_ranked[0]
+                    lgr.debug("+ OOV [{}], BestEdCand [{}], {}, Reason [D+LMvsEB]".format(
+                        repr(oov.form), repr(oov.best_ed_cando.form), repr(oov.best_ed_cando.dislmsco)))
+                    # partial correction
+                    tweet.set_par_corr(oov.best_ed_cando.form, oov.posi)
+            # log scores for each candidate
             for cand in oov.ed_filtered_ranked:
                 lgr.debug("O [{0}], C [{1}], ED {2}| LM {3}| T {4}".format(
                     string.ljust(repr(oov.form), 15),
@@ -352,14 +361,6 @@ def rank_candidates(oov):
                     string.rjust(str(cand.dista), 4),
                     string.rjust(str(cand.lmsco), 15),
                     string.rjust(str(cand.dislmsco), 15)))
-            if oov.best is None: # means some cand's lm score is better than the OOV's
-                if not oov.edbase_best:
-                    oov.best_ed_cando = oov.ed_filtered_ranked[0]
-                    lgr.debug("+ OOV [{}], BestEdCand [{}], {}".format(
-                        repr(oov.form), repr(oov.best_ed_cando.form), repr(oov.best_ed_cando.dislmsco)))
-                    # partial correction
-                    tweet.set_par_corr(oov.best_ed_cando.form, oov.posi)
-                    
         else:
             oov.ed_filtered_ranked = []
             lgr.debug("+ OOV [{}], No Edit Cands, Reason: [Filtering]".format(repr(oov.form)))
@@ -367,44 +368,46 @@ def rank_candidates(oov):
         oov.ed_filtered_ranked = []
         lgr.debug("+ OOV [{}], No Edit Cands, Reason: [No IV Intersection]".format(repr(oov.form)))
 
+def hash_final_form(oov, outdico, tid):
+    """Choose among edbase, oov.form and best candidate form given OOV instance state"""
+    if oov.assess_edbase:
+        lgr.debug("WR O [{}], Using the EB [{}]".format(oov.form, oov.edbase))
+        outdico[tid].append((oov.form, oov.edbase))
+    elif oov.keep_orig:
+        outdico[tid].append((oov.form, oov.form))
+    else:
+        outdico[tid].append((oov.form, oov.best_ed_cando.form))                    
+
 def populate_outdico(all_tweeto, outdico):
+    """Select candidates for final output filling a hash with them"""
     for tid in all_tweeto:
         tweet = all_tweeto[tid]
         for tok in tweet.toks:
             if not isinstance(tok, OOV):
                 continue
-            oov = tok # oov label easier    
+            oov = tok # easier label    
             if oov.safecorr is not None:
                 outdico[tid].append((oov.form, oov.safecorr))
             elif oov.ppro_recorr is not None:
+                # if verify IV status above could read from par_corr?
                 if oov.ppro_recorr_IV:
                     outdico[tid].append((oov.form, oov.ppro_recorr))
                 else:
-                    #outdico[tid].append((oov.form, oov.form))
-                    if len(oov.ed_filtered_ranked) > 0:
-                        if oov.edbase_best:
-                            lgr.debug("WR Using the edbase, [{}]".format(oov.edbase))
-                            outdico[tid].append((oov.form, oov.edbase))
-                        elif oov.best: # way to express that oov's LM score better than scor for any candidate
-                            outdico[tid].append((oov.form, oov.form))
-                        else:
-                            outdico[tid].append((oov.form, oov.best_ed_cando.form))                    
+                    if tc.accept_all_regex_modifs:
+                        outdico[tid].append((oov.form, oov.form))                    
+                    elif len(oov.ed_filtered_ranked) > 0:
+                        hash_final_form(oov, outdico, tid)
                     else:
                         outdico[tid].append((oov.form, oov.form))
             else:
                 if len(oov.ed_filtered_ranked) > 0:
-                    if oov.edbase_best:
-                        outdico[tid].append((oov.form, oov.edbase))
-                    elif oov.best: # way to express that oov's LM score better than scor for any candidate
-                        outdico[tid].append((oov.form, oov.form))
-                    else:
-                        outdico[tid].append((oov.form, oov.best_ed_cando.form))                    
+                    hash_final_form(oov, outdico, tid)
                 else:
-                    outdico[tid].append((oov.form, oov.form))
-              
+                    outdico[tid].append((oov.form, oov.form))              
     return outdico
 
 def write_out(corr_dico):
+    """Write out the final hash"""
     with codecs.open(tc.id_order, "r", "utf8") as idor:
         orderlist = [idn.strip() for idn in idor.readlines()]    
     with codecs.open(tc.OUTFN.format(prep.find_run_id()), "w", "utf8") as outfh:
@@ -415,6 +418,7 @@ def write_out(corr_dico):
                     outfh.write("\t%s\t%s\n" % (oov_corr[0], oov_corr[1]))
 
 def write_to_cumulog(clargs=None):
+    """Write config infos and accuracy measures to cumulative log"""
     inf = {}
     inf["run_id"] = prep.find_run_id()
     try:
@@ -446,12 +450,13 @@ def write_to_cumulog(clargs=None):
         inf["lm_window"] = tc.lm_window
     else:
         inf["lm_window"] = tc.lm_window
+    inf["increment_norm"] = tc.increment_norm
     outhead = "Run ID [{0}], RevNum [{1}] {2}\n".format(inf["run_id"], inf["revnum"], "="*50)
     with codecs.open(tc.EVALFN.format(prep.find_run_id()), "r", "utf8") as done_res:
         with codecs.open(tc.CUMULOG, "a", "utf8") as cumu_res:
             cumu_res.write(outhead)
             cumu_res.write("RunComment: {}\n".format(inf["run_comment"]))
-            for key in ["maxdista", "distaw", "lmw", "lmpath"]:
+            for key in ["maxdista", "distaw", "lmw", "lmpath", "increment_norm"]:
                 cumu_res.write("{}: {}\n".format(key, inf[key]))
             cumu_res.write("".join(done_res.readlines()[-4:]))
 
@@ -460,6 +465,7 @@ def write_to_cumulog(clargs=None):
 
 def main():
 
+    global lgr
     global tweet
     global clargs
     global ref_OOVs # debug
@@ -468,7 +474,7 @@ def main():
     global rerules
     global ppro
     global edimgr
-    global lgr
+    global outdico
     all_tweets = [] # debug
     
     # prep ---------------------------------------------------------------------

@@ -147,9 +147,17 @@ class OOV(Token):
     safecorr = None
     ppro_recorr = None
     ppro_recorr_IV = True
+
+    #cands_filtered = None
+    #ed_filtered_ranked = None
+    
     edbase = None
     edbase_lmsco = None
+    best_ed_cando = None
     lmsco = None
+
+    keep_orig = None
+    assess_edbase = None
 
     def add_cand(self, cand):
         self.cands[cand] = True
@@ -175,6 +183,10 @@ class OOV(Token):
         self.ppro_recorr_IV = boolean
     def set_correction(self, corr):
         self.correction = corr
+    def set_edbase(self, form):
+        self.edbase = form
+    def set_edbase_lmsco(self, sco):
+        self.edbase_lmsco = sco
     def set_lmsco(self, sco):
         self.lmsco = sco
         

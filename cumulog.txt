@@ -342,3 +342,56 @@ ERR: 0
 POS: 342 
 NEG: 320 
 ACCUR: 51.6616314199 
+Run ID [516], RevNum [8297c9c] ==================================================
+RunComment: Testing getting context from tweet with MORE partial correction and window of 4
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+ERR: 0 
+POS: 342 
+NEG: 320 
+ACCUR: 51.6616314199 
+Run ID [522], RevNum [8297c9c] ==================================================
+RunComment: Testing rank and populate refactoring
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+ERR: 0 
+POS: 341 
+NEG: 321 
+ACCUR: 51.5105740181 
+Run ID [523], RevNum [8297c9c] ==================================================
+RunComment: Testing rank and populate refactoring
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+ERR: 0 
+POS: 341 
+NEG: 321 
+ACCUR: 51.5105740181 
+Run ID [524], RevNum [8297c9c] ==================================================
+RunComment: Testing rank and populate refactoring
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+ERR: 0 
+POS: 342 
+NEG: 320 
+ACCUR: 51.6616314199 
+Run ID [525], RevNum [8297c9c] ==================================================
+RunComment: Testing rank and populate refactoring
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+ERR: 0 
+POS: 342 
+NEG: 320 
+ACCUR: 51.6616314199 
