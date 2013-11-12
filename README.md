@@ -76,10 +76,11 @@ tnor2
     |_ preprocessing.py         OOV preprocessing with regexes and lists
     |_ editor.py                Candidate Generation and Distance-Scoring
     |_ lmmgr.py                 Language Model creation, candidate lookup and scoring
+    |_ postprocessing.py        Recasing
     |_ processing.py            Main program
- |_ data			Regex lists, entity lists, correction model data, LMs etc.
+ |_ data                        Regex lists, entity lists, correction model data, LMs etc.
  |_ evaluation
-    |_ dev			devset texts and annotations
-    |_ eval			test-set texts and annotations
+    |_ dev                      devset texts and annotations
+    |_ eval                     test-set texts and annotations
 ```
 

@@ -75,13 +75,13 @@ class Prepro:
                         corr = match.group(0)
                         applied = True
                         lgr.debug("ST OOV |%s| Matched Rgx (gr0) Safetoken |%s| Gives |%s| ~ [Rule %s]" %\
-                                  (oov, match.group(0), rule[2], rule[0]))
+                                  (oov, match.group(0), match.group(0), rule[0]))
                     #TODO: add a third type: ^SU, where you re.sub??
                     else:
                         #safe[2] is correct
                         corr = rule[2]
                         applied = True
-                        lgr.debug("ST OOV |%s| Matched Rgx (gr0) Safetoken |%s| Gives |%s| ~ [Rule %s]" %\
+                        lgr.debug("ST OOV |%s| Matched Rgx (r2) Safetoken |%s| Gives |%s| ~ [Rule %s]" %\
                                   (oov, match.group(0), rule[2], rule[0]))    
             # token-type rules
             else:
@@ -100,9 +100,10 @@ class Prepro:
         #return (corr, applied)
         return {"corr": corr, "applied": applied}
 
-    def load_regexes(self, infile=tc.REGPREPRO):
-        """Load regexes that will be used to correct OOVs
-           Rule format: ^id\tcontext\treplacement\t(comment)$"""
+    def load_rules(self, infile):
+        """Load rules (regexes) that will be used to correct OOVs
+           Rule format: ^id\tcontext\treplacement\t(comment)$
+           Rule types: misc-regexes, abbreviation-rules, run-in-regexes"""
         inlines = codecs.open(infile, "r", "utf8").readlines()
         rules = []
         for line in inlines:
@@ -169,7 +170,16 @@ class Prepro:
             
         #return (corr, applied)
         return {"corr": corr, "applied": applied, "IVflag": IVflag}
-                      
+
+    def find_prepro_general(self, oov, rules):
+        """Apply preprocessing rules, returning result and result status
+           applied = True/False, indicating whether a rule has applied or not"""
+        applied = False
+        for rule in rules:
+            match = re.match(rule[1], oov)
+            if match:
+                return {"corr": rule[2], "applied": True}
+        return {"corr": oov, "applied" : False}
 
     def set_doubledchar_dico(self, dc):
         self.doubledchar_dico = dc

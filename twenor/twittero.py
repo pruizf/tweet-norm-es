@@ -144,18 +144,22 @@ class OOV(Token):
         self.has_cands = None
         self.has_LM_cands = None
 
+    # Prepro
     safecorr = None
+    abbrev = None
+    runin = None
     ppro_recorr = None
     ppro_recorr_IV = True
 
+    # ED and LM
     #cands_filtered = None
     #ed_filtered_ranked = None
-    
     edbase = None
     edbase_lmsco = None
     best_ed_cando = None
     lmsco = None
 
+    # Ranking
     keep_orig = None
     assess_edbase = None
 
@@ -181,6 +185,10 @@ class OOV(Token):
         self.ppro_recorr = corr
     def set_ppro_recorr_IV(self, boolean):
         self.ppro_recorr_IV = boolean
+    def set_abbrev(self, abbrev):
+        self.abbrev = abbrev
+    def set_runin(self, runin):
+        self.runin = runin
     def set_correction(self, corr):
         self.correction = corr
     def set_edbase(self, form):

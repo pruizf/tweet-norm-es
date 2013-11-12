@@ -527,3 +527,36 @@ ERR: 0
 POS: 373 
 NEG: 289 
 ACCUR: 56.3444108761 
+Run ID [551], RevNum [a1fccbd] ==================================================
+RunComment: Testing rank and populate refactoring
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+ERR: 0 
+POS: 306 
+NEG: 356 
+ACCUR: 46.2235649547 
+Run ID [552], RevNum [a1fccbd] ==================================================
+RunComment: Testing rank and populate refactoring
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+ERR: 0 
+POS: 373 
+NEG: 289 
+ACCUR: 56.3444108761 
+Run ID [557], RevNum [a1fccbd] ==================================================
+RunComment: Testing rank and populate refactoring
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+ERR: 0 
+POS: 373 
+NEG: 289 
+ACCUR: 56.3444108761 

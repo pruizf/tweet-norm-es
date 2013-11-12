@@ -99,7 +99,7 @@ def call_freeling(textdico):
         print "= FL: Tagging with Freeling, {}".format(time.asctime(time.localtime()))
         fl.tag_texts(textdico)
     else:
-         print"= FL: Skipping Freeling-tagging"
+        print"= FL: Skipping Freeling-tagging"
 
 def load_preprocessing():
     """Return Rule-sets for safe-tokens, regex-based prepro and abbreviations
@@ -109,26 +109,24 @@ def load_preprocessing():
 
     ppro = ppr.Prepro()
     safe_rules = ppro.load_safetokens()
-    rerules = ppro.load_regexes()
+    rerules = ppro.load_rules(tc.REGPREPRO)
+    abbrules = ppro.load_rules(tc.ABBREVS)
+    rinrules = ppro.load_rules(tc.RUNIN)
     if "dc_dico" not in dir(sys.modules["__main__"]):
         print "= prepro: Doubled-char dico, {}".format((time.asctime(time.localtime())))
         dc_dico = ppro.create_doubledchar_dico()
         print "Done {0}".format((time.asctime(time.localtime())))
     else:
         print "= prepro: Skip creating doubled-char dico"
-    #Q: need to set here cos recreating ppro above?
     ppro.set_doubledchar_dico(dc_dico)
-
-    # don't recreate IV dico if in dir for this module
     if "ivs" not in dir(sys.modules["__main__"]):
         print "= prepro: Hashing IV dico, {0}".format(time.asctime(time.localtime()))
         ivs = ppro.generate_known_words()
         print "Done {0}".format(time.asctime(time.localtime()))
     else:
         print "= editor: Skip creating IV dico"
-    #Q: need to set here cos recreating ppro above?
     ppro.set_ivdico(ivs)
-    return ppro, safe_rules, rerules
+    return ppro, safe_rules, rerules, abbrules, rinrules
 
 def load_distance_editor():
     """Instantiate EdScoreMatrix and EdManager instances, returning the latter"""
@@ -197,20 +195,32 @@ def preprocess(oov):
     global lgr
     global tweet
     global ppro
-    # Safetokens -------------------------------------------------------
+    # Safetokens found
     safecorr = ppro.find_safetoken(oov.form, safe_rules)
     if safecorr is not False and safecorr["applied"] is True:
         oov.set_safecorr(safecorr["corr"])
         tweet.set_par_corr(safecorr["corr"], posi=oov.posi)
-    # Regexes ----------------------------------------------------------
-      # only if not safecorr for token
+    # No safetokens
     if oov.safecorr is None:
+        # Regexes 
         ppro_recorr = ppro.find_rematch(oov.form, rerules)
         oov.set_ppro_recorr_IV(ppro_recorr["IVflag"])
         if ppro_recorr["applied"] is True:
             if oov.ppro_recorr_IV:
                 tweet.set_par_corr(ppro_recorr["corr"], posi=oov.posi)                
-            oov.set_ppro_recorr(ppro_recorr["corr"]) 
+            oov.set_ppro_recorr(ppro_recorr["corr"])
+        # Abbreviations
+        if oov.ppro_recorr is not None:
+            pprobase = oov.ppro_recorr
+        else:
+            pprobase = oov.form
+        abbrev = ppro.find_prepro_general(pprobase, abbrules)
+        if abbrev["applied"] is True:
+            oov.set_abbrev(abbrev["corr"])
+        # Run-in Rules
+        runin = ppro.find_prepro_general(pprobase, rinrules)
+        if runin["applied"] is True:
+            oov.set_runin(runin["corr"])    
 
 def create_edit_candidates(oov):
     """Create and score edit-candidates obtained with regexes and with edit-distance"""
@@ -353,7 +363,7 @@ def rank_candidates(oov):
                         repr(oov.form), oov.lmsco, repr(oov.edbase), oov.edbase_lmsco,
                         repr(oov.ed_filtered_ranked[0].form), oov.ed_filtered_ranked[0].lmsco))
                     # partial correction
-                       # shouldn't I check if edbase is IV here? (if wanna do without populate_dico at least)
+                       # if check edbase IV status can read final forms from par_corr?
                     tweet.set_par_corr(oov.edbase, oov.posi)
                 else:
                     oov.assess_edbase = False
@@ -410,7 +420,7 @@ def populate_outdico(all_tweeto, outdico):
                 if oov.ppro_recorr_IV:
                     outdico[tid].append((oov.form, oov.ppro_recorr_posp))
                 else:
-                    if tc.accept_all_regex_modifs:
+                    if tc.accept_all_IV_regex_outputs:
                         outdico[tid].append((oov.form, oov.ppro_recorr_posp))                    
                     elif len(oov.ed_filtered_ranked) > 0:
                         hash_final_form(oov, outdico, tweet)
@@ -420,7 +430,7 @@ def populate_outdico(all_tweeto, outdico):
                 if len(oov.ed_filtered_ranked) > 0:
                     hash_final_form(oov, outdico, tweet)
                 else:
-                    outdico[tid].append((oov.form, oov.form))              
+                    outdico[tid].append((oov.form, oov.form))          
     return outdico
 
 def write_out(corr_dico):
@@ -490,6 +500,8 @@ def main():
     global all_tweets # debug
     global safe_rules
     global rerules
+    global abbrules
+    global rinrules
     global ppro
     global edimgr
     global outdico
@@ -511,7 +523,7 @@ def main():
     call_freeling(textdico)
 
     print "= main: load analyzers"
-    ppro, safe_rules, rerules = load_preprocessing()
+    ppro, safe_rules, rerules, abbrules, rinrules = load_preprocessing()
     edimgr = load_distance_editor()
     slmmgr, binslm = load_lm()
 

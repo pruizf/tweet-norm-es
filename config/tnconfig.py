@@ -100,6 +100,8 @@ doubledchar_dico = APPDIR + r"/data/" + "doubledchar-dic.txt"
 IVDICO = APPDIR + r"/data/" + "aspell-es-expanded.dic"
 SAFETOKENS = APPDIR + r"/data/" + "safelist.txt"
 REGPREPRO = APPDIR + r"/data/" + "preprocessing.txt"
+ABBREVS = APPDIR + r"/data/" + "abbreviations.txt"
+RUNIN = APPDIR + r"/data/" + "runinwords.txt"
 accept_all_IV_regex_outputs = False
 
 # EDIT-DISTANCE ----------------------------------------------------------------
