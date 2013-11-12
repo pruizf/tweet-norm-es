@@ -131,15 +131,29 @@ def load_preprocessing():
 
 def load_entities():
     """Prepare entity-hashes"""
+    global ent_hash
     entity_config = ppro.find_ent_files_active()
     ppro.set_ent_files_active(entity_config)
     if "ent_hash" not in dir(sys.modules["__main__"]):
         print "= prepro: Hashing entity files, {0}".format(time.asctime(time.localtime()))
         ent_hash = ppro.hash_entity_files()
         print "Done, {0}".format(time.asctime(time.localtime()))
+        return ent_hash
     else:
-        print "=prepro: Skip creating entity-hashes"
-    return ent_hash
+        print "= prepro: Skip creating entity-hashes"
+    return sys.modules[__name__].ent_hash
+        
+
+def merge_iv_and_entities(ivs, ent_hash):
+    """Add entities to the IV dico"""
+    global ivs_only
+    ivs_only = copy.deepcopy(ivs)
+    for key in ent_hash:
+        if key not in ivs:
+            ivs[key] = 1
+    print "+ IV dico length: {0}".format(len(ivs_only))
+    print "+ IV + Entities dico length: {0}".format(len(ivs))
+    return ivs
 
 def load_distance_editor():
     """Instantiate EdScoreMatrix and EdManager instances, returning the latter"""
@@ -542,6 +556,7 @@ def main():
     global rerules
     global abbrules
     global rinrules
+    global ivs
     global ent_hash
     global ppro
     global edimgr
@@ -552,6 +567,14 @@ def main():
     lgr, lfh, clargs = preliminary_preps()
     
     # processing ---------------------------------------------------------------
+    ok = raw_input("Need to reset the IV dictionary (if just tc.merged_iv_and_entities)? [y] to reset\n")
+    if ok == "y":
+        print "+ Deleting 'ivs' in current scope"
+        delattr(sys.modules[__name__], "ivs")
+        if "ivs_only" in dir(sys.modules["__main__"]):
+            print "+ Deleting 'ivs_only' in current scope"
+            delattr(sys.modules[__name__], "ivs_only")
+
     print "Start {0}".format(time.asctime(time.localtime()))
     print "Run ID: %s" % prep.find_run_id()
     lgr.info("Run {0} START | Rev [{1}] {2}".format(tc.RUNID, prep.find_git_revnum(), "="*60))
@@ -566,6 +589,8 @@ def main():
     print "= main: load analyzers"
     ppro, safe_rules, rerules, abbrules, rinrules = load_preprocessing()
     ent_hash = load_entities()
+    if tc.merge_iv_and_entities:
+        ivs = merge_iv_and_entities(ivs, ent_hash)
     edimgr = load_distance_editor()
     slmmgr, binslm = load_lm()
 

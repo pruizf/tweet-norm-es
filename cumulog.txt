@@ -626,3 +626,69 @@ ERR: 0
 POS: 415 
 NEG: 247 
 ACCUR: 62.6888217523 
+Run ID [578], RevNum [3d88a87] ==================================================
+RunComment: THIS IS WHEN MERGING THE IV DICO AND THE ENTITY HASH. Goes down a bit, see Site for examples.
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+ERR: 0 
+POS: 410 
+NEG: 252 
+ACCUR: 61.9335347432 
+Run ID [579], RevNum [3d88a87] ==================================================
+RunComment: Abbrevs and run-in in output. Testing entity-hashing
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+ERR: 0 
+POS: 410 
+NEG: 252 
+ACCUR: 61.9335347432 
+Run ID [580], RevNum [XXXXX] ==================================================
+RunComment: Abbrevs and run-in in output. Testing entity-hashing
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+ERR: 0 
+POS: 415 
+NEG: 247 
+ACCUR: 62.6888217523 
+Run ID [586], RevNum [XXXXX] ==================================================
+RunComment: Abbrevs and run-in in output. Testing entity-hashing
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+ERR: 0 
+POS: 410 
+NEG: 252 
+ACCUR: 61.9335347432 
+Run ID [590], RevNum [3d88a87] ==================================================
+RunComment: Abbrevs and run-in in output. Testing entity-hashing
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+ERR: 0 
+POS: 410 
+NEG: 252 
+ACCUR: 61.9335347432 
+Run ID [591], RevNum [3d88a87] ==================================================
+RunComment: THIS IS BACK TO UNMERGED IV AND ENT. 
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+ERR: 0 
+POS: 415 
+NEG: 247 
+ACCUR: 62.6888217523 

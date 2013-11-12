@@ -129,6 +129,7 @@ ent_use = {"jrc":      (1, "jrc_names.txt"),
            "geonames": (0, "geonames.txt"),       #tks 1 min to hash into a python dico
            "savas":    (1, "savas_es_names.txt"),
            "xtyle":    (1, "xtyle_names.txt")}
+merge_iv_and_entities = False
 
 # OTHER ------------------------------------------------------------------------
 BLANKLINES_RE = re.compile(r"^\s*$")
