@@ -763,3 +763,17 @@ ERR: 0
 POS: 415 
 NEG: 247 
 ACCUR: 62.6888217523 
+== Run ID [607], RevNum [f79c001] ================================================
+RunComment: x
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+accept_all_IV_regex_outputs: False
+merge_iv_and_entities: False
+corpus: test
+ERR: 0 
+POS: 415 
+NEG: 247 
+ACCUR: 62.6888217523 

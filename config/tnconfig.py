@@ -7,7 +7,7 @@ import sys
 COMMENT = "x"
 RUNID = None
 TAG = False                    # Tag with Freeling (1) or read tags from TAGSDIR (0)
-ENV = "W"                   # Work, Home, Server
+ENV = "S"                   # Work, Home, Server
 EVAL = bool(1)              # test (1) vs. dev (0) sets
 if ENV == "W":
     RESDIR = "/home/pruiz/DATA/projects/Tweet-Norm/results2"
