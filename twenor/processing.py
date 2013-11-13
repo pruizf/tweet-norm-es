@@ -39,6 +39,7 @@ if "ppro" in dir(): reload(ppr)
 if "editor" in dir(): reload(editor)
 if "lmmgr" in dir(): reload(lmmgr)
 if "posp" in dir(): reload(posp)
+if "entities" in dir(): reload(entities)
 
 import tnconfig as tc
 import preparation as prep
@@ -51,6 +52,8 @@ import editor
 import edcosts
 import lmmgr
 import postprocessing as posp
+import entities
+
 
 # functions ================================================================
 
@@ -181,6 +184,20 @@ def load_lm():
         print "= LM: Skip creating binary LM"
     slmmgr.set_slmbin(binslm)
     return slmmgr, binslm
+
+def load_entity_manager(ent_hash, ivs, edimgr, lmmgr):
+    entmgr = entities.EntityMgr(ent_hash, ivs, edimgr, lmmgr)
+    return entmgr
+
+def check_entity_basic(oov, form, toktype="n/a"):
+    """Look for exact matches or case-variants for a form (str) in an entity-list,
+       and set properties in <oov> accordingly. <toktype> is for logging"""
+    ent_status = entmgr.find_entity(form, toktype)
+    if ent_status["applied"] is True:
+        oov.entifin = ent_status["corr"]
+        tweet.set_par_corr(oov.entifin, posi=oov.posi)
+        return True
+    return False
 
 def parse_tweets(textdico):
     """Create Tweet, Token and OOV instances. Prepare dico for final outputs"""
@@ -356,9 +373,6 @@ def rank_candidates(oov):
 
         # Compare oov.lmsco, oov.edbase_lmsco and lmsco for best candidate
         if len(oov.ed_filtered_ranked) > 0:
-            #if oov.edbase == 'si' and tweet.tid == '318707630908534784': #DEBUG
-            #    import pdb
-            #    pdb.set_trace()
             if oov.lmsco >= oov.edbase_lmsco:
                 oov.assess_edbase = False
                 if oov.form == oov.edbase:
@@ -418,10 +432,6 @@ def rank_candidates(oov):
 
 def hash_final_form(oov, outdico, tweet):
     """Choose among edbase, oov.form and best candidate form given OOV instance state"""
-    #if oov.edbase == 'si' and tid == '318707630908534784': #DEBUG
-    #if tid == '318707630908534784':
-    #    import pdb
-    #    pdb.set_trace()
     if oov.assess_edbase:
         lgr.debug("WR O [{0}], Using the EB [{1}]".format(oov.form, oov.edbase))
         oov.edbase_posp = posp.recase(oov.form, oov.edbase, tweet)
@@ -452,6 +462,12 @@ def populate_outdico(all_tweeto, outdico):
                 outdico[tid].append((oov.form, oov.safecorr_posp))
                 lgr.debug("WRF O [{0}], C [{1}], T [{2}]".format(
                     repr(oov.form), repr(oov.safecorr_posp), "ST"))
+            elif oov.entifin is not None:
+                outdico[tid].append((oov.form, oov.entifin))                
+                lgr.debug("WRF O [{0}], C [{1}], T [{2}]".format(
+                    repr(oov.form), repr(oov.entifin), "EN_1"))
+                # next if entifin
+                continue
             elif oov.abbrev is not None:
                 oov.abbrev_posp = posp.recase(oov.form, oov.abbrev, tweet)
                 outdico[tid].append((oov.form, oov.abbrev_posp))
@@ -538,14 +554,16 @@ def write_to_cumulog(clargs=None):
         inf["corpus"] = "test"
     else:
         inf["corpus"] = "dev"
+    envs_dico = {"W": "work", "H": "home", "S": "hslt-server"}
+    inf["enviro"] = envs_dico[tc.ENV]
     outhead = "== Run ID [{0}], RevNum [{1}] {2}\n".format(inf["run_id"], inf["revnum"], "="*48)
     with codecs.open(tc.EVALFN.format(prep.find_run_id()), "r", "utf8") as done_res:
         with codecs.open(tc.CUMULOG, "a", "utf8") as cumu_res:
             cumu_res.write(outhead)
             cumu_res.write("RunComment: {0}\n".format(inf["run_comment"]))
-            for key in ["maxdista", "distaw", "lmw", "lmpath", "increment_norm", 
-                        "accept_all_IV_regex_outputs", "merge_iv_and_entities",
-                        "corpus"]:
+            for key in ["enviro", "maxdista", "distaw", "lmw", "lmpath",
+                        "increment_norm", "accept_all_IV_regex_outputs",
+                        "merge_iv_and_entities", "corpus"]:
                 cumu_res.write("{0}: {1}\n".format(key, inf[key]))
             cumu_res.write("".join(done_res.readlines()[-4:]))
 
@@ -565,6 +583,7 @@ def main():
     global rinrules
     global ivs
     global ent_hash
+    global entmgr
     global ppro
     global edimgr
     global outdico
@@ -602,6 +621,7 @@ def main():
         ivs = merge_iv_and_entities(ivs, ent_hash)
     edimgr = load_distance_editor()
     slmmgr, binslm = load_lm()
+    entmgr = load_entity_manager(ent_hash, ivs, edimgr, lmmgr)
 
     print "= twittero: creating Tweet instances"
     all_tweeto, outdico = parse_tweets(textdico)
@@ -618,10 +638,11 @@ def main():
             if not isinstance(tok, OOV):
                 continue
             oov = tok # easier label
-            preprocess(oov)
-            create_edit_candidates(oov)
-            find_lm_scores(oov)
-            rank_candidates(oov)
+            if not check_entity_basic(oov, oov.form, "O"):
+                preprocess(oov)
+                create_edit_candidates(oov)
+                find_lm_scores(oov)
+                rank_candidates(oov)
         x += 1
         if x % 100 == 0:
             print("Done {0} tweets, {1}".format(x, time.asctime(time.localtime())))

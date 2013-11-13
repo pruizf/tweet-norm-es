@@ -6,8 +6,8 @@ import sys
 # BASIC ========================================================================
 COMMENT = "x"
 RUNID = None
-TAG = False                    # Tag with Freeling (1) or read tags from TAGSDIR (0)
-ENV = "S"                   # Work, Home, Server
+TAG = False                 # Tag with Freeling (1) or read tags from TAGSDIR (0)
+ENV = "W"                   # Work, Home, Server
 EVAL = bool(1)              # test (1) vs. dev (0) sets
 if ENV == "W":
     RESDIR = "/home/pruiz/DATA/projects/Tweet-Norm/results2"
@@ -115,7 +115,15 @@ distaw = 0.7 # weight for distance scores
 
 # LANGUAGE MODELS --------------------------------------------------------------
 increment_norm = True # ltr, use normalized tokens as context for later tokens
-lmpath = APPDIR + "/data/" + "SUMATCasedLM_kenlm_es.arpa"
+if ENV in ["W", "H"]:
+    lmpath = APPDIR + "/data/" + "SUMATCasedLM_kenlm_es.arpa"
+    #lmpath = "/home/VICOMTECH/share/Tweet-Norm/lms/es_strict_noht_lc.arpa"
+if ENV == "S":
+    lmpath = "/home/VICOMTECH/share/SUMAT/LanguageModels/OpenSubs/5-gram/es/OpenSubsLM_kenlm_es.arpa"
+
+
+
+
 lm_window = 4
 lmw = 0.3 # weight for lm scores
 

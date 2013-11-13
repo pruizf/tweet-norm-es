@@ -151,6 +151,9 @@ class OOV(Token):
     ppro_recorr = None
     ppro_recorr_IV = True
 
+    # Entities
+    entifin = None
+
     # ED and LM
     #cands_filtered = None
     #ed_filtered_ranked = None
