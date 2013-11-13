@@ -157,17 +157,17 @@ class Prepro:
                         lgr.debug("RE Ph2, Initial: [%s], Ph1: [%s], Before: [%s], After: [%s] || Rule [%s]: [%s]" % \
                                       (oov, ph1corr, corr_before, corr, rule[0], repr([rule[1].pattern, rule[2]])))
                 else:
-                    lgr.debug("RE Ph2 NOT applying to |%s| , |%s|: is in doubledchar_dico" % (ph1corr, corr_before))
+                    lgr.debug("RE Ph2 NOT applying to [%s] , [%s]: is in doubledchar_dico" % (ph1corr, corr_before))
         if applied:
             if corr in self.ivdico:
                 IVflag = True
             else:
                 IVflag = False
-            lgr.debug("RE Out, OOV |{}|, recorr |{}| , IVFlag |{}|, [RE_Changed]".format(
+            lgr.debug("RE Out, OOV [{0}], recorr [{1}] , IVFlag [{2}], [RE_Changed]".format(
                 repr(oov), repr(corr), IVflag))
         else:
             IVflag = None
-            lgr.debug("RE Out, OOV |{}|, recorr |{}| [RE_Unchanged]".format(repr(oov), repr(corr)))
+            lgr.debug("RE Out, OOV [{0}], recorr [{1}] [RE_Unchanged]".format(repr(oov), repr(corr)))
             
         #return (corr, applied)
         return {"corr": corr, "applied": applied, "IVflag": IVflag}

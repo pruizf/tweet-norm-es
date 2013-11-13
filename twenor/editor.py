@@ -197,7 +197,7 @@ class EdManager:
                 del result[cand]
             elif cand == oov:
                 del result[cand]
-        lgr.debug("RED RES {}, APPT {}".format(repr(result), repr(apptimes)))
+        lgr.debug("RED RES {0}, APPT {1}".format(repr(result), repr(apptimes)))
         return {"cands": result, "apptimes" : apptimes}
     
     def edits1(self, word):
@@ -231,10 +231,10 @@ class EdManager:
            The cost-matrix is organized as mat[corr][incorr]
            Assumes that "a" and "b" are utf8-decoded"""
         if type(a) is not unicode and a != "zero":
-            lgr.warn("Not unicode: [{}]".format(repr(a)))
+            lgr.warn("Not unicode: [{0}]".format(repr(a)))
 
         elif type(b) is not unicode and b != "zero":
-            lgr.warn("Not unicode: [{}]".format(repr(b)))
+            lgr.warn("Not unicode: [{0}]".format(repr(b)))
             
         if a == b:
             cost = 0

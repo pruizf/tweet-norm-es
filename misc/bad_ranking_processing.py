@@ -1,6 +1,8 @@
 #!/usr/bin/python2.7
 # -*- coding: utf-8 -*-
 
+# THIS RANKING DECRASES ACCU BY 10 pp
+
 import argparse
 import codecs
 from collections import defaultdict
@@ -55,7 +57,6 @@ import postprocessing as posp
 # functions ================================================================
 
 def set_option_parser():
-    """Set option parser and return command-line arguments"""
     parser = argparse.ArgumentParser(prog='processing.py')
     parser.add_argument("-t", "--tag", action="store_true", help="tag with FreeLing")
     parser.add_argument("-c", "--comment", help="comment for run (shown in cumulog.txt)")
@@ -75,7 +76,7 @@ def preliminary_preps():
     lgr, lfh = prep.set_log(__name__, logfile_name, False)
     # cl options
     clargs = set_option_parser()
-    if clargs.tag is not None and clargs.tag:
+    if clargs is not None and clargs.tag:
         tc.TAG = True
     elif clargs is not None and not clargs.tag:
         tc.TAG = False
@@ -97,10 +98,10 @@ def call_freeling(textdico):
     if not os.path.exists(tc.TAGSDIR):
         os.makedirs(tc.TAGSDIR)
     if tc.TAG:
-        print "= FL: Tagging with Freeling, {0}".format(time.asctime(time.localtime()))
+        print "= FL: Tagging with Freeling, {}".format(time.asctime(time.localtime()))
         fl.tag_texts(textdico)
     else:
-        print"= FL: Skipping Freeling-tagging"
+         print"= FL: Skipping Freeling-tagging"
 
 def load_preprocessing():
     """Return Rule-sets for safe-tokens, regex-based prepro and abbreviations
@@ -110,50 +111,26 @@ def load_preprocessing():
 
     ppro = ppr.Prepro()
     safe_rules = ppro.load_safetokens()
-    rerules = ppro.load_rules(tc.REGPREPRO)
-    abbrules = ppro.load_rules(tc.ABBREVS)
-    rinrules = ppro.load_rules(tc.RUNIN)
+    rerules = ppro.load_regexes()
     if "dc_dico" not in dir(sys.modules["__main__"]):
-        print "= prepro: Doubled-char dico, {0}".format((time.asctime(time.localtime())))
+        print "= prepro: Doubled-char dico, {}".format((time.asctime(time.localtime())))
         dc_dico = ppro.create_doubledchar_dico()
         print "Done {0}".format((time.asctime(time.localtime())))
     else:
         print "= prepro: Skip creating doubled-char dico"
+    #Q: need to set here cos recreating ppro above?
     ppro.set_doubledchar_dico(dc_dico)
+
+    # don't recreate IV dico if in dir for this module
     if "ivs" not in dir(sys.modules["__main__"]):
         print "= prepro: Hashing IV dico, {0}".format(time.asctime(time.localtime()))
         ivs = ppro.generate_known_words()
         print "Done {0}".format(time.asctime(time.localtime()))
     else:
         print "= editor: Skip creating IV dico"
+    #Q: need to set here cos recreating ppro above?
     ppro.set_ivdico(ivs)
-    return ppro, safe_rules, rerules, abbrules, rinrules
-
-def load_entities():
-    """Prepare entity-hashes"""
-    global ent_hash
-    entity_config = ppro.find_ent_files_active()
-    ppro.set_ent_files_active(entity_config)
-    if "ent_hash" not in dir(sys.modules["__main__"]):
-        print "= prepro: Hashing entity files, {0}".format(time.asctime(time.localtime()))
-        ent_hash = ppro.hash_entity_files()
-        print "Done, {0}".format(time.asctime(time.localtime()))
-        return ent_hash
-    else:
-        print "= prepro: Skip creating entity-hashes"
-    return sys.modules[__name__].ent_hash
-        
-
-def merge_iv_and_entities(ivs, ent_hash):
-    """Add entities to the IV dico"""
-    global ivs_only
-    ivs_only = copy.deepcopy(ivs)
-    for key in ent_hash:
-        if key not in ivs:
-            ivs[key] = 1
-    print "+ IV dico length: {0}".format(len(ivs_only))
-    print "+ IV + Entities dico length: {0}".format(len(ivs))
-    return ivs
+    return ppro, safe_rules, rerules
 
 def load_distance_editor():
     """Instantiate EdScoreMatrix and EdManager instances, returning the latter"""
@@ -222,34 +199,20 @@ def preprocess(oov):
     global lgr
     global tweet
     global ppro
-    # Safetokens found
+    # Safetokens -------------------------------------------------------
     safecorr = ppro.find_safetoken(oov.form, safe_rules)
     if safecorr is not False and safecorr["applied"] is True:
         oov.set_safecorr(safecorr["corr"])
         tweet.set_par_corr(safecorr["corr"], posi=oov.posi)
-    # No safetokens
+    # Regexes ----------------------------------------------------------
+      # only if not safecorr for token
     if oov.safecorr is None:
-        # Regexes 
         ppro_recorr = ppro.find_rematch(oov.form, rerules)
         oov.set_ppro_recorr_IV(ppro_recorr["IVflag"])
         if ppro_recorr["applied"] is True:
             if oov.ppro_recorr_IV:
                 tweet.set_par_corr(ppro_recorr["corr"], posi=oov.posi)                
-            oov.set_ppro_recorr(ppro_recorr["corr"])
-        # Abbreviations
-        if oov.ppro_recorr is not None:
-            pprobase = oov.ppro_recorr
-        else:
-            pprobase = oov.form
-        abbrev = ppro.find_prepro_general(pprobase, abbrules, ruletype="AB")
-        if abbrev["applied"] is True:
-            oov.set_abbrev(abbrev["corr"])
-            tweet.set_par_corr(abbrev["corr"], posi=oov.posi)
-        # Run-in Rules
-        runin = ppro.find_prepro_general(pprobase, rinrules, ruletype="RI")
-        if runin["applied"] is True:
-            oov.set_runin(runin["corr"])    
-            tweet.set_par_corr(runin["corr"], posi=oov.posi)
+            oov.set_ppro_recorr(ppro_recorr["corr"]) 
 
 def create_edit_candidates(oov):
     """Create and score edit-candidates obtained with regexes and with edit-distance"""
@@ -259,7 +222,7 @@ def create_edit_candidates(oov):
     rgx_corr_cand_forms = {}
 
     # Determine form to base edit-candidates on    
-    if oov.safecorr is None and oov.abbrev is None and oov.runin is None:
+    if oov.safecorr is None:
         if oov.ppro_recorr is None:
             oov.set_edbase(oov.form)
         else:
@@ -392,7 +355,7 @@ def rank_candidates(oov):
                         repr(oov.form), oov.lmsco, repr(oov.edbase), oov.edbase_lmsco,
                         repr(oov.ed_filtered_ranked[0].form), oov.ed_filtered_ranked[0].lmsco))
                     # partial correction
-                       # if check edbase IV status can read final forms from par_corr?
+                       # shouldn't I check if edbase is IV here? (if wanna do without populate_dico at least)
                     tweet.set_par_corr(oov.edbase, oov.posi)
                 else:
                     oov.assess_edbase = False
@@ -426,23 +389,16 @@ def hash_final_form(oov, outdico, tweet):
         lgr.debug("WR O [{0}], Using the EB [{1}]".format(oov.form, oov.edbase))
         oov.edbase_posp = posp.recase(oov.form, oov.edbase, tweet)
         outdico[tweet.tid].append((oov.form, oov.edbase_posp))
-        lgr.debug("WRF O [{0}], C [{1}], T [{2}]".format(
-            repr(oov.form), repr(oov.edbase_posp), "EB||Orig||BC"))
     elif oov.keep_orig:
         outdico[tweet.tid].append((oov.form, oov.form))
-        lgr.debug("WRF O [{0}], C [{1}], T [{2}]".format(
-            repr(oov.form), repr(oov.form), "Orig||EB||BC"))
     else:
         oov.best_ed_cando_posp = posp.recase(oov.form, oov.best_ed_cando.form, tweet)
-        outdico[tweet.tid].append((oov.form, oov.best_ed_cando_posp))
-        lgr.debug("WRF O [{0}], C [{1}], T [{2}]".format(
-        repr(oov.form), repr(oov.best_ed_cando_posp), "BC||EB||Orig"))
-                  
+        outdico[tweet.tid].append((oov.form, oov.best_ed_cando_posp))                    
+
 def populate_outdico(all_tweeto, outdico):
     """Select candidates for final output filling a hash with them"""
     for tid in all_tweeto:
         tweet = all_tweeto[tid]
-        lgr.debug("POPULATE FINAL DICO, TID [{0}]".format(tid))
         for tok in tweet.toks:
             if not isinstance(tok, OOV):
                 continue
@@ -450,30 +406,23 @@ def populate_outdico(all_tweeto, outdico):
             if oov.safecorr is not None:
                 oov.safecorr_posp = posp.recase(oov.form, oov.safecorr, tweet)
                 outdico[tid].append((oov.form, oov.safecorr_posp))
-                lgr.debug("WRF O [{0}], C [{1}], T [{2}]".format(
-                    repr(oov.form), repr(oov.safecorr_posp), "ST"))
-            elif oov.abbrev is not None:
-                oov.abbrev_posp = posp.recase(oov.form, oov.abbrev, tweet)
-                outdico[tid].append((oov.form, oov.abbrev_posp))
-                lgr.debug("WRF O [{0}], C [{1}], T [{2}]".format(
-                    repr(oov.form), repr(oov.abbrev_posp), "AB"))
-            elif oov.runin is not None:
-                oov.runin_posp = posp.recase(oov.form, oov.runin, tweet)
-                outdico[tid].append((oov.form, oov.runin_posp))
-                lgr.debug("WRF O [{0}], C [{1}], T [{2}]".format(
-                    repr(oov.form), repr(oov.runin_posp), "RI"))                
             elif oov.ppro_recorr is not None:
                 oov.ppro_recorr_posp = posp.recase(oov.form, oov.ppro_recorr, tweet)
                 # if verify IV status above could read from par_corr?
                 if oov.ppro_recorr_IV:
-                    outdico[tid].append((oov.form, oov.ppro_recorr_posp))
-                    lgr.debug("WRF O [{0}], C [{1}], T [{2}]".format(
-                        repr(oov.form), repr(oov.ppro_recorr_posp), "PRE-IV"))
-                else:
-                    if tc.accept_all_IV_regex_outputs:
+                    if tc.accept_all_regex_modifs:
                         outdico[tid].append((oov.form, oov.ppro_recorr_posp))
-                        lgr.debug("WRF O [{0}], C [{1}], T [{2}]".format(
-                            repr(oov.form), repr(oov.ppro_recorr_posp), "PRE-Accept-All"))
+                    elif len(oov.ed_filtered_ranked) > 0:
+                        if oov.assess_edbase:
+                            outdico[tid].append((oov.form, oov.ppro_recorr_posp))
+                        else:
+                            oov.best_ed_cando_posp = posp.recase(oov.form, oov.best_ed_cando.form, tweet)
+                            outdico[tid].append((oov.form, oov.best_ed_cando_posp))
+                    else:
+                        outdico[tid].append((oov.form, oov.ppro_recorr_posp))
+                else:
+                    if tc.accept_all_regex_modifs:
+                        outdico[tid].append((oov.form, oov.ppro_recorr_posp))                    
                     elif len(oov.ed_filtered_ranked) > 0:
                         hash_final_form(oov, outdico, tweet)
                     else:
@@ -482,9 +431,7 @@ def populate_outdico(all_tweeto, outdico):
                 if len(oov.ed_filtered_ranked) > 0:
                     hash_final_form(oov, outdico, tweet)
                 else:
-                    outdico[tid].append((oov.form, oov.form))
-                    lgr.debug("WRF O [{0}], C [{1}], T [{2}]".format(
-                        repr(oov.form), repr(oov.form), "Orig-Default"))
+                    outdico[tid].append((oov.form, oov.form))          
     return outdico
 
 def write_out(corr_dico):
@@ -533,20 +480,13 @@ def write_to_cumulog(clargs=None):
         inf["lm_window"] = tc.lm_window
     inf["increment_norm"] = tc.increment_norm
     inf["accept_all_IV_regex_outputs"] = tc.accept_all_IV_regex_outputs
-    inf["merge_iv_and_entities"] = tc.merge_iv_and_entities
-    if tc.EVAL:
-        inf["corpus"] = "test"
-    else:
-        inf["corpus"] = "dev"
-    outhead = "== Run ID [{0}], RevNum [{1}] {2}\n".format(inf["run_id"], inf["revnum"], "="*48)
+    outhead = "Run ID [{0}], RevNum [{1}] {2}\n".format(inf["run_id"], inf["revnum"], "="*50)
     with codecs.open(tc.EVALFN.format(prep.find_run_id()), "r", "utf8") as done_res:
         with codecs.open(tc.CUMULOG, "a", "utf8") as cumu_res:
             cumu_res.write(outhead)
-            cumu_res.write("RunComment: {0}\n".format(inf["run_comment"]))
-            for key in ["maxdista", "distaw", "lmw", "lmpath", "increment_norm", 
-                        "accept_all_IV_regex_outputs", "merge_iv_and_entities",
-                        "corpus"]:
-                cumu_res.write("{0}: {1}\n".format(key, inf[key]))
+            cumu_res.write("RunComment: {}\n".format(inf["run_comment"]))
+            for key in ["maxdista", "distaw", "lmw", "lmpath", "increment_norm"]:
+                cumu_res.write("{}: {}\n".format(key, inf[key]))
             cumu_res.write("".join(done_res.readlines()[-4:]))
 
     
@@ -561,10 +501,6 @@ def main():
     global all_tweets # debug
     global safe_rules
     global rerules
-    global abbrules
-    global rinrules
-    global ivs
-    global ent_hash
     global ppro
     global edimgr
     global outdico
@@ -574,16 +510,6 @@ def main():
     lgr, lfh, clargs = preliminary_preps()
     
     # processing ---------------------------------------------------------------
-
-    # Check if need to delete in-memory IV and entities dicos (if just changed config)
-    ok = raw_input("Need to reset the IV dictionary (if changed tc.merged_iv_and_entities)? [y] to reset\n")
-    if ok == "y":
-        print "- Deleting 'ivs' (Imerged IV + ent) in current scope"
-        delattr(sys.modules[__name__], "ivs")
-        if "ivs_only" in dir(sys.modules["__main__"]):
-            print "- Deleting 'ivs_only' (IV) in current scope"
-            delattr(sys.modules[__name__], "ivs_only")
-
     print "Start {0}".format(time.asctime(time.localtime()))
     print "Run ID: %s" % prep.find_run_id()
     lgr.info("Run {0} START | Rev [{1}] {2}".format(tc.RUNID, prep.find_git_revnum(), "="*60))
@@ -596,10 +522,7 @@ def main():
     call_freeling(textdico)
 
     print "= main: load analyzers"
-    ppro, safe_rules, rerules, abbrules, rinrules = load_preprocessing()
-    ent_hash = load_entities()
-    if tc.merge_iv_and_entities:
-        ivs = merge_iv_and_entities(ivs, ent_hash)
+    ppro, safe_rules, rerules = load_preprocessing()
     edimgr = load_distance_editor()
     slmmgr, binslm = load_lm()
 

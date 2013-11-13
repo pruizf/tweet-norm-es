@@ -45,10 +45,10 @@ def recase(orig, prop, tweet):
     else:
         return prop
 
-# other post-processing: uppercase if preceding token is sentence_delim
-#   regardless of orig status
-
-# yet other: if jibberish string, put original and that's it
+# TODO: Allcaps tokens become caps-initial if caps initial variant in entity-dico
+#       If lc variant in IV dico, see what ws convention is: lc, or original case?
+#
+#       Other: if jibberish string, put original and that's it
 
 
     

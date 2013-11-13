@@ -32,6 +32,8 @@ optional arguments:
   -t, --tag             tag with FreeLing
   -c COMMENT, --comment COMMENT
                         comment for run (shown in cumulog.txt)
+
+#COMMAND_LINE OPTIONS BELOW HERE NOT FUNCTIONAL (set them in config/tnconfig.py)
   -b, --baseline        baseline run: accept all OOV
   -x MAXDISTA, --maxdista MAXDISTA
                         maximum edit distance above which candidate is
@@ -46,7 +48,7 @@ optional arguments:
 
 E.g.
 
->>> sys.argv = ["", "--comment", "testing baseline settings", "--tag"]
+>>> sys.argv = ["", "--comment", "test Freeling tagging", "--tag"]
 >>> execfile("/path/to/tnor2/twenor/processing.py")
 ```
 

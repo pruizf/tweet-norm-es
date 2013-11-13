@@ -39,7 +39,7 @@ class SLM:
     def create_bin_lm(self):
         """Create binary LM with SRILM from Arpa file"""
         if not "slmbin" in dir(sys.modules["__main__"]):
-            msg = "= LM: Creating SRILM binary LM from Arpa file [{}], {}".format(
+            msg = "= LM: Creating SRILM binary LM from Arpa file [{0}], {1}".format(
                 self.arpa_path, time.asctime(time.localtime()))
             print msg ; lgr.debug(msg)
             slmbin = srilm.LM(self.arpa_path)

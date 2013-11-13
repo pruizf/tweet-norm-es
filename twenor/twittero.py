@@ -58,7 +58,7 @@ class Tweet:
                 if tok.isOOV:
                     # create OOV instance only if in reference annotations
                     if tok.form not in self.ref_OOVs:
-                        lgr.warn("TID [{}]: Skipping found OOV [{}], posi [{}], reason [Not in Ref]".format(
+                        lgr.warn("TID [{0}]: Skipping found OOV [{1}], posi [{2}], reason [Not in Ref]".format(
                             self.tid, repr(tok.form), idx))
                         continue
                     self.toks[idx] = OOV(tok.form)
@@ -106,10 +106,10 @@ class Tweet:
         par_out = []
         for idx, tok in enumerate(self.par_corr):
             if idx == posi:
-                par_out.append("**{}".format(repr(tok.form)))
+                par_out.append("**{0}".format(repr(tok.form)))
             else:
                 par_out.append(tok.form)
-        lgr.debug("par_corr {}".format(repr(par_out)))
+        lgr.debug("par_corr {0}".format(repr(par_out)))
 
 class Token:
     def __init__(self, form):

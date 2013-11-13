@@ -22,7 +22,7 @@ def set_log(lh_name, lf_name, propa=False):
 
 def find_git_revnum():
     """Find Git revision number for revision used"""
-    git_dir = "{}/.git".format(tc.APPDIR)    
+    git_dir = "{0}/.git".format(tc.APPDIR)    
     return subprocess.check_output(["git", "--git-dir=%s" % git_dir, "describe", "--always"]).strip()
     
 def find_run_id(increase=False):

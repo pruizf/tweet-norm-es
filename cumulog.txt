@@ -692,3 +692,74 @@ ERR: 0
 POS: 415 
 NEG: 247 
 ACCUR: 62.6888217523 
+Run ID [592], RevNum [28b7d30] ==================================================
+RunComment: Abbrevs and run-in in output. Testing entity-hashing
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+ERR: 0 
+POS: 415 
+NEG: 247 
+ACCUR: 62.6888217523 
+Run ID [593], RevNum [28b7d30] ==================================================
+RunComment: x
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+ERR: 0 
+POS: 410 
+NEG: 252 
+ACCUR: 61.9335347432 
+Run ID [596], RevNum [28b7d30] ==================================================
+RunComment: x
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+ERR: 1 
+POS: 398 
+NEG: 206 
+ACCUR: 60.9494640123 
+Run ID [597], RevNum [28b7d30] ==================================================
+RunComment: x
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+ERR: 1 
+POS: 386 
+NEG: 218 
+ACCUR: 59.1117917305 
+== Run ID [598], RevNum [28b7d30] ================================================
+RunComment: x
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+== Run ID [602], RevNum [28b7d30] ================================================
+RunComment: x
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+== Run ID [603], RevNum [28b7d30] ================================================
+RunComment: x
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+accept_all_IV_regex_outputs: False
+merge_iv_and_entities: False
+corpus: test
+ERR: 0 
+POS: 415 
+NEG: 247 
+ACCUR: 62.6888217523 
