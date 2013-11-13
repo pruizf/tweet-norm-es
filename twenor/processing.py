@@ -186,12 +186,15 @@ def load_lm():
     return slmmgr, binslm
 
 def load_entity_manager(ent_hash, ivs, edimgr, lmmgr):
+    """Instantiate the entity manager class"""
+    #TODO: is a separate function necessary?
     entmgr = entities.EntityMgr(ent_hash, ivs, edimgr, lmmgr)
     return entmgr
 
 def check_entity_basic(oov, form, toktype="n/a"):
     """Look for exact matches or case-variants for a form (str) in an entity-list,
        and set properties in <oov> accordingly. <toktype> is for logging"""
+    #TODO: is it needed to give it an object? Refactoring?
     ent_status = entmgr.find_entity(form, toktype)
     if ent_status["applied"] is True:
         oov.entifin = ent_status["corr"]
@@ -638,11 +641,10 @@ def main():
             if not isinstance(tok, OOV):
                 continue
             oov = tok # easier label
-            if not check_entity_basic(oov, oov.form, "O"):
-                preprocess(oov)
-                create_edit_candidates(oov)
-                find_lm_scores(oov)
-                rank_candidates(oov)
+            preprocess(oov)
+            create_edit_candidates(oov)
+            find_lm_scores(oov)
+            rank_candidates(oov)
         x += 1
         if x % 100 == 0:
             print("Done {0} tweets, {1}".format(x, time.asctime(time.localtime())))

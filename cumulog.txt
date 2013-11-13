@@ -792,3 +792,18 @@ ERR: 0
 POS: 402 
 NEG: 260 
 ACCUR: 60.7250755287 
+== Run ID [619], RevNum [368d444] ================================================
+RunComment: Checking if all fine after removing basic (BAD) treatment of entities
+enviro: work
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+accept_all_IV_regex_outputs: False
+merge_iv_and_entities: False
+corpus: test
+ERR: 0 
+POS: 415 
+NEG: 247 
+ACCUR: 62.6888217523 
