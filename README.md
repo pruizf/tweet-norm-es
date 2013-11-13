@@ -4,7 +4,6 @@ tnor2: Tweet Normalization
 Requires
 --------
  - psutil: apt-get install python-psutil
- - BeautifulSoup: pip  or easy_install beautifulsoup4, apt-get install python-bs4
  - SRILM and pysrilm (https://github.com/njsmith/pysrilm)
 
 Running
