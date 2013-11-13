@@ -4,7 +4,7 @@ import re
 import sys
 
 # BASIC ========================================================================
-COMMENT = "Checking if all fine after removing basic (BAD) treatment of entities"
+COMMENT = "Test easy way to pass final choice before entities to output dico"
 RUNID = None
 TAG = False                 # Tag with Freeling (1) or read tags from TAGSDIR (0)
 ENV = "W"                   # Work, Home, Server
@@ -119,10 +119,7 @@ if ENV in ["W", "H"]:
     lmpath = APPDIR + "/data/" + "SUMATCasedLM_kenlm_es.arpa"
     #lmpath = "/home/VICOMTECH/share/Tweet-Norm/lms/es_strict_noht_lc.arpa"
 if ENV == "S":
-    lmpath = "/home/VICOMTECH/share/SUMAT/LanguageModels/OpenSubs/5-gram/es/OpenSubsLM_kenlm_es.arpa"
-
-
-
+    lmpath = "/home/VICOMTECH/share/SUMAT/LanguageModels/OpenSubs/5-gram/es/OpenSubsLM.tc.5grams.es.arpa"
 
 lm_window = 4
 lmw = 0.3 # weight for lm scores

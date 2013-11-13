@@ -191,16 +191,16 @@ def load_entity_manager(ent_hash, ivs, edimgr, lmmgr):
     entmgr = entities.EntityMgr(ent_hash, ivs, edimgr, lmmgr)
     return entmgr
 
-def check_entity_basic(oov, form, toktype="n/a"):
-    """Look for exact matches or case-variants for a form (str) in an entity-list,
-       and set properties in <oov> accordingly. <toktype> is for logging"""
-    #TODO: is it needed to give it an object? Refactoring?
-    ent_status = entmgr.find_entity(form, toktype)
-    if ent_status["applied"] is True:
-        oov.entifin = ent_status["corr"]
-        tweet.set_par_corr(oov.entifin, posi=oov.posi)
-        return True
-    return False
+##def check_entity_basic(oov, form, toktype="n/a"):
+##    """Look for exact matches or case-variants for a form (str) in an entity-list,
+##       and set properties in <oov> accordingly. <toktype> is for logging"""
+##    #TODO: is it needed to give it an object? Refactoring?
+##    ent_status = entmgr.find_entity(form, toktype)
+##    if ent_status["applied"] is True:
+##        oov.entifin = ent_status["corr"]
+##        tweet.set_par_corr(oov.entifin, posi=oov.posi)
+##        return True
+##    return False
 
 def parse_tweets(textdico):
     """Create Tweet, Token and OOV instances. Prepare dico for final outputs"""
@@ -396,6 +396,7 @@ def rank_candidates(oov):
                         repr(oov.form), repr(oov.best_ed_cando.form), repr(oov.best_ed_cando.dislmsco)))
                     # partial correction
                     tweet.set_par_corr(oov.best_ed_cando.form, oov.posi)
+                    oov.accept_best_ed_cando = True
             else: 
                 oov.keep_orig = False
                 if oov.edbase_lmsco >= oov.ed_filtered_ranked[0].lmsco: #edbase (if IV later??)
@@ -418,6 +419,7 @@ def rank_candidates(oov):
                         repr(oov.form), repr(oov.best_ed_cando.form), repr(oov.best_ed_cando.dislmsco)))
                     # partial correction
                     tweet.set_par_corr(oov.best_ed_cando.form, oov.posi)
+                    oov.accept_best_ed_cando = True
             # log scores for each candidate
             for cand in oov.ed_filtered_ranked:
                 lgr.debug("O [{0}], C [{1}], ED {2}| LM {3}| T {4}".format(
@@ -429,9 +431,43 @@ def rank_candidates(oov):
         else:
             oov.ed_filtered_ranked = []
             lgr.debug("+ OOV [{0}], No Edit Cands, Reason: [Filtering]".format(repr(oov.form)))
+            oov.keep_orig = True
     else:
         oov.ed_filtered_ranked = []
         lgr.debug("+ OOV [{0}], No Edit Cands, Reason: [No IV Intersection]".format(repr(oov.form)))
+        oov.keep_orig = True
+
+def rank_before_entities(oov):
+    if oov.safecorr is not None:
+        oov.befent = oov.safecorr
+    elif oov.abbrev is not None:
+        oov.befent = oov.abbrev
+    elif oov.runin is not None:
+        oov.befent = oov.runin
+    elif oov.ppro_recorr is not None and oov.ppro_recorr_IV:
+        oov.befent = oov.ppro_recorr
+    elif oov.keep_orig:
+        oov.befent = oov.form
+    elif oov.assess_edbase:
+        oov.befent = oov.edbase
+    elif oov.accept_best_ed_cando:
+        oov.befent = oov.best_ed_cando.form
+
+def populate_easy(all_tweeto, outdico):
+    """Select candidates for final output filling a hash with them"""
+    for tid in all_tweeto:
+        tweet = all_tweeto[tid]
+        lgr.debug("POPULATE FINAL DICO, TID [{0}]".format(tid))
+        for tok in tweet.toks:
+            if not isinstance(tok, OOV):
+                continue
+            oov = tok
+            
+            oov.befent_posp = posp.recase(oov.form, oov.befent, tweet)
+            outdico[tid].append((oov.form, oov.befent_posp))
+            lgr.debug("WRF O [{0}], C [{1}]".format(
+                repr(oov.form), repr(oov.befent_posp)))
+    return outdico
 
 def hash_final_form(oov, outdico, tweet):
     """Choose among edbase, oov.form and best candidate form given OOV instance state"""
@@ -598,13 +634,13 @@ def main():
     # processing ---------------------------------------------------------------
 
     # Check if need to delete in-memory IV and entities dicos (if just changed config)
-    ok = raw_input("Need to reset the IV dictionary (if changed tc.merged_iv_and_entities)? [y] to reset\n")
-    if ok == "y":
-        print "- Deleting 'ivs' (Imerged IV + ent) in current scope"
-        delattr(sys.modules[__name__], "ivs")
-        if "ivs_only" in dir(sys.modules["__main__"]):
-            print "- Deleting 'ivs_only' (IV) in current scope"
-            delattr(sys.modules[__name__], "ivs_only")
+    #ok = raw_input("Need to reset the IV dictionary (if changed tc.merged_iv_and_entities)? [y] to reset\n")
+    #if ok == "y":
+    #    print "- Deleting 'ivs' (Imerged IV + ent) in current scope"
+    #    delattr(sys.modules[__name__], "ivs")
+    #    if "ivs_only" in dir(sys.modules["__main__"]):
+    #        print "- Deleting 'ivs_only' (IV) in current scope"
+    #        delattr(sys.modules[__name__], "ivs_only")
 
     print "Start {0}".format(time.asctime(time.localtime()))
     print "Run ID: %s" % prep.find_run_id()
@@ -645,11 +681,13 @@ def main():
             create_edit_candidates(oov)
             find_lm_scores(oov)
             rank_candidates(oov)
+            rank_before_entities(oov)
         x += 1
         if x % 100 == 0:
             print("Done {0} tweets, {1}".format(x, time.asctime(time.localtime())))
 
-    outdico = populate_outdico(all_tweeto, outdico)
+    #outdico = populate_outdico(all_tweeto, outdico)
+    outdico = populate_easy(all_tweeto, outdico)
 
     # write-out ----------------------------------------------------------------
     print "= writer"
