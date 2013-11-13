@@ -16,6 +16,8 @@ import subprocess
 import sys
 import time
 
+from nltk.corpus import stopwords
+
 # setup  =========================================================
 
 # PYTHONPATH
@@ -453,21 +455,49 @@ def rank_before_entities(oov):
     elif oov.accept_best_ed_cando:
         oov.befent = oov.best_ed_cando.form
 
-def populate_easy(all_tweeto, outdico):
+def populate_easy(all_tweeto, outdico, order="aft"):
     """Select candidates for final output filling a hash with them"""
     for tid in all_tweeto:
         tweet = all_tweeto[tid]
-        lgr.debug("POPULATE FINAL DICO, TID [{0}]".format(tid))
+        lgr.debug("POPULATE EASY FINAL DICO, TID [{0}]".format(tid))
         for tok in tweet.toks:
             if not isinstance(tok, OOV):
                 continue
             oov = tok
-            
-            oov.befent_posp = posp.recase(oov.form, oov.befent, tweet)
-            outdico[tid].append((oov.form, oov.befent_posp))
-            lgr.debug("WRF O [{0}], C [{1}]".format(
-                repr(oov.form), repr(oov.befent_posp)))
+            if order == "aft":
+                oov.aftent_posp = posp.recase(oov.form, oov.aftent, tweet)
+                outdico[tid].append((oov.form, oov.aftent_posp))
+                lgr.debug("WRF O [{0}], C [{1}]".format(
+                    repr(oov.form), repr(oov.aftent_posp)))
+            else:
+                oov.befent_posp = posp.recase(oov.form, oov.befent, tweet)
+                outdico[tid].append((oov.form, oov.befent_posp))
+                lgr.debug("WRF O [{0}], C [{1}]".format(
+                    repr(oov.form), repr(oov.befent_posp)))                
     return outdico
+
+def cf_with_ent(oov):
+    """Compare oov instance's befent with an entity-candidate
+       based on the entity lists"""
+    # mb should apply to oov.befent AND oov.form and see what returns 
+    ent_status = entmgr.find_entity(oov.form)
+    if ent_status["applied"]:
+        oov.entcand = ent_status["corr"]
+    else:
+        oov.entcand = None
+        oov.aftent = oov.befent
+    if oov.entcand is not None:
+        if (oov.safecorr is not None or oov.abbrev is not None or
+            oov.runin is not None or oov.ppro_recorr_IV is True):
+            oov.aftent = oov.befent
+        else:
+            if oov.befent.lower() in stpwords:
+                oov.aftent = oov.befent
+            befent_dista = edimgr.levdist(oov.befent, oov.edbase)
+            if befent_dista >= -0.5:
+                oov.aftent = oov.befent
+            else:
+                oov.aftent = oov.entcand
 
 def hash_final_form(oov, outdico, tweet):
     """Choose among edbase, oov.form and best candidate form given OOV instance state"""
@@ -625,6 +655,7 @@ def main():
     global entmgr
     global ppro
     global edimgr
+    global stpwords
     global outdico
     all_tweets = [] # debug
     
@@ -661,6 +692,7 @@ def main():
     edimgr = load_distance_editor()
     slmmgr, binslm = load_lm()
     entmgr = load_entity_manager(ent_hash, ivs, edimgr, lmmgr)
+    stpwords = stopwords.words('english')
 
     print "= twittero: creating Tweet instances"
     all_tweeto, outdico = parse_tweets(textdico)
@@ -682,12 +714,13 @@ def main():
             find_lm_scores(oov)
             rank_candidates(oov)
             rank_before_entities(oov)
+            cf_with_ent(oov) #ents
         x += 1
         if x % 100 == 0:
             print("Done {0} tweets, {1}".format(x, time.asctime(time.localtime())))
 
     #outdico = populate_outdico(all_tweeto, outdico)
-    outdico = populate_easy(all_tweeto, outdico)
+    outdico = populate_easy(all_tweeto, outdico, "aft")
 
     # write-out ----------------------------------------------------------------
     print "= writer"

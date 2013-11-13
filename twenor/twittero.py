@@ -149,7 +149,7 @@ class OOV(Token):
     abbrev = None
     runin = None
     ppro_recorr = None
-    ppro_recorr_IV = True
+    ppro_recorr_IV = None
 
     # Entities
     #entifin = None #TODO: remove
@@ -165,9 +165,11 @@ class OOV(Token):
     # Ranking
     keep_orig = None
     assess_edbase = None
-    accept_best_cando = None
+    accept_best_cand = None
 
     #ranking implicit from flags set here and ppro_recorr_IV
+    befent = None
+    aftent = None
 
     def add_cand(self, cand):
         self.cands[cand] = True
