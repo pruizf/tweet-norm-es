@@ -837,3 +837,243 @@ ERR: 0
 POS: 437 
 NEG: 225 
 ACCUR: 66.0120845921 
+== Run ID [631], RevNum [0f1090d] ================================================
+RunComment: Test dev corpus with entities
+enviro: work
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+accept_all_IV_regex_outputs: False
+merge_iv_and_entities: False
+corpus: dev
+ERR: 1 
+POS: 423 
+NEG: 181 
+ACCUR: 64.7779479326 
+== Run ID [632], RevNum [0f1090d] ================================================
+RunComment: Test dev corpus without entities
+enviro: work
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+accept_all_IV_regex_outputs: False
+merge_iv_and_entities: False
+corpus: dev
+ERR: 1 
+POS: 398 
+NEG: 206 
+ACCUR: 60.9494640123 
+== Run ID [633], RevNum [0f1090d] ================================================
+RunComment: Test 'if befent_dista >= -0.5 and oov.befent != oov.edbase'
+enviro: work
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+accept_all_IV_regex_outputs: False
+merge_iv_and_entities: False
+corpus: test
+ERR: 0 
+POS: 415 
+NEG: 247 
+ACCUR: 62.6888217523 
+== Run ID [639], RevNum [0f1090d] ================================================
+RunComment: Test if can revert to 66% ACCU cos some previous runs had cf_with_ent call commented, so crashed
+enviro: work
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+accept_all_IV_regex_outputs: False
+merge_iv_and_entities: False
+corpus: test
+ERR: 0 
+POS: 437 
+NEG: 225 
+ACCUR: 66.0120845921 
+== Run ID [640], RevNum [0f1090d] ================================================
+RunComment: Test 'if befent_dista >= -0.5 and oov.befent != oov.edbase' again, cos before had set pouplate to 'bef' TAKE 2. AND THIS RUN IS THE ONE THAT WORKED
+enviro: work
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+accept_all_IV_regex_outputs: False
+merge_iv_and_entities: False
+corpus: test
+ERR: 0 
+POS: 444 
+NEG: 218 
+ACCUR: 67.0694864048 
+== Run ID [641], RevNum [0f1090d] ================================================
+RunComment: Test DEV corpus 'if befent_dista >= -0.5 and oov.befent != oov.edbase'
+enviro: work
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+accept_all_IV_regex_outputs: False
+merge_iv_and_entities: False
+corpus: dev
+ERR: 1 
+POS: 431 
+NEG: 173 
+ACCUR: 66.0030627871 
+== Run ID [642], RevNum [0f1090d] ================================================
+RunComment: Test small  modif in postprocessing
+enviro: work
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+accept_all_IV_regex_outputs: False
+merge_iv_and_entities: False
+corpus: dev
+ERR: 1 
+POS: 419 
+NEG: 185 
+ACCUR: 64.1653905054 
+== Run ID [643], RevNum [0f1090d] ================================================
+RunComment: Test small  modif in postprocessing
+enviro: work
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+accept_all_IV_regex_outputs: False
+merge_iv_and_entities: False
+corpus: test
+ERR: 0 
+POS: 430 
+NEG: 232 
+ACCUR: 64.9546827795 
+== Run ID [644], RevNum [0f1090d] ================================================
+RunComment: Test small  modif in postprocessing
+enviro: work
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+accept_all_IV_regex_outputs: False
+merge_iv_and_entities: False
+corpus: test
+ERR: 0 
+POS: 430 
+NEG: 232 
+ACCUR: 64.9546827795 
+== Run ID [645], RevNum [0f1090d] ================================================
+RunComment: REAL test small modif in postprocessing. The previous runs were screwed (642, 643) OK THE MODIF WORKED
+enviro: work
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+accept_all_IV_regex_outputs: False
+merge_iv_and_entities: False
+corpus: test
+ERR: 0 
+POS: 444 
+NEG: 218 
+ACCUR: 67.0694864048 
+== Run ID [647], RevNum [0f1090d] ================================================
+RunComment: DEV REAL test small modif in postprocessing. The previous runs were screwed (642, 643)
+enviro: work
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+accept_all_IV_regex_outputs: False
+merge_iv_and_entities: False
+corpus: dev
+ERR: 1 
+POS: 431 
+NEG: 173 
+ACCUR: 66.0030627871 
+== Run ID [648], RevNum [0f1090d] ================================================
+RunComment: dev test removing some exceptions from old version
+enviro: work
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+accept_all_IV_regex_outputs: False
+merge_iv_and_entities: False
+corpus: dev
+ERR: 1 
+POS: 431 
+NEG: 173 
+ACCUR: 66.0030627871 
+== Run ID [649], RevNum [0f1090d] ================================================
+RunComment: dev test removing some exceptions from old version
+enviro: work
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+accept_all_IV_regex_outputs: False
+merge_iv_and_entities: False
+corpus: dev
+ERR: 1 
+POS: 430 
+NEG: 174 
+ACCUR: 65.8499234303 
+== Run ID [650], RevNum [0f1090d] ================================================
+RunComment: dev test removing some exceptions from old version
+enviro: work
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+accept_all_IV_regex_outputs: False
+merge_iv_and_entities: False
+corpus: test
+ERR: 0 
+POS: 441 
+NEG: 221 
+ACCUR: 66.6163141994 
+== Run ID [651], RevNum [0f1090d] ================================================
+RunComment: test putting back some of the old exceptions
+enviro: work
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+accept_all_IV_regex_outputs: False
+merge_iv_and_entities: False
+corpus: test
+ERR: 0 
+POS: 444 
+NEG: 218 
+ACCUR: 67.0694864048 
+== Run ID [652], RevNum [0f1090d] ================================================
+RunComment: test putting back some of the old exceptions
+enviro: work
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+accept_all_IV_regex_outputs: False
+merge_iv_and_entities: False
+corpus: dev
+ERR: 1 
+POS: 431 
+NEG: 173 
+ACCUR: 66.0030627871 

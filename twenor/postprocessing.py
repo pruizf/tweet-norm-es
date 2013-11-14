@@ -39,8 +39,9 @@ def recase(orig, prop, tweet):
             to_recase = True
     if to_recase:
         postp = "".join([prop[0].upper(), prop[1:]])
-        lgr.debug("PS Recased [{0}] into [{1}], Reason, Delim [{2}]".format(
-            repr(prop), repr(postp), repr(toks[toks.index(orig)-1])))
+        if postp != orig:
+            lgr.debug("PS Recased [{0}] into [{1}], Reason, Delim [{2}]".format(
+                repr(prop), repr(postp), repr(toks[toks.index(orig)-1])))
         return postp
     else:
         return prop

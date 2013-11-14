@@ -440,19 +440,29 @@ def rank_candidates(oov):
         oov.keep_orig = True
 
 def rank_before_entities(oov):
+    #if oov.form in ["inglaterra", "psoe"]:
+    #    import pdb
+    #    pdb.set_trace()
     if oov.safecorr is not None:
         oov.befent = oov.safecorr
+        lgr.debug("RK Befent [{0}] from safecorr [{1}]".format(repr(oov.befent), repr(oov.safecorr)))
     elif oov.abbrev is not None:
         oov.befent = oov.abbrev
+        lgr.debug("RK Befent [{0}] from abbrev [{1}]".format(repr(oov.befent), repr(oov.abbrev)))
     elif oov.runin is not None:
         oov.befent = oov.runin
+        lgr.debug("RK Befent [{0}] from runin [{1}]".format(repr(oov.befent), repr(oov.runin)))
     elif oov.ppro_recorr is not None and oov.ppro_recorr_IV:
         oov.befent = oov.ppro_recorr
+        lgr.debug("RK Befent [{0}] from ppro [{1}]".format(repr(oov.befent), repr(oov.ppro_recorr)))
     elif oov.keep_orig:
         oov.befent = oov.form
+        lgr.debug("RK Befent [{0}] from orig [{1}]".format(repr(oov.befent), repr(oov.form)))
     elif oov.assess_edbase:
         oov.befent = oov.edbase
+        lgr.debug("RK Befent [{0}] from edbase [{1}]".format(repr(oov.befent), repr(oov.edbase)))
     elif oov.accept_best_ed_cando:
+        lgr.debug("RK Befent [{0}] from best_ed_cando [{1}]".format(repr(oov.befent), repr(oov.best_ed_cando.form)))        
         oov.befent = oov.best_ed_cando.form
 
 def populate_easy(all_tweeto, outdico, order="aft"):
@@ -464,6 +474,10 @@ def populate_easy(all_tweeto, outdico, order="aft"):
             if not isinstance(tok, OOV):
                 continue
             oov = tok
+            #if oov.form in ["inglaterra", "psoe"]:
+            #    import pdb
+            #    pdb.set_trace()
+
             if order == "aft":
                 oov.aftent_posp = posp.recase(oov.form, oov.aftent, tweet)
                 outdico[tid].append((oov.form, oov.aftent_posp))
@@ -483,21 +497,31 @@ def cf_with_ent(oov):
     ent_status = entmgr.find_entity(oov.form)
     if ent_status["applied"]:
         oov.entcand = ent_status["corr"]
+        lgr.debug("EN entcand [{0}] for O [{1}]".format(repr(oov.entcand), repr(oov.form)))
     else:
         oov.entcand = None
         oov.aftent = oov.befent
+        lgr.debug("EN NO entcand for [{0}]".format(repr(oov.form)))
+                  
     if oov.entcand is not None:
         if (oov.safecorr is not None or oov.abbrev is not None or
             oov.runin is not None or oov.ppro_recorr_IV is True):
             oov.aftent = oov.befent
+            lgr.debug("EN keep befent, Reason [{0}] [Trusted corr]".format(repr(oov.befent)))
         else:
             if oov.befent.lower() in stpwords:
                 oov.aftent = oov.befent
+                lgr.debug("EN keep befent, Reason [{0}] [Stopw]".format(repr(oov.befent)))
             befent_dista = edimgr.levdist(oov.befent, oov.edbase)
-            if befent_dista >= -0.5:
+            if befent_dista >= -0.5 and not oov.befent == oov.edbase:
                 oov.aftent = oov.befent
+                lgr.debug("EN keep befent, Reason [{0}] vs. [{1}][Dista]".format(repr(oov.befent),
+                                                                                      repr(oov.edbase)))
             else:
                 oov.aftent = oov.entcand
+                lgr.debug("EN keep aftent [{0}], vs. befent [{1}], O [{2}]".format(repr(oov.aftent),
+                                                                                   repr(oov.befent),
+                                                                                   repr(oov.form)))
 
 def hash_final_form(oov, outdico, tweet):
     """Choose among edbase, oov.form and best candidate form given OOV instance state"""

@@ -59,3 +59,39 @@
                         outdico[tid].append((oov.form, oov.best_ed_cando.form))
                 else:
                     outdico[tid].append((oov.form, oov.form))
+
+
+
+
+
+
+def cf_with_ent(oov):
+    """Compare oov instance's befent with an entity-candidate
+       based on the entity lists"""
+    # mb should apply to oov.befent AND oov.form and see what returns 
+    ent_status = entmgr.find_entity(oov.form)
+    if ent_status["applied"]:
+        oov.entcand = ent_status["corr"]
+        lgr.debug("EN entcand [{0}] for O [{1}]".format(repr(oov.entcand), repr(oov.form)))
+    else:
+        oov.entcand = None
+        oov.aftent = oov.befent
+        lgr.debug("EN NO entcand for [{0}]".format(repr(oov.form))
+                  
+    if oov.entcand is not None:
+        if (oov.safecorr is not None or oov.abbrev is not None or
+            oov.runin is not None or oov.ppro_recorr_IV is True):
+            oov.aftent = oov.befent
+        else:
+            if oov.befent.lower() in stpwords:
+                oov.aftent = oov.befent
+            befent_dista = edimgr.levdist(oov.befent, oov.edbase)
+            if befent_dista >= -0.5:
+                if oov.befent != oov.edbase:
+                    oov.aftent = oov.befent
+                elif oov.entcand is not None:
+                    oov.aftent = oov.entcand
+                else:
+                    oov.aftent = oov.befent
+            else:
+                oov.aftent = oov.entcand

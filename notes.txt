@@ -31,3 +31,14 @@ Kenlm vs. SRILM scoring
 >>> slm.total_logprob_strings(["<s>", "es", "un", "casa", "</s>"])
 -inf
 
+Results comparisons to keep
+
+version 2 for entities vs version 3
+devset
+pruiz@pruiz-ubuntu-desktop:~/DATA/projects/Tweet-Norm/tnor2$ diff -y ../results2/devset_run_631_eval.txt ../results2/devset_run_641_eval.txt | grep ^NEG | grep POS | less
+
+testset
+630 vs. 640 for version 2 vs. 3
+in the case of the testset, can also compare 618 with 630 for version 1 vs. version 2
+
+

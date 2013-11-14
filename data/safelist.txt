@@ -24,11 +24,8 @@
 # PREFERRED TOKENS
 
 # Priority Person Names, not extracted by generic workflow
-100	^juan$	Juan	#need it here (vs. cuán) unless remove current algo to compare entity and non-entity candidates
-110	^jesus$	Jesús	#can't fix with current algo
+110	^jesus$	Jesús	#not extracted with distance-based entity selection
 
-# Priority Locations
-#102	^inglaterra$	Inglaterra	#fixed
 
 # Priority Org and Brands
 104	^gh$	GH	#real issue here is hashtag/trending topic list
@@ -62,7 +59,7 @@
 
 # emoticon tokens that are not caught by Freeling mapper
 MA100	^(x[d]+)$	\\1	#turn into raw string before compiling
-MA101	^(om+)$	\\1	#hack for one of the testset OOVs (logic bug in filtering candidates before writeout)
+MA101	^(om+)$	\\1
 
 # abbreviation tokens, to keep
 1000	^a\.$
