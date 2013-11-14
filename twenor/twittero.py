@@ -141,6 +141,7 @@ class OOV(Token):
         # isOOV always True
         self.set_OOV_status(True)
         self.cands = {}
+        self.entcands = {}
         self.has_cands = None
         self.has_LM_cands = None
 
@@ -152,7 +153,7 @@ class OOV(Token):
     ppro_recorr_IV = None
 
     # Entities
-    #entifin = None #TODO: remove
+    entcand = None
 
     # ED and LM
     #cands_filtered = None

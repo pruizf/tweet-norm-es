@@ -78,6 +78,7 @@ tnor2
     |_ editor.py                Candidate Generation and Distance-Scoring
     |_ lmmgr.py                 Language Model creation, candidate lookup and scoring
     |_ postprocessing.py        Recasing
+    |_ entities.py              Form lookup in entity resources
     |_ processing.py            Main program
  |_ data                        Regex lists, entity lists, correction model data, LMs etc.
  |_ evaluation

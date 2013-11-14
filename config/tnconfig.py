@@ -6,8 +6,8 @@ import sys
 # BASIC ========================================================================
 COMMENT = "test putting back some of the old exceptions"
 RUNID = None
-TAG = False                 # Tag with Freeling (1) or read tags from TAGSDIR (0)
-ENV = "W"                   # Work, Home, Server
+TAG = False                # Tag with Freeling (1) or read tags from TAGSDIR (0)
+ENV = "S"                   # Work, Home, Server
 EVAL = bool(1)              # test (1) vs. dev (0) sets
 if ENV == "W":
     RESDIR = "/home/pruiz/DATA/projects/Tweet-Norm/results2"
@@ -119,7 +119,9 @@ if ENV in ["W", "H"]:
     lmpath = APPDIR + "/data/" + "SUMATCasedLM_kenlm_es.arpa"
     #lmpath = "/home/VICOMTECH/share/Tweet-Norm/lms/es_strict_noht_lc.arpa"
 if ENV == "S":
-    lmpath = "/home/VICOMTECH/share/SUMAT/LanguageModels/OpenSubs/5-gram/es/OpenSubsLM.tc.5grams.es.arpa"
+    #lmpath = "/home/VICOMTECH/share/SUMAT/LanguageModels/OpenSubs/5-gram/es/OpenSubsLM.tc.5grams.es.arpa"
+    lmpath = "/home/VICOMTECH/share/SUMAT/LanguageModels/TweetNorm/opensubs+tweets.tok.tc.es.arpa"
+    #lmpath = APPDIR + "/data/" + "SUMATCasedLM_kenlm_es.arpa"
 
 lm_window = 4
 lmw = 0.3 # weight for lm scores

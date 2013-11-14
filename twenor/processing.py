@@ -697,7 +697,11 @@ def main():
     #        print "- Deleting 'ivs_only' (IV) in current scope"
     #        delattr(sys.modules[__name__], "ivs_only")
 
+    corpus_type = {True: "test", False: "dev"}
+    print "= Corpus: {0}".format(corpus_type[tc.EVAL])
+
     print "Start {0}".format(time.asctime(time.localtime()))
+
     print "Run ID: %s" % prep.find_run_id()
     lgr.info("Run {0} START | Rev [{1}] {2}".format(tc.RUNID, prep.find_git_revnum(), "="*60))
 
@@ -742,6 +746,29 @@ def main():
         x += 1
         if x % 100 == 0:
             print("Done {0} tweets, {1}".format(x, time.asctime(time.localtime())))
+
+    # Extra step to add more entity candidates
+    print "= Adding extra entities, {0}".format(time.asctime(time.localtime()))
+    for tid in all_tweeto:
+        lgr.debug("ADDING MORE ENTITIES, TID [{}]".format(tid))
+        tweet = all_tweeto[tid]
+        for tok in tweet.toks:
+            if not isinstance(tok, OOV):
+                continue
+            oov = tok
+            # basing entity-candidates on the pre-processed variant if available
+            if oov.edbase is None:
+                entity_candidates = [cand.form for cand in
+                                     entmgr.add_entity_candidates(oov.form)]
+            else:
+                entity_candidates = [cand.form for cand in
+                                     entmgr.add_entity_candidates(oov.edbase)]
+            # not sure why some candidates started with lowercase
+            entity_candidates = [cand for cand in entity_candidates if
+                                 cand[0].isupper()]
+            if oov.entcand is not None:
+                entity_candidates.append(oov.entcand)
+            oov.entcands = entity_candidates
 
     #outdico = populate_outdico(all_tweeto, outdico)
     outdico = populate_easy(all_tweeto, outdico, "aft")

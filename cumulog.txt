@@ -1077,3 +1077,213 @@ ERR: 1
 POS: 431 
 NEG: 173 
 ACCUR: 66.0030627871 
+== Run ID [654], RevNum [292fde5] ================================================
+RunComment: test putting back some of the old exceptions
+enviro: hslt-server
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: OpenSubsLM.tc.5grams.es.arpa
+increment_norm: True
+accept_all_IV_regex_outputs: False
+merge_iv_and_entities: False
+corpus: test
+ERR: 0 
+POS: 444 
+NEG: 218 
+ACCUR: 67.0694864048 
+== Run ID [658], RevNum [292fde5] ================================================
+RunComment: test putting back some of the old exceptions
+enviro: hslt-server
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: OpenSubsLM.tc.5grams.es.arpa
+increment_norm: True
+accept_all_IV_regex_outputs: False
+merge_iv_and_entities: False
+corpus: dev
+ERR: 1 
+POS: 432 
+NEG: 172 
+ACCUR: 66.156202144 
+== Run ID [659], RevNum [292fde5] ================================================
+RunComment: 
+enviro: hslt-server
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: opensubs+tweets.tok.tc.es.arpa
+increment_norm: True
+accept_all_IV_regex_outputs: False
+merge_iv_and_entities: False
+corpus: dev
+ERR: 1 
+POS: 435 
+NEG: 169 
+ACCUR: 66.6156202144 
+== Run ID [660], RevNum [292fde5] ================================================
+RunComment: 
+enviro: hslt-server
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: opensubs+tweets.tok.tc.es.arpa
+increment_norm: True
+accept_all_IV_regex_outputs: False
+merge_iv_and_entities: False
+corpus: test
+ERR: 0 
+POS: 448 
+NEG: 214 
+ACCUR: 67.6737160121 
+== Run ID [661], RevNum [292fde5] ================================================
+RunComment: with Geonames
+enviro: hslt-server
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: opensubs+tweets.tok.tc.es.arpa
+increment_norm: True
+accept_all_IV_regex_outputs: False
+merge_iv_and_entities: False
+corpus: test
+ERR: 0 
+POS: 440 
+NEG: 222 
+ACCUR: 66.4652567976 
+== Run ID [662], RevNum [292fde5] ================================================
+RunComment: with Geonames
+enviro: hslt-server
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: opensubs+tweets.tok.tc.es.arpa
+increment_norm: True
+accept_all_IV_regex_outputs: False
+merge_iv_and_entities: False
+corpus: dev
+ERR: 1 
+POS: 412 
+NEG: 192 
+ACCUR: 63.0934150077 
+== Run ID [674], RevNum [292fde5] ================================================
+RunComment: test putting back some of the old exceptions
+enviro: hslt-server
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+accept_all_IV_regex_outputs: False
+merge_iv_and_entities: False
+corpus: dev
+ERR: 1 
+POS: 431 
+NEG: 173 
+ACCUR: 66.0030627871 
+== Run ID [675], RevNum [292fde5] ================================================
+RunComment: test putting back some of the old exceptions
+enviro: hslt-server
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+accept_all_IV_regex_outputs: False
+merge_iv_and_entities: False
+corpus: dev
+ERR: 1 
+POS: 431 
+NEG: 173 
+ACCUR: 66.0030627871 
+== Run ID [676], RevNum [292fde5] ================================================
+RunComment: test putting back some of the old exceptions
+enviro: hslt-server
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+accept_all_IV_regex_outputs: False
+merge_iv_and_entities: False
+corpus: dev
+ERR: 1 
+POS: 431 
+NEG: 173 
+ACCUR: 66.0030627871 
+== Run ID [677], RevNum [292fde5] ================================================
+RunComment: test putting back some of the old exceptions
+enviro: hslt-server
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+accept_all_IV_regex_outputs: False
+merge_iv_and_entities: False
+corpus: dev
+ERR: 1 
+POS: 431 
+NEG: 173 
+ACCUR: 66.0030627871 
+== Run ID [678], RevNum [292fde5] ================================================
+RunComment: test putting back some of the old exceptions
+enviro: hslt-server
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+accept_all_IV_regex_outputs: False
+merge_iv_and_entities: False
+corpus: test
+ERR: 0 
+POS: 444 
+NEG: 218 
+ACCUR: 67.0694864048 
+== Run ID [680], RevNum [292fde5] ================================================
+RunComment: test putting back some of the old exceptions
+enviro: hslt-server
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+accept_all_IV_regex_outputs: False
+merge_iv_and_entities: False
+corpus: test
+ERR: 0 
+POS: 444 
+NEG: 218 
+ACCUR: 67.0694864048 
+== Run ID [681], RevNum [292fde5] ================================================
+RunComment: test putting back some of the old exceptions
+enviro: hslt-server
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: SUMATCasedLM_kenlm_es.arpa
+increment_norm: True
+accept_all_IV_regex_outputs: False
+merge_iv_and_entities: False
+corpus: test
+ERR: 0 
+POS: 444 
+NEG: 218 
+ACCUR: 67.0694864048 
+== Run ID [682], RevNum [292fde5] ================================================
+RunComment: test putting back some of the old exceptions
+enviro: hslt-server
+maxdista: -1.5
+distaw: 0.7
+lmw: 0.3
+lmpath: opensubs+tweets.tok.tc.es.arpa
+increment_norm: True
+accept_all_IV_regex_outputs: False
+merge_iv_and_entities: False
+corpus: test
+ERR: 0 
+POS: 448 
+NEG: 214 
+ACCUR: 67.6737160121 

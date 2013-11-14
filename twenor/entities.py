@@ -18,16 +18,17 @@ if not os.path.join(os.path.join(parentdir, "scripts")) in sys.path:
 # app-specific imports
 import preparation as prep
 import tnconfig as tc
+import editor
 
 # logging
 logfile_name = os.path.join(tc.LOGDIR, "run_%s.log" % prep.find_run_id())
 lgr, lfh = prep.set_log(__name__, logfile_name)
 
 class EntityMgr:
-    def __init__(self, ent_hash, ivs, edmgr, lmmgr):
+    def __init__(self, ent_hash, ivs, edimgr, lmmgr):
         self.ent_hash = ent_hash
         self.ivs = ivs
-        self.edmgr = edmgr
+        self.edimgr = edimgr
         self.lmmgr = lmmgr
 
     def find_entity(self, token, toktype="n/a"):
@@ -54,4 +55,24 @@ class EntityMgr:
                     return {"corr": allcaps2inicap, "applied": True}
                 else:
                     return {"corr": token, "applied": False}
-    
+   
+    def add_entity_candidates(self, form):
+        """<form> is the string to generate edits for"""
+        entcands_string = self.edimgr.generate_candidates(form) #returns a set
+        entcands_string_upper = ["".join((c[0].upper(), c[1:])) for c in
+                                 entcands_string]
+        entcands_string.extend(entcands_string_upper)
+        entcands_obj = []
+        if len(entcands_string) > 0:
+            for ecand in entcands_string:
+                entcands_obj.append(editor.Candidate(ecand))
+            for ecando in entcands_obj:
+                ecando.set_dista(self.edimgr.levdist(ecando.form, form))
+        entcands_filtered = [cand for cand in entcands_obj if cand.dista >= -0.5]
+        entcands_final = []
+        for cand in entcands_filtered:
+            is_ent = self.find_entity(cand.form)
+            if is_ent["applied"]:
+                entcands_final.append(cand)
+        return entcands_final
+
