@@ -147,7 +147,6 @@ def load_entities():
     else:
         print "= prepro: Skip creating entity-hashes"
     return sys.modules[__name__].ent_hash
-        
 
 def merge_iv_and_entities(ivs, ent_hash):
     """Add entities to the IV dico"""
@@ -249,15 +248,22 @@ def preprocess(oov):
     if safecorr is not False and safecorr["applied"] is True:
         oov.set_safecorr(safecorr["corr"])
         tweet.set_par_corr(safecorr["corr"], posi=oov.posi)
+    if tc.safelist_end:
+        return
     # No safetokens
     if oov.safecorr is None:
-        # Regexes 
-        ppro_recorr = ppro.find_rematch(oov.form, rerules)
-        oov.set_ppro_recorr_IV(ppro_recorr["IVflag"])
-        if ppro_recorr["applied"] is True:
-            if oov.ppro_recorr_IV:
-                tweet.set_par_corr(ppro_recorr["corr"], posi=oov.posi)                
-            oov.set_ppro_recorr(ppro_recorr["corr"])
+        #if ((not tc.safelist_end and not tc.abbrev_end and not tc.runin_end)
+        #    or not tc.regex_end):
+        if tc.use_regexes:
+            # Regexes 
+            ppro_recorr = ppro.find_rematch(oov.form, rerules)
+            oov.set_ppro_recorr_IV(ppro_recorr["IVflag"])
+            if ppro_recorr["applied"] is True:
+                if oov.ppro_recorr_IV:
+                    tweet.set_par_corr(ppro_recorr["corr"], posi=oov.posi)                
+                oov.set_ppro_recorr(ppro_recorr["corr"])
+        if tc.regex_end:
+            return
         # Abbreviations
         if oov.ppro_recorr is not None:
             pprobase = oov.ppro_recorr
@@ -267,6 +273,8 @@ def preprocess(oov):
         if abbrev["applied"] is True:
             oov.set_abbrev(abbrev["corr"])
             tweet.set_par_corr(abbrev["corr"], posi=oov.posi)
+        if tc.abbrev_end:
+            return
         # Run-in Rules
         runin = ppro.find_prepro_general(pprobase, rinrules, ruletype="RI")
         if runin["applied"] is True:
@@ -433,16 +441,26 @@ def rank_candidates(oov):
         else:
             oov.ed_filtered_ranked = []
             lgr.debug("+ OOV [{0}], No Edit Cands, Reason: [Filtering]".format(repr(oov.form)))
-            oov.keep_orig = True
+            #Q: is the if necessary? Or should the test be if oov.safecorr .... , forgetting generic_workflow test?
+            if tc.generic_workflow:
+                oov.keep_orig = True
+            else:
+                # checking for trusted variants added for indiv modules
+                if oov.safecorr is None and oov.abbrev is None and oov.runin is None and oov.ppro_recorr is None:
+                    oov.keep_orig = True
     else:
         oov.ed_filtered_ranked = []
         lgr.debug("+ OOV [{0}], No Edit Cands, Reason: [No IV Intersection]".format(repr(oov.form)))
-        oov.keep_orig = True
+        #Q: is the if necessary? Or should the test be if oov.safecorr .... , forgetting generic_workflow test?
+        if tc.generic_workflow:
+            oov.keep_orig = True
+        else:
+            # checking for trusted variants added for indiv modules
+            if oov.safecorr is None and oov.abbrev is None and oov.runin is None and oov.ppro_recorr is None:
+                oov.keep_orig = True
 
 def rank_before_entities(oov):
-    #if oov.form in ["inglaterra", "psoe"]:
-    #    import pdb
-    #    pdb.set_trace()
+    """Select best candidate before comparing with entities"""
     if oov.safecorr is not None:
         oov.befent = oov.safecorr
         lgr.debug("RK Befent [{0}] from safecorr [{1}]".format(repr(oov.befent), repr(oov.safecorr)))
@@ -464,6 +482,9 @@ def rank_before_entities(oov):
     elif oov.accept_best_ed_cando:
         lgr.debug("RK Befent [{0}] from best_ed_cando [{1}]".format(repr(oov.befent), repr(oov.best_ed_cando.form)))        
         oov.befent = oov.best_ed_cando.form
+    # for cumulative/isolated improvements, option to accept oov.form if all else fails
+    else:
+        oov.befent = oov.form
 
 def populate_easy(all_tweeto, outdico, order="aft"):
     """Select candidates for final output filling a hash with them"""
@@ -474,10 +495,6 @@ def populate_easy(all_tweeto, outdico, order="aft"):
             if not isinstance(tok, OOV):
                 continue
             oov = tok
-            #if oov.form in ["inglaterra", "psoe"]:
-            #    import pdb
-            #    pdb.set_trace()
-
             if order == "aft":
                 oov.aftent_posp = posp.recase(oov.form, oov.aftent, tweet)
                 outdico[tid].append((oov.form, oov.aftent_posp))
@@ -512,15 +529,20 @@ def cf_with_ent(oov):
             if oov.befent.lower() in stpwords:
                 oov.aftent = oov.befent
                 lgr.debug("EN keep befent, Reason [{0}] [Stopw]".format(repr(oov.befent)))
-            befent_dista = edimgr.levdist(oov.befent, oov.edbase)
-            if befent_dista >= -0.5 and not oov.befent == oov.edbase:
+            # variable base_for_enti_dista allows to test entities module separately
+            if not tc.use_ed and tc.use_entities:
+                base_for_enti_dista = oov.form
+            else:
+                base_for_enti_dista = oov.edbase
+            befent_dista = edimgr.levdist(oov.befent, base_for_enti_dista)
+            if befent_dista >= -0.5 and not oov.befent == base_for_enti_dista:
                 oov.aftent = oov.befent
                 lgr.debug("EN keep befent, Reason [{0}] vs. [{1}][Dista]".format(repr(oov.befent),
-                                                                                      repr(oov.edbase)))
+                                                                                      repr(base_for_enti_dista)))
             else:
                 oov.aftent = oov.entcand
                 lgr.debug("EN keep aftent [{0}], vs. befent [{1}], O [{2}]".format(repr(oov.aftent),
-                                                                                   repr(oov.befent),
+                                                                                   repr(base_for_enti_dista),
                                                                                    repr(oov.form)))
 
 def hash_final_form(oov, outdico, tweet):
@@ -596,8 +618,32 @@ def populate_outdico(all_tweeto, outdico):
                         repr(oov.form), repr(oov.form), "Orig-Default"))
     return outdico
 
+def add_extra_entities():
+    """Add extra entities for consideration with LM"""
+    global all_tweeto
+    for tid in all_tweeto:
+        lgr.debug("ADDING MORE ENTITIES, TID [{}]".format(tid))
+        tweet = all_tweeto[tid]
+        for tok in tweet.toks:
+            if not isinstance(tok, OOV):
+                continue
+            oov = tok
+            # basing entity-candidates on the pre-processed variant if available
+            if oov.edbase is None:
+                entity_candidates = [cand.form for cand in
+                                     entmgr.add_entity_candidates(oov.form)]
+            else:
+                entity_candidates = [cand.form for cand in
+                                     entmgr.add_entity_candidates(oov.edbase)]
+            # not sure why some candidates started with lowercase
+            entity_candidates = [cand for cand in entity_candidates if
+                                 cand[0].isupper()]
+            if oov.entcand is not None:
+                entity_candidates.append(oov.entcand)
+            oov.entcands = entity_candidates
+
 def write_out(corr_dico):
-    """Write out the final hash"""
+    """Write out the final hash in a format that matches reference output format"""
     with codecs.open(tc.id_order, "r", "utf8") as idor:
         orderlist = [idn.strip() for idn in idor.readlines()]    
     with codecs.open(tc.OUTFN.format(prep.find_run_id()), "w", "utf8") as outfh:
@@ -649,15 +695,17 @@ def write_to_cumulog(clargs=None):
         inf["corpus"] = "dev"
     envs_dico = {"W": "work", "H": "home", "S": "hslt-server"}
     inf["enviro"] = envs_dico[tc.ENV]
+    wf_dico = {True: "lm_all", False: "lm_one"}
+    inf["lm_app"] = wf_dico[tc.use_lmall]
     outhead = "== Run ID [{0}], RevNum [{1}] {2}\n".format(inf["run_id"], inf["revnum"], "="*48)
     with codecs.open(tc.EVALFN.format(prep.find_run_id()), "r", "utf8") as done_res:
         with codecs.open(tc.CUMULOG, "a", "utf8") as cumu_res:
             cumu_res.write(outhead)
             cumu_res.write("RunComment: {0}\n".format(inf["run_comment"]))
-            for key in ["enviro", "maxdista", "distaw", "lmw", "lmpath",
-                        "increment_norm", "accept_all_IV_regex_outputs",
-                        "merge_iv_and_entities", "corpus"]:
-                cumu_res.write("{0}: {1}\n".format(key, inf[key]))
+            for key in ["enviro", "corpus", "lm_app", "maxdista", "distaw",
+                        "lmw", "lmpath", "increment_norm",
+                        "accept_all_IV_regex_outputs", "merge_iv_and_entities"]:
+                cumu_res.write("- {0}: {1}\n".format(key, inf[key]))
             cumu_res.write("".join(done_res.readlines()[-4:]))
 
     
@@ -681,6 +729,7 @@ def main():
     global edimgr
     global stpwords
     global outdico
+    global all_tweeto
     all_tweets = [] # debug
     
     # prep ---------------------------------------------------------------------
@@ -697,13 +746,13 @@ def main():
     #        print "- Deleting 'ivs_only' (IV) in current scope"
     #        delattr(sys.modules[__name__], "ivs_only")
 
-    corpus_type = {True: "test", False: "dev"}
-    print "= Corpus: {0}".format(corpus_type[tc.EVAL])
-
     print "Start {0}".format(time.asctime(time.localtime()))
 
     print "Run ID: %s" % prep.find_run_id()
-    lgr.info("Run {0} START | Rev [{1}] {2}".format(tc.RUNID, prep.find_git_revnum(), "="*60))
+    try:
+        lgr.info("Run {0} START | Rev [{1}] {2}".format(tc.RUNID, prep.find_git_revnum(), "="*60))
+    except OSError:
+        lgr.info("Run {0} START | Rev [{1}] {2}".format(tc.RUNID, "XXXX", "="*60))
 
     print "= main: preliminary preps"
     id_order = prep.find_id_order()
@@ -728,50 +777,45 @@ def main():
     print "= main: create baseline"
     baseline_dico = get_baseline_results(all_tweeto)
 
-    print "= main: NORMALIZATION"
-    x = 0 
-    for tid in all_tweeto:
-        lgr.debug("NORMALIZING, TID [{0}]".format(tid))
-        tweet = all_tweeto[tid]
-        for tok in tweet.toks:
-            if not isinstance(tok, OOV):
-                continue
-            oov = tok # easier label
-            preprocess(oov)
-            create_edit_candidates(oov)
-            find_lm_scores(oov)
-            rank_candidates(oov)
-            rank_before_entities(oov)
-            cf_with_ent(oov) #ents
-        x += 1
-        if x % 100 == 0:
-            print("Done {0} tweets, {1}".format(x, time.asctime(time.localtime())))
+    if not tc.BASELINE:
+        print "= main: NORMALIZATION"
+        x = 0 
+        for tid in all_tweeto:
+            lgr.debug("NORMALIZING, TID [{0}]".format(tid))
+            tweet = all_tweeto[tid]
+            for tok in tweet.toks:
+                if not isinstance(tok, OOV):
+                    continue
+                oov = tok # easier label
+                if tc.activate_prepro:
+                    # separate prepro components switched on/off inside preprocess(oov)
+                    preprocess(oov)
+                if tc.use_ed:
+                    create_edit_candidates(oov)
+                    find_lm_scores(oov)
+                rank_candidates(oov)
+                rank_before_entities(oov)
+                if tc.use_entities:
+                    cf_with_ent(oov)
+            x += 1
+            #if x == 10: break #debug
 
-    # Extra step to add more entity candidates
-    print "= Adding extra entities, {0}".format(time.asctime(time.localtime()))
-    for tid in all_tweeto:
-        lgr.debug("ADDING MORE ENTITIES, TID [{}]".format(tid))
-        tweet = all_tweeto[tid]
-        for tok in tweet.toks:
-            if not isinstance(tok, OOV):
-                continue
-            oov = tok
-            # basing entity-candidates on the pre-processed variant if available
-            if oov.edbase is None:
-                entity_candidates = [cand.form for cand in
-                                     entmgr.add_entity_candidates(oov.form)]
-            else:
-                entity_candidates = [cand.form for cand in
-                                     entmgr.add_entity_candidates(oov.edbase)]
-            # not sure why some candidates started with lowercase
-            entity_candidates = [cand for cand in entity_candidates if
-                                 cand[0].isupper()]
-            if oov.entcand is not None:
-                entity_candidates.append(oov.entcand)
-            oov.entcands = entity_candidates
+            if x % 100 == 0:
+                print("Done {0} tweets, {1}".format(x, time.asctime(time.localtime())))
 
-    #outdico = populate_outdico(all_tweeto, outdico)
-    outdico = populate_easy(all_tweeto, outdico, "aft")
+        # Extra step to add more entity candidates
+        if tc.use_lmall:
+            print "= Adding extra entities, {0}".format(time.asctime(time.localtime()))
+            add_extra_entities()
+            print "= Done"
+
+        #outdico = populate_outdico(all_tweeto, outdico) # old, now use populate_easy
+
+        if tc.generic_workflow or tc.use_entities: # Doesn't cover all cases. Enough for paper-tests
+            wf = "aft"
+        else:
+            wf = "bef"
+        outdico = populate_easy(all_tweeto, outdico, wf)
 
     # write-out ----------------------------------------------------------------
     print "= writer"

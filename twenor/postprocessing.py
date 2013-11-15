@@ -27,6 +27,8 @@ lgr, lfh = prep.set_log(__name__, logfile_name)
 def recase(orig, prop, tweet):
     """Reproduce orginal's upper-case initial in the proposal"""
     global lgr
+    if tc.no_postprocessing: #bypass component
+        return prop
     to_recase = False
     toks = [tok.form for tok in tweet.toks]
     if orig not in toks:

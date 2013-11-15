@@ -238,8 +238,6 @@ class EdManager:
             
         if a == b:
             cost = 0
-        #elif a.lower() == b or b.lower() and not a== b:
-        #    cost = -0.5
         else:
             try:
                 cost = self.editcosts[a.lower()][b.lower()]
@@ -247,6 +245,10 @@ class EdManager:
                 #if a != "zero" and b != "zero":
                 #    print "KeyError, a: %s, b: %s || Bad Key: %s" % (a, b, msg) #debug
                 cost = -1
+        #TODO: case-sensitivity how?
+        #if a.lower() == b or b.lower() and not a== b:
+        #    cost += -0.5
+
         #print "looking for costs between", repr(a), repr(b) #debug
         return 0 - cost # matrix has neg numbers, min() below won't work if not do "0 -" here
 

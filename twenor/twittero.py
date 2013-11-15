@@ -166,7 +166,7 @@ class OOV(Token):
     # Ranking
     keep_orig = None
     assess_edbase = None
-    accept_best_cand = None
+    accept_best_ed_cando = None
 
     #ranking implicit from flags set here and ppro_recorr_IV
     befent = None

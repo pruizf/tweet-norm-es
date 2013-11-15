@@ -41,4 +41,21 @@ testset
 630 vs. 640 for version 2 vs. 3
 in the case of the testset, can also compare 618 with 630 for version 1 vs. version 2
 
+Settings that bring it back to best results 
+
+# ISOLATE COMPONENTS -----------------------------------------------------------
+generic_workflow = bool(1)                      # 0 if applying components separately
+use_lmall = bool(0)                             # new lm workflow
+
+no_postprocessing = bool(0)
+activate_prepro = bool(1)                       # 1 if gonna use one of safelist, abbrev, runin, regex
+safelist_end = bool(0)                          # stop after safelist
+abbrev_end = bool(0)                            # stop after abbrev
+#runin_end = bool(0)                            # no need, cos at that point, the function returns anyway
+use_regexes = bool(1) ; regex_end = bool(0)     # use_regexes to turn on/off. Both 1 means regexes ONLY
+trusted_end = bool(0)
+trusted_and_regex_end = bool(0)
+use_ed = bool(1)                                # Edit candidates 
+#edcand_end = bool(0)                            # Edit candidates only: No need, cos use_entities 0 does it
+use_entities = bool(1)
 

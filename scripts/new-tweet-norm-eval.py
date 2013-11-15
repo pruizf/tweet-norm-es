@@ -165,5 +165,5 @@ def main(goldStandard, resultFile):
   return 'ERR: {0} \nPOS: {1} \nNEG: {2} \nACCUR: {3} '.format(errors, pos, neg, acc)
 
 
-#if __name__ == '__main__':
-#    print main(sys.argv[1], sys.argv[2]).encode('utf-8')
+if __name__ == '__main__':
+    print main(sys.argv[1], sys.argv[2]).encode('utf-8')
