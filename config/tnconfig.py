@@ -4,7 +4,7 @@ import re
 import sys
 
 # BASIC ========================================================================
-COMMENT = "PPR: should bring back to best results"
+COMMENT = "PPR: retest generic_lev"
 RUNID = None
 TAG = False                # Tag with Freeling (1) or read tags from TAGSDIR (0)
 ENV = "W"                   # Work, Home, Server
@@ -24,17 +24,17 @@ BASELINE = False
 generic_workflow = bool(1)                      # 0 if applying components separately
 use_lmall = bool(0)                             # new lm workflow
 
-no_postprocessing = bool(0)
+no_postprocessing = bool(1)                     # /!\ FALSE is YES to postprocessing
 activate_prepro = bool(1)                       # 1 if gonna use one of safelist, abbrev, runin, regex
 safelist_end = bool(0)                          # stop after safelist
-abbrev_end = bool(0)                            # stop after abbrev
+abbrev_end = bool(1)                            # stop after abbrev
 #runin_end = bool(0)                            # no need, cos at that point, the function returns anyway
-use_regexes = bool(1) ; regex_end = bool(0)     # use_regexes to turn on/off. Both 1 means regexes ONLY
+use_regexes = bool(0) ; regex_end = bool(0)     # use_regexes to turn on/off. Both 1 means regexes ONLY
 trusted_end = bool(0)
 trusted_and_regex_end = bool(0)
-use_ed = bool(1)                                # Edit candidates 
+use_ed = bool(0)                                # Edit candidates 
 #edcand_end = bool(0)                            # Edit candidates only: No need, cos use_entities 0 does it
-use_entities = bool(1)
+use_entities = bool(0)
 
 # in case:
 if safelist_end or abbrev_end or use_regexes:
@@ -125,6 +125,7 @@ REGPREPRO = APPDIR + r"/data/" + "preprocessing.txt"
 ABBREVS = APPDIR + r"/data/" + "abbreviations.txt"
 RUNIN = APPDIR + r"/data/" + "runinwords.txt"
 accept_all_IV_regex_outputs = False
+generic_lev = False
 
 # EDIT-DISTANCE ----------------------------------------------------------------
     #TODO: if costs ever get expressed with positive values,
@@ -134,6 +135,7 @@ acc_ins_penalty = -0.5 # for now negative values penalize.
 alphabet = ('bcdfghjklmnpqrstvwxyzaeiou', ['á', 'é', 'í', 'ó', 'ú', 'ü', 'ñ'])
 maxdista = -1.5
 distaw = 0.7 # weight for distance scores
+context_sens_ed = bool(1)
 
 # LANGUAGE MODELS --------------------------------------------------------------
 increment_norm = True # ltr, use normalized tokens as context for later tokens

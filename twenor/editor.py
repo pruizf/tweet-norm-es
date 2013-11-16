@@ -226,7 +226,7 @@ class EdManager:
         return set(w for w in words if w in self.ivdico)
 
     def find_cost(self, a,b):
-        """Return single-character-edit cost for changing
+        """<b> OOV, <a> Cand. Return single-character-edit cost for changing
            'b' (from oov under study) into 'a' (from edit-candidate under study)
            The cost-matrix is organized as mat[corr][incorr]
            Assumes that "a" and "b" are utf8-decoded"""

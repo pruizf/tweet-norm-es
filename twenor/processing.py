@@ -39,6 +39,8 @@ if "fl" in dir(): reload(fl)
 if "twittero" in dir(): reload(twittero)
 if "ppro" in dir(): reload(ppr)
 if "editor" in dir(): reload(editor)
+if "edcosts" in dir(): reload(edcosts)
+if "generic_edcosts" in dir(): reload(generic_edcosts)
 if "lmmgr" in dir(): reload(lmmgr)
 if "posp" in dir(): reload(posp)
 if "entities" in dir(): reload(entities)
@@ -52,6 +54,7 @@ import neweval as neval
 import preprocessing as ppr
 import editor
 import edcosts
+import generic_edcosts
 import lmmgr
 import postprocessing as posp
 import entities
@@ -165,7 +168,11 @@ def load_distance_editor():
     global ivs
 
     # prepare cost-matrix first cos EdManager needs it for initiation
-    lev_score_mat = editor.EdScoreMatrix(edcosts)
+    if tc.generic_lev:
+        chosen_edcosts = generic_edcosts
+    else:
+        chosen_edcosts = edcosts
+    lev_score_mat = editor.EdScoreMatrix(chosen_edcosts)
     lev_score_mat.read_cost_matrix()
     lev_score_mat.find_matrix_stats()
     lev_score_mat_hash = lev_score_mat.create_matrix_hash()
@@ -297,15 +304,16 @@ def create_edit_candidates(oov):
 
         # Regex-based -------------------
         #TODO: some side-effects of regexes, treat them (list-based if need be)
-        rgx_corr_cands = edimgr.rgdist(oov.edbase) #edbase, not oov.form
-        if len(rgx_corr_cands["cands"]) > 0:
-            for rcc in rgx_corr_cands["cands"]:
-                recando = editor.Candidate(rcc)
-                # rgx_corr_cands: distances indexed by cand
-                recando.set_dista(rgx_corr_cands["cands"][rcc])
-                recando.set_candtype("re")
-                oov.add_cand(recando)
-            rgx_corr_cand_forms[oov.form] = True
+        if tc.context_sens_ed:
+            rgx_corr_cands = edimgr.rgdist(oov.edbase) #edbase, not oov.form
+            if len(rgx_corr_cands["cands"]) > 0:
+                for rcc in rgx_corr_cands["cands"]:
+                    recando = editor.Candidate(rcc)
+                    # rgx_corr_cands: distances indexed by cand
+                    recando.set_dista(rgx_corr_cands["cands"][rcc])
+                    recando.set_candtype("re")
+                    oov.add_cand(recando)
+                rgx_corr_cand_forms[oov.form] = True
 
         # Lev Distance based -----------
         lev_corr_cands = edimgr.generate_candidates(oov.edbase)
@@ -666,6 +674,7 @@ def write_to_cumulog(clargs=None):
         inf["run_comment"] = clargs.comment
     else:
         inf["run_comment"] = tc.COMMENT
+    inf["generic_lev"] = tc.generic_lev
     if clargs.maxdista is not None:
         inf["maxdista"] = clargs.maxdsita
     else:
@@ -702,10 +711,18 @@ def write_to_cumulog(clargs=None):
         with codecs.open(tc.CUMULOG, "a", "utf8") as cumu_res:
             cumu_res.write(outhead)
             cumu_res.write("RunComment: {0}\n".format(inf["run_comment"]))
-            for key in ["enviro", "corpus", "lm_app", "maxdista", "distaw",
+            for key in ["enviro", "corpus", "lm_app",
+                        "generic_lev", "maxdista", "distaw",
                         "lmw", "lmpath", "increment_norm",
                         "accept_all_IV_regex_outputs", "merge_iv_and_entities"]:
                 cumu_res.write("- {0}: {1}\n".format(key, inf[key]))
+            iso_cumu_settings_list = ['tc.no_postprocessing', 'tc.activate_prepro',
+                                     'tc.safelist_end', 'tc.abbrev_end', 'tc.use_regexes',
+                                     'tc.use_ed', 'tc.context_sens_ed', 'tc.use_entities']
+            iso_cumu_settings_dict = dict((name, eval(name)) for name in iso_cumu_settings_list)
+            cumu_res.write("+ Isolating/Cumulative Module Settings +\n")
+            for setting in iso_cumu_settings_dict:
+                cumu_res.write("- {0}: {1}\n".format(setting, iso_cumu_settings_dict[setting]))
             cumu_res.write("".join(done_res.readlines()[-4:]))
 
     
@@ -746,8 +763,10 @@ def main():
     #        print "- Deleting 'ivs_only' (IV) in current scope"
     #        delattr(sys.modules[__name__], "ivs_only")
 
-    print "Start {0}".format(time.asctime(time.localtime()))
+    corpusname = {True: "test", False: "dev"}
+    print "Corpus: {}".format(corpusname[tc.EVAL])
 
+    print "Start {0}".format(time.asctime(time.localtime()))
     print "Run ID: %s" % prep.find_run_id()
     try:
         lgr.info("Run {0} START | Rev [{1}] {2}".format(tc.RUNID, prep.find_git_revnum(), "="*60))
