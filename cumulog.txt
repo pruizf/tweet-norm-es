@@ -2428,3 +2428,29 @@ ERR: 1
 POS: 431 
 NEG: 173 
 ACCUR: 66.0030627871 
+== Run ID [764], RevNum [68040b9] ================================================
+RunComment: PPR: test again keeping stopwords
+- enviro: work
+- corpus: dev
+- lm_app: lm_one
+- generic_lev: False
+- maxdista: -1.5
+- distaw: 0.7
+- lmw: 0.3
+- lmpath: SUMATCasedLM_kenlm_es.arpa
+- increment_norm: True
+- accept_all_IV_regex_outputs: False
+- merge_iv_and_entities: False
++ Isolating/Cumulative Module Settings +
+- tc.use_regexes: True
+- tc.context_sens_ed: True
+- tc.use_ed: True
+- tc.no_postprocessing: False
+- tc.abbrev_end: False
+- tc.safelist_end: False
+- tc.activate_prepro: True
+- tc.use_entities: True
+ERR: 1 
+POS: 431 
+NEG: 173 
+ACCUR: 66.0030627871 

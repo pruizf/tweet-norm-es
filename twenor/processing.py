@@ -534,9 +534,9 @@ def cf_with_ent(oov):
             oov.aftent = oov.befent
             lgr.debug("EN keep befent, Reason [{0}] [Trusted corr]".format(repr(oov.befent)))
         else:
-            #if oov.befent.lower() in stpwords:
-            #    oov.aftent = oov.befent
-            #    lgr.debug("EN keep befent, Reason [{0}] [Stopw]".format(repr(oov.befent)))
+            if oov.befent.lower() in stpwords:
+                oov.aftent = oov.befent
+                lgr.debug("EN keep befent, Reason [{0}] [Stopw]".format(repr(oov.befent)))
             # variable base_for_enti_dista allows to test entities module separately
             if not tc.use_ed and tc.use_entities:
                 base_for_enti_dista = oov.form

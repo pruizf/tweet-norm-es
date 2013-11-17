@@ -4,7 +4,7 @@ import re
 import sys
 
 # BASIC ========================================================================
-COMMENT = "PPR: test when not keep stopwords always"
+COMMENT = "PPR: test again keeping stopwords"
 RUNID = None
 TAG = False                # Tag with Freeling (1) or read tags from TAGSDIR (0)
 ENV = "W"                   # Work, Home, Server
