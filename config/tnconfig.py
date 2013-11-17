@@ -4,11 +4,11 @@ import re
 import sys
 
 # BASIC ========================================================================
-COMMENT = "PPR: retest generic_lev"
+COMMENT = "PPR: test when not keep stopwords always"
 RUNID = None
 TAG = False                # Tag with Freeling (1) or read tags from TAGSDIR (0)
 ENV = "W"                   # Work, Home, Server
-EVAL = bool(1)              # test (1) vs. dev (0) sets
+EVAL = bool(0)              # test (1) vs. dev (0) sets
 if ENV == "W":
     RESDIR = "/home/pruiz/DATA/projects/Tweet-Norm/results2"
 elif ENV == "H":
@@ -24,17 +24,17 @@ BASELINE = False
 generic_workflow = bool(1)                      # 0 if applying components separately
 use_lmall = bool(0)                             # new lm workflow
 
-no_postprocessing = bool(1)                     # /!\ FALSE is YES to postprocessing
+no_postprocessing = bool(0)                     # /!\ FALSE is YES to postprocessing
 activate_prepro = bool(1)                       # 1 if gonna use one of safelist, abbrev, runin, regex
 safelist_end = bool(0)                          # stop after safelist
-abbrev_end = bool(1)                            # stop after abbrev
+abbrev_end = bool(0)                            # stop after abbrev
 #runin_end = bool(0)                            # no need, cos at that point, the function returns anyway
-use_regexes = bool(0) ; regex_end = bool(0)     # use_regexes to turn on/off. Both 1 means regexes ONLY
+use_regexes = bool(1) ; regex_end = bool(0)     # use_regexes to turn on/off. Both 1 means regexes ONLY
 trusted_end = bool(0)
 trusted_and_regex_end = bool(0)
-use_ed = bool(0)                                # Edit candidates 
+use_ed = bool(1)                                # Edit candidates 
 #edcand_end = bool(0)                            # Edit candidates only: No need, cos use_entities 0 does it
-use_entities = bool(0)
+use_entities = bool(1)
 
 # in case:
 if safelist_end or abbrev_end or use_regexes:

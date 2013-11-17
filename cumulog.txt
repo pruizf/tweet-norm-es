@@ -2298,3 +2298,133 @@ ERR: 0
 POS: 174 
 NEG: 488 
 ACCUR: 26.2839879154 
+== Run ID [758], RevNum [dff5068] ================================================
+RunComment: PPR: retest generic_lev
+- enviro: work
+- corpus: test
+- lm_app: lm_one
+- generic_lev: False
+- maxdista: -1.5
+- distaw: 0.7
+- lmw: 0.3
+- lmpath: SUMATCasedLM_kenlm_es.arpa
+- increment_norm: True
+- accept_all_IV_regex_outputs: False
+- merge_iv_and_entities: False
++ Isolating/Cumulative Module Settings +
+- tc.use_regexes: False
+- tc.context_sens_ed: True
+- tc.use_ed: False
+- tc.no_postprocessing: True
+- tc.abbrev_end: True
+- tc.safelist_end: False
+- tc.activate_prepro: True
+- tc.use_entities: False
+ERR: 0 
+POS: 0 
+NEG: 662 
+ACCUR: 0.0 
+== Run ID [760], RevNum [dff5068] ================================================
+RunComment: PPR: retest generic_lev
+- enviro: work
+- corpus: test
+- lm_app: lm_one
+- generic_lev: False
+- maxdista: -1.5
+- distaw: 0.7
+- lmw: 0.3
+- lmpath: SUMATCasedLM_kenlm_es.arpa
+- increment_norm: True
+- accept_all_IV_regex_outputs: False
+- merge_iv_and_entities: False
++ Isolating/Cumulative Module Settings +
+- tc.use_regexes: True
+- tc.context_sens_ed: True
+- tc.use_ed: True
+- tc.no_postprocessing: False
+- tc.abbrev_end: False
+- tc.safelist_end: False
+- tc.activate_prepro: True
+- tc.use_entities: True
+ERR: 0 
+POS: 444 
+NEG: 218 
+ACCUR: 67.0694864048 
+== Run ID [761], RevNum [dff5068] ================================================
+RunComment: PPR: test removing clause 'not oov.befent == base_for_edit_dista'
+- enviro: work
+- corpus: test
+- lm_app: lm_one
+- generic_lev: False
+- maxdista: -1.5
+- distaw: 0.7
+- lmw: 0.3
+- lmpath: SUMATCasedLM_kenlm_es.arpa
+- increment_norm: True
+- accept_all_IV_regex_outputs: False
+- merge_iv_and_entities: False
++ Isolating/Cumulative Module Settings +
+- tc.use_regexes: True
+- tc.context_sens_ed: True
+- tc.use_ed: True
+- tc.no_postprocessing: False
+- tc.abbrev_end: False
+- tc.safelist_end: False
+- tc.activate_prepro: True
+- tc.use_entities: True
+ERR: 0 
+POS: 437 
+NEG: 225 
+ACCUR: 66.0120845921 
+== Run ID [762], RevNum [dff5068] ================================================
+RunComment: PPR: test when not keep stopwords always
+- enviro: work
+- corpus: test
+- lm_app: lm_one
+- generic_lev: False
+- maxdista: -1.5
+- distaw: 0.7
+- lmw: 0.3
+- lmpath: SUMATCasedLM_kenlm_es.arpa
+- increment_norm: True
+- accept_all_IV_regex_outputs: False
+- merge_iv_and_entities: False
++ Isolating/Cumulative Module Settings +
+- tc.use_regexes: True
+- tc.context_sens_ed: True
+- tc.use_ed: True
+- tc.no_postprocessing: False
+- tc.abbrev_end: False
+- tc.safelist_end: False
+- tc.activate_prepro: True
+- tc.use_entities: True
+ERR: 0 
+POS: 444 
+NEG: 218 
+ACCUR: 67.0694864048 
+== Run ID [763], RevNum [dff5068] ================================================
+RunComment: PPR: test when not keep stopwords always
+- enviro: work
+- corpus: dev
+- lm_app: lm_one
+- generic_lev: False
+- maxdista: -1.5
+- distaw: 0.7
+- lmw: 0.3
+- lmpath: SUMATCasedLM_kenlm_es.arpa
+- increment_norm: True
+- accept_all_IV_regex_outputs: False
+- merge_iv_and_entities: False
++ Isolating/Cumulative Module Settings +
+- tc.use_regexes: True
+- tc.context_sens_ed: True
+- tc.use_ed: True
+- tc.no_postprocessing: False
+- tc.abbrev_end: False
+- tc.safelist_end: False
+- tc.activate_prepro: True
+- tc.use_entities: True
+ERR: 1 
+POS: 431 
+NEG: 173 
+ACCUR: 66.0030627871 
