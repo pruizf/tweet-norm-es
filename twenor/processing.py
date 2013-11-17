@@ -534,24 +534,51 @@ def cf_with_ent(oov):
             oov.aftent = oov.befent
             lgr.debug("EN keep befent, Reason [{0}] [Trusted corr]".format(repr(oov.befent)))
         else:
-            if oov.befent.lower() in stpwords:
-                oov.aftent = oov.befent
-                lgr.debug("EN keep befent, Reason [{0}] [Stopw]".format(repr(oov.befent)))
+            #if oov.befent.lower() in stpwords:
+            #    oov.aftent = oov.befent
+            #    lgr.debug("EN keep befent, Reason [{0}] [Stopw]".format(repr(oov.befent)))
             # variable base_for_enti_dista allows to test entities module separately
             if not tc.use_ed and tc.use_entities:
                 base_for_enti_dista = oov.form
             else:
                 base_for_enti_dista = oov.edbase
             befent_dista = edimgr.levdist(oov.befent, base_for_enti_dista)
-            if befent_dista >= -0.5 and not oov.befent == base_for_enti_dista:
-                oov.aftent = oov.befent
-                lgr.debug("EN keep befent, Reason [{0}] vs. [{1}][Dista]".format(repr(oov.befent),
-                                                                                      repr(base_for_enti_dista)))
-            else:
+            #if befent_dista >= -0.5:
+            #    if not oov.befent == base_for_enti_dista:
+            #        oov.aftent = oov.befent
+            #        lgr.debug("EN keep befent, Reason [{0}] vs. [{1}][Dista]".format(repr(oov.befent),
+            #                                                                          repr(base_for_enti_dista)))
+            #    else:
+            #        lcon = slmmgr.find_left_context(oov.posi, [t.form for t in tweet.par_corr])
+            #        befent_lmsco = slmmgr.find_logprog_in_ctx(oov.befent, lcon)
+            #        entcand_lmsco = slmmgr.find_logprog_in_ctx(oov.entcand, lcon)
+            #        if befent_lmsco >= entcand_lmsco:
+            #            oov.aftent = oov.befent
+            #        else:
+            #            oov.aftent = oov.entcand
+            #else:
+            #    oov.aftent = oov.entcand
+            #    lgr.debug("EN keep aftent [{0}], vs. befent [{1}], O [{2}]".format(repr(oov.aftent),
+            #                                                                       repr(base_for_enti_dista),
+            #                                                                       repr(oov.form)))
+            if befent_dista < -0.5:
                 oov.aftent = oov.entcand
-                lgr.debug("EN keep aftent [{0}], vs. befent [{1}], O [{2}]".format(repr(oov.aftent),
-                                                                                   repr(base_for_enti_dista),
-                                                                                   repr(oov.form)))
+            else:
+                if slmmgr.check_is_inLM(oov.befent) and slmmgr.check_is_inLM(oov.entcand):
+                    if tc.increment_norm:
+                        lcon = slmmgr.find_left_context(oov.posi, [t.form for t in tweet.par_corr])
+                    else:
+                        lcon = slmmgr.find_left_context(oov.posi, [t.form for t in tweet.toks])                        
+                    befent_lmsco = slmmgr.find_logprog_in_ctx(oov.befent, lcon)
+                    entcand_lmsco = slmmgr.find_logprog_in_ctx(oov.entcand, lcon)
+                    if befent_lmsco >= entcand_lmsco:
+                        oov.aftent = oov.befent
+                    else:
+                        oov.aftent = oov.entcand
+                elif slmmgr.check_is_inLM(oov.befent) and not slmmgr.check_is_inLM(oov.entcand):
+                    oov.aftent = oov.befent
+                else:
+                    oov.aftent = oov.entcand
 
 def hash_final_form(oov, outdico, tweet):
     """Choose among edbase, oov.form and best candidate form given OOV instance state"""

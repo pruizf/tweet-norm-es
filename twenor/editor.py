@@ -137,25 +137,39 @@ class EdManager:
         self.ivdico = ivdico
 
     alphabet = None
+    accents_dico = {"a": u'\xe1', "e": u'\xe9', "i": u'\xed', "n": u'\xf1', "o": u'\xf3', "u": u'\xfa'}
 
     def prep_alphabet(self, alphabet=tc.alphabet):
-        """ """ 
+        """ Get alphabet for edit distance ready""" 
         alphabet_all = list(alphabet[0])
         # In config, entered the alphabet as strings. Decode using utf-8,
         # in order to be able to join to other unicode in edits1
         alphabet_all.extend([a.decode("utf-8") for a in alphabet[1]])
         self.alphabet = alphabet_all
 
+    def accent_check(self, cand_form, oov_form):
+        if not tc.accent_check_in_regexes:
+            return False
+        iniform = cand_form
+        for key in self.accents_dico:
+            if re.search(r"id[oa]$", cand_form):
+                accented_cand = re.sub(key, self.accents_dico[key], oov_form)
+                if accented_cand != iniform and accented_cand in self.ivdico:
+                    return accented_cand
+                    break
+        return False        
+
     def rgdist(self, oov):
         """Regex-based distance. If OOV matches certain contexts, some candidates
            need special weights. E.g. "ao$ => ado" should cost little. Calculate
-           these special weights. 
+           these special weights.
+           <oov> refers to the .form property, not the the instance of OOV itself
            Return tuple with
                [1] hash, keys: candidates, values: distances
                [2] hash, keys: candidates, values: times cand has been matched by a regex
         """
         # Ordered regexes. Format: (incorrect, correct)
-        # TODO: treat side effects like laa=>lada, mia=>mía, solaa=>solada
+        # TODO: treat side effects like laa=>lada, mia=>mida, solaa=>solada
         #       any stats (even unigram freq) may get rid of it wout extra lists
         # TODO: more precise regexes cos some (those w "h") are unlikely to bring good
         #       candidates
@@ -193,9 +207,17 @@ class EdManager:
                 result.setdefault(cand, 0)
                 result[cand] = -0.5 * apptimes[cand]
         for cand in result.keys():
-            if cand not in self.ivdico:
+            acc_cand = self.accent_check(cand, oov)
+            if acc_cand:
+                bkp_times = result[cand]
                 del result[cand]
-            elif cand == oov:
+                lgr.debug("ED (Rg) Deleted [{0}] from regex cands, Reason, Acc Cand [{1}]".format(
+                    repr(cand), repr(acc_cand)))
+                result[acc_cand] = bkp_times
+                result[acc_cand] += -0.25
+            if cand not in self.ivdico and cand in result:
+                del result[cand]
+            if cand == oov and cand in result:
                 del result[cand]
         lgr.debug("RED RES {0}, APPT {1}".format(repr(result), repr(apptimes)))
         return {"cands": result, "apptimes" : apptimes}

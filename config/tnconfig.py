@@ -4,7 +4,7 @@ import re
 import sys
 
 # BASIC ========================================================================
-COMMENT = "PPR: test again keeping stopwords"
+COMMENT = "PPR: TESTSET back to best, NEW REGEX DIST"
 RUNID = None
 TAG = False                # Tag with Freeling (1) or read tags from TAGSDIR (0)
 ENV = "W"                   # Work, Home, Server
@@ -136,9 +136,10 @@ alphabet = ('bcdfghjklmnpqrstvwxyzaeiou', ['á', 'é', 'í', 'ó', 'ú', 'ü', '
 maxdista = -1.5
 distaw = 0.7 # weight for distance scores
 context_sens_ed = bool(1)
+accent_check_in_regexes = bool(0)
 
 # LANGUAGE MODELS --------------------------------------------------------------
-increment_norm = True # ltr, use normalized tokens as context for later tokens
+increment_norm = False # ltr, use normalized tokens as context for later tokens
 if ENV in ["W", "H"]:
     lmpath = APPDIR + "/data/" + "SUMATCasedLM_kenlm_es.arpa"
     #lmpath = "/home/VICOMTECH/share/Tweet-Norm/lms/es_strict_noht_lc.arpa"
