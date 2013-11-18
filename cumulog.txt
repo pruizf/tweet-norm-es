@@ -2922,3 +2922,92 @@ ERR: 1
 POS: 431 
 NEG: 173 
 ACCUR: 66.0030627871 
+== Run ID [813], RevNum [XXXXX] ================================================
+RunComment: PPR: devset, test no context sensitive, no acc in regex
+- enviro: work
+- corpus: dev
+- lm_app: lm_one
+- generic_lev: False
+- maxdista: -1.5
+- distaw: 0.7
+== Run ID [815], RevNum [XXXXX] ================================================
+RunComment: PPR: devset, test no context sensitive, no acc in regex
+- enviro: work
+- corpus: dev
+- lm_app: lm_one
+- generic_lev: False
+- maxdista: -1.5
+- distaw: 0.7
+- accent_check_in_regexes: False
+- lmw: 0.3
+- lmpath: SUMATCasedLM_kenlm_es.arpa
+- increment_norm: False
+- accept_all_IV_regex_outputs: False
+- merge_iv_and_entities: False
++ Isolating/Cumulative Module Settings +
+- tc.use_regexes: True
+- tc.context_sens_ed: False
+- tc.use_ed: True
+- tc.no_postprocessing: True
+- tc.abbrev_end: False
+- tc.safelist_end: False
+- tc.activate_prepro: True
+- tc.use_entities: True
+ERR: 1 
+POS: 406 
+NEG: 198 
+ACCUR: 62.1745788668 
+== Run ID [816], RevNum [XXXXX] ================================================
+RunComment: PPR: devset, test no context sensitive, no acc in regex
+- enviro: work
+- corpus: dev
+- lm_app: lm_one
+- generic_lev: False
+- maxdista: -1.5
+- distaw: 0.7
+- accent_check_in_regexes: False
+- lmw: 0.3
+- lmpath: SUMATCasedLM_kenlm_es.arpa
+- increment_norm: False
+- accept_all_IV_regex_outputs: False
+- merge_iv_and_entities: False
++ Isolating/Cumulative Module Settings +
+- tc.use_regexes: True
+- tc.context_sens_ed: False
+- tc.use_ed: True
+- tc.no_postprocessing: False
+- tc.abbrev_end: False
+- tc.safelist_end: False
+- tc.activate_prepro: True
+- tc.use_entities: True
+ERR: 1 
+POS: 427 
+NEG: 177 
+ACCUR: 65.3905053599 
+== Run ID [817], RevNum [XXXXX] ================================================
+RunComment: PPR: testset, test no context sensitive, no acc in regex
+- enviro: work
+- corpus: test
+- lm_app: lm_one
+- generic_lev: False
+- maxdista: -1.5
+- distaw: 0.7
+- accent_check_in_regexes: False
+- lmw: 0.3
+- lmpath: SUMATCasedLM_kenlm_es.arpa
+- increment_norm: False
+- accept_all_IV_regex_outputs: False
+- merge_iv_and_entities: False
++ Isolating/Cumulative Module Settings +
+- tc.use_regexes: True
+- tc.context_sens_ed: False
+- tc.use_ed: True
+- tc.no_postprocessing: False
+- tc.abbrev_end: False
+- tc.safelist_end: False
+- tc.activate_prepro: True
+- tc.use_entities: True
+ERR: 0 
+POS: 440 
+NEG: 222 
+ACCUR: 66.4652567976 

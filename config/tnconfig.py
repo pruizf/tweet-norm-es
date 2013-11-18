@@ -4,11 +4,11 @@ import re
 import sys
 
 # BASIC ========================================================================
-COMMENT = "PPR: TESTSET back to best, NEW REGEX DIST"
+COMMENT = "PPR: devset, test no context sensitive, no acc in regex"
 RUNID = None
 TAG = False                # Tag with Freeling (1) or read tags from TAGSDIR (0)
 ENV = "W"                   # Work, Home, Server
-EVAL = bool(0)              # test (1) vs. dev (0) sets
+EVAL = bool(1)              # test (1) vs. dev (0) sets
 if ENV == "W":
     RESDIR = "/home/pruiz/DATA/projects/Tweet-Norm/results2"
 elif ENV == "H":
@@ -135,7 +135,7 @@ acc_ins_penalty = -0.5 # for now negative values penalize.
 alphabet = ('bcdfghjklmnpqrstvwxyzaeiou', ['á', 'é', 'í', 'ó', 'ú', 'ü', 'ñ'])
 maxdista = -1.5
 distaw = 0.7 # weight for distance scores
-context_sens_ed = bool(1)
+context_sens_ed = bool(0)
 accent_check_in_regexes = bool(0)
 
 # LANGUAGE MODELS --------------------------------------------------------------

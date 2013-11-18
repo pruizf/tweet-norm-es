@@ -725,6 +725,7 @@ def write_to_cumulog(clargs=None):
     inf["increment_norm"] = tc.increment_norm
     inf["accept_all_IV_regex_outputs"] = tc.accept_all_IV_regex_outputs
     inf["merge_iv_and_entities"] = tc.merge_iv_and_entities
+    inf["accent_check_in_regexes"] = tc.accent_check_in_regexes
     if tc.EVAL:
         inf["corpus"] = "test"
     else:
@@ -739,7 +740,7 @@ def write_to_cumulog(clargs=None):
             cumu_res.write(outhead)
             cumu_res.write("RunComment: {0}\n".format(inf["run_comment"]))
             for key in ["enviro", "corpus", "lm_app",
-                        "generic_lev", "maxdista", "distaw",
+                        "generic_lev", "maxdista", "distaw", "accent_check_in_regexes",
                         "lmw", "lmpath", "increment_norm",
                         "accept_all_IV_regex_outputs", "merge_iv_and_entities"]:
                 cumu_res.write("- {0}: {1}\n".format(key, inf[key]))

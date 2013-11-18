@@ -207,14 +207,15 @@ class EdManager:
                 result.setdefault(cand, 0)
                 result[cand] = -0.5 * apptimes[cand]
         for cand in result.keys():
-            acc_cand = self.accent_check(cand, oov)
-            if acc_cand:
-                bkp_times = result[cand]
-                del result[cand]
-                lgr.debug("ED (Rg) Deleted [{0}] from regex cands, Reason, Acc Cand [{1}]".format(
-                    repr(cand), repr(acc_cand)))
-                result[acc_cand] = bkp_times
-                result[acc_cand] += -0.25
+            if tc.accent_check_in_regexes:
+                acc_cand = self.accent_check(cand, oov)
+                if acc_cand:
+                    bkp_times = result[cand]
+                    del result[cand]
+                    lgr.debug("ED (Rg) Deleted [{0}] from regex cands, Reason, Acc Cand [{1}]".format(
+                        repr(cand), repr(acc_cand)))
+                    result[acc_cand] = bkp_times
+                    result[acc_cand] += -0.25
             if cand not in self.ivdico and cand in result:
                 del result[cand]
             if cand == oov and cand in result:
