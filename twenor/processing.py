@@ -762,6 +762,9 @@ def write_to_cumulog(clargs=None):
                 cumu_res.write("- {0}: {1}\n".format(stat, coverage_stats[stat]))
                              
             cumu_res.write("".join(done_res.readlines()[-4:]))
+            done_res.seek(0,0)
+        print "+ Results +"
+        print "".join(done_res.readlines()[-4:])
 
     
 # MAIN =========================================================================

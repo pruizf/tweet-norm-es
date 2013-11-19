@@ -39,6 +39,8 @@ def recase(orig, prop, tweet):
             to_recase = True
         elif toks[toks.index(orig) -1] in sen_delims:
             to_recase = True
+    elif orig == toks[0]:
+        to_recase = True
     if to_recase:
         postp = "".join([prop[0].upper(), prop[1:]])
         if postp != orig:

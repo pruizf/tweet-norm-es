@@ -112,7 +112,7 @@ def main(goldStandard, resultFile):
   # store the gold standard
   goldStandardDict, OOVnumber=loadFile(goldStandard)
 
-  evalfh.write('reference loaded:  {0} tweets and {1} OOVs\n '.format(len (goldStandardDict), OOVnumber))
+  evalfh.write('reference loaded:  {0} tweets and {1} OOVs\n'.format(len (goldStandardDict), OOVnumber))
 
   gold=[]
   res=[]
@@ -122,7 +122,7 @@ def main(goldStandard, resultFile):
   # store the result file
   resultDict, OOVnumberRes=loadFile(resultFile)
 
-  evalfh.write('result file loaded:  {0} tweets and {1} OOVs\n '.format(len (resultDict), OOVnumberRes))
+  evalfh.write('result file loaded:  {0} tweets and {1} OOVs\n'.format(len (resultDict), OOVnumberRes))
 
 
   # read results file line by line

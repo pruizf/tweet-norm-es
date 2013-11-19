@@ -48,7 +48,7 @@ def hash_gold_standard(goldStandard):
   # list with gold standard results
   goldStandardDict, OOVnumber=loadFile(goldStandard)
   print "= Coverage Stats"
-  print 'reference loaded: {0} tweets and {1} OOVs\n'.format(len (goldStandardDict), OOVnumber)
+  print 'reference loaded: {0} tweets and {1} OOVs'.format(len (goldStandardDict), OOVnumber)
   key=""
   outDict = {}
   for key in goldStandardDict:
@@ -127,5 +127,5 @@ def get_upper_bound(refe, resu):
                  float(covered) / (covered + missing))
   stats["total_tweets"] = total_tweets
   stats["upper_bound"] = upper_bound
-  print "UpperBoundOOV: {0}%".format(upper_bound)
+  print "UpperBoundOOV: {0}".format(upper_bound)
   return coverage, stats
