@@ -4,9 +4,9 @@ import re
 import sys
 
 # BASIC ========================================================================
-COMMENT = "PPR: devset, test no context sensitive, no acc in regex"
+COMMENT = "PPR: look regex output up in lowercase"
 RUNID = None
-TAG = False                # Tag with Freeling (1) or read tags from TAGSDIR (0)
+TAG = False                 # Tag with Freeling (1) or read tags from TAGSDIR (0)
 ENV = "W"                   # Work, Home, Server
 EVAL = bool(1)              # test (1) vs. dev (0) sets
 if ENV == "W":
@@ -135,11 +135,11 @@ acc_ins_penalty = -0.5 # for now negative values penalize.
 alphabet = ('bcdfghjklmnpqrstvwxyzaeiou', ['á', 'é', 'í', 'ó', 'ú', 'ü', 'ñ'])
 maxdista = -1.5
 distaw = 0.7 # weight for distance scores
-context_sens_ed = bool(0)
-accent_check_in_regexes = bool(0)
+context_sens_ed = bool(1)
+accent_check_in_regexes = bool(1)
 
 # LANGUAGE MODELS --------------------------------------------------------------
-increment_norm = False # ltr, use normalized tokens as context for later tokens
+increment_norm = True # ltr, use normalized tokens as context for later tokens
 if ENV in ["W", "H"]:
     lmpath = APPDIR + "/data/" + "SUMATCasedLM_kenlm_es.arpa"
     #lmpath = "/home/VICOMTECH/share/Tweet-Norm/lms/es_strict_noht_lc.arpa"

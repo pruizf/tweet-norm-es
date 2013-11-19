@@ -156,7 +156,7 @@ class OOV(Token):
     entcand = None
 
     # ED and LM
-    #cands_filtered = None
+    cands_filtered = None
     #ed_filtered_ranked = None
     edbase = None
     edbase_lmsco = None

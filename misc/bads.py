@@ -181,3 +181,27 @@ def cf_with_ent(oov):
                     oov.aftent = oov.befent
             else:
                 oov.aftent = oov.entcand
+
+
+
+
+            # caps variations
+            if corr.isupper():                
+                if corr in self.ivdico or corr.lower() in self.ivdico:
+                    IVflag = True
+                    corr = corr.lower()
+                else:
+                    IVflag = False
+            elif corr[0].isupper() and not corr.isupper():
+                if corr in self.ivdico or corr.lower() in self.ivdico:
+                    IVflag = True            
+                else:
+                    IVflag = False
+            elif corr in self.ivdico:
+                IVflag = True
+            else:
+                IVflag = False
+            lgr.debug("RE Out, OOV [{0}], recorr [{1}] , IVFlag [{2}], [RE_Changed]".format(
+                repr(oov), repr(corr), IVflag))
+        else:
+            IVflag = None

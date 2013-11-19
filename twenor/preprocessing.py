@@ -159,8 +159,11 @@ class Prepro:
                 else:
                     lgr.debug("RE Ph2 NOT applying to [%s] , [%s]: is in doubledchar_dico" % (ph1corr, corr_before))
         if applied:
-            if corr in self.ivdico:
+            # caps variations
+            if corr in self.ivdico or corr.lower() in self.ivdico:
                 IVflag = True
+                if corr.lower() in self.ivdico:
+                    corr = corr.lower()
             else:
                 IVflag = False
             lgr.debug("RE Out, OOV [{0}], recorr [{1}] , IVFlag [{2}], [RE_Changed]".format(

@@ -59,3 +59,10 @@ use_ed = bool(1)                                # Edit candidates
 #edcand_end = bool(0)                            # Edit candidates only: No need, cos use_entities 0 does it
 use_entities = bool(1)
 
+# 
+
+Pb with OOV in allcaps:
+827 vs. 843: now solved, allcaps and caps initial found in IV dico resolved. 
+the other differences between 827 and 843 are due to increment_norm = False in 827.
+
+

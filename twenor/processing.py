@@ -44,6 +44,7 @@ if "generic_edcosts" in dir(): reload(generic_edcosts)
 if "lmmgr" in dir(): reload(lmmgr)
 if "posp" in dir(): reload(posp)
 if "entities" in dir(): reload(entities)
+if "tnstats" in dir(): reload(tnstats)
 
 import tnconfig as tc
 import preparation as prep
@@ -58,7 +59,7 @@ import generic_edcosts
 import lmmgr
 import postprocessing as posp
 import entities
-
+import tnstats
 
 # functions ================================================================
 
@@ -690,6 +691,8 @@ def write_out(corr_dico):
 
 def write_to_cumulog(clargs=None):
     """Write config infos and accuracy measures to cumulative log"""
+    global golden_set_res
+    global all_tweeto
     inf = {}
     inf["run_id"] = prep.find_run_id()
     try:
@@ -730,6 +733,9 @@ def write_to_cumulog(clargs=None):
         inf["corpus"] = "test"
     else:
         inf["corpus"] = "dev"
+
+    golden_set_res = tnstats.hash_gold_standard(tc.ANNOTS)
+    coverage_info, coverage_stats = tnstats.get_upper_bound(golden_set_res, all_tweeto.values())
     envs_dico = {"W": "work", "H": "home", "S": "hslt-server"}
     inf["enviro"] = envs_dico[tc.ENV]
     wf_dico = {True: "lm_all", False: "lm_one"}
@@ -751,6 +757,10 @@ def write_to_cumulog(clargs=None):
             cumu_res.write("+ Isolating/Cumulative Module Settings +\n")
             for setting in iso_cumu_settings_dict:
                 cumu_res.write("- {0}: {1}\n".format(setting, iso_cumu_settings_dict[setting]))
+            cumu_res.write("+ Upper Bound +\n")
+            for stat in coverage_stats:
+                cumu_res.write("- {0}: {1}\n".format(stat, coverage_stats[stat]))
+                             
             cumu_res.write("".join(done_res.readlines()[-4:]))
 
     
