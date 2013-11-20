@@ -7,14 +7,14 @@ import sys
 COMMENT = "PPR: look regex output up in lowercase"
 RUNID = None
 TAG = False                 # Tag with Freeling (1) or read tags from TAGSDIR (0)
-ENV = "W"                   # Work, Home, Server
-EVAL = bool(0)              # test (1) vs. dev (0) sets
+ENV = "S"                   # Work, Home, Server
+EVAL = bool(1)              # test (1) vs. dev (0) sets
 if ENV == "W":
     RESDIR = "/home/pruiz/DATA/projects/Tweet-Norm/results2"
 elif ENV == "H":
     RESDIR = "/home/ps/DATA/wk/VT/projects/Tweet-Norm/results2"
 elif ENV == "S":
-    RESDIR = "/home/VICOMTECH/share/Tweet-Norm2/results"
+    RESDIR = "/home/VICOMTECH/share/Tweet-Norm2/TNT/results"
 if not os.path.exists(RESDIR):
     os.makedirs(RESDIR)
 BASELINE = False
@@ -134,7 +134,7 @@ generic_lev = False
 acc_ins_penalty = -0.5 # for now negative values penalize. 
 alphabet = ('bcdfghjklmnpqrstvwxyzaeiou', ['á', 'é', 'í', 'ó', 'ú', 'ü', 'ñ'])
 maxdista = -1.5
-distaw = 0.7 # weight for distance scores
+distaw = 1.0 # weight for distance scores
 context_sens_ed = bool(1)
 accent_check_in_regexes = bool(1)
 
@@ -149,7 +149,7 @@ if ENV == "S":
     #lmpath = APPDIR + "/data/" + "SUMATCasedLM_kenlm_es.arpa"
 
 lm_window = 4
-lmw = 0.3 # weight for lm scores
+lmw = 0.0 # weight for lm scores
 
 # EVALUATION -------------------------------------------------------------------
 evalscript = APPDIR + "/scripts/" + "new-tweet-norm-eval.py"

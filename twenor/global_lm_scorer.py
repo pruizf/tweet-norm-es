@@ -33,7 +33,8 @@ def is_accented_variant(acc_str, str2):
 
 #--                  
 def set_recase_val(tok, tweet):    
-    return tok.form[0].isupper() and len(tok.form) > 1 and is_capitalization_context(tok.posi, tweet)                      
+    return tok.posi == 0 or \
+        (tok.form[0].isupper() and len(tok.form) > 1 and is_capitalization_context(tok.posi, tweet))                      
             
                 
 def get_candidate_combinations(tweets):    
@@ -49,7 +50,7 @@ def get_candidate_combinations(tweets):
         tcp.initialize(tweet.tid)
         del tweet_sqs[:]
         for tok in tweet.toks:             
-            if tok.form == u"XD":
+            if tok.form == u"Agustinos":
                 pdb.set_trace()        
             #-- Check trusted corrections first and set them as unique candidate if they exist           
             del orig_and_cands[:]   
@@ -135,7 +136,7 @@ def report_results(list_best):
             if tpl[3]: #-- i.e. is OOV word
                 if not res.has_key(b[0]):
                     res[b[0]] = []            
-                if tpl[2] == True: #-- i.e. the word was truecased                 
+                if tpl[2] == True: #-- i.e. the word was marked for recasing                 
                     res[b[0]].append((tpl[0], tpl[1][0].upper() + tpl[1][1:])) 
                 else:
                     res[b[0]].append((tpl[0], tpl[1]))
