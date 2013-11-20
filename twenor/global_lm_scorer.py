@@ -14,6 +14,8 @@ final_punc = [".", "!", "?"]
 
 cap_context = [".", "!", "?", '"', "...", "(", ")", "/"]
 
+tweet_markers = ['@', '#']
+
 def get_reduced_cands(tok, tweet, cand_list):
     orig_and_cands = [(tok.form, c.form, set_recase_val(tok, tweet), True) for c in cand_list]
     if len(orig_and_cands) > 1:
@@ -22,13 +24,13 @@ def get_reduced_cands(tok, tweet, cand_list):
 
 def is_capitalization_context(tok_pos, tweet):
     return tok_pos == 0 \
-            or ( ((tok_pos - 1) > 0) \
-                and ( (tweet.toks[tok_pos-1].form in cap_context))) 
-                       #or (tok_pos == 1 and (tweet.toks[0].form[0] == "@")))) 
+            or ( (tok_pos > 0) \
+                and ( (tweet.toks[tok_pos-1].form in cap_context) 
+                       or (tok_pos == 1 and (tweet.toks[0].form[0] in tweet_markers)))) 
 
-def is_accented_variant(acc_str, str2):
+def is_accented_variant(acc_str, str2):    
     return unicodedata.normalize('NFD', acc_str).encode('ASCII', 'ignore') \
-                == str2.encode('ASCII', 'ignore')
+                == unicodedata.normalize('NFD', str2).encode('ASCII', 'ignore')
 
 
 #--                  
@@ -50,8 +52,8 @@ def get_candidate_combinations(tweets):
         tcp.initialize(tweet.tid)
         del tweet_sqs[:]
         for tok in tweet.toks:             
-            if tok.form == u"Agustinos":
-                pdb.set_trace()        
+            #if tok.form == u"Graaciaas":
+                #pdb.set_trace()        
             #-- Check trusted corrections first and set them as unique candidate if they exist           
             del orig_and_cands[:]   
             if isinstance(tok, OOV):
@@ -67,7 +69,7 @@ def get_candidate_combinations(tweets):
                         if tok.ed_filtered_ranked != None:
                             rcands = get_reduced_cands(tok, tweet, tok.ed_filtered_ranked)
                             orig_and_cands.extend([tpl for tpl in rcands \
-                                if (is_accented_variant(tpl[1], tok.entcand) \
+                                if (is_accented_variant(tpl[1], tok.entcand.lower()) \
                                     or (is_accented_variant(tpl[1], tpl[0])))])
 
                     if tok.ppro_recorr != None:

@@ -3669,3 +3669,71 @@ ERR: 1
 POS: 438 
 NEG: 166 
 ACCUR: 67.0750382848 
+== Run ID [859], RevNum [ba85558] ================================================
+RunComment: PPR: look regex output up in lowercase
+- enviro: hslt-server
+- corpus: test
+- lm_app: lm_one
+- generic_lev: False
+- maxdista: -1.5
+- distaw: 1.0
+- accent_check_in_regexes: True
+- lmw: 0.0
+- lmpath: opensubs+tweets.tok.tc.es.arpa
+- increment_norm: True
+- accept_all_IV_regex_outputs: False
+- merge_iv_and_entities: False
++ Isolating/Cumulative Module Settings +
+- tc.use_regexes: True
+- tc.context_sens_ed: True
+- tc.use_ed: True
+- tc.no_postprocessing: False
+- tc.abbrev_end: False
+- tc.safelist_end: False
+- tc.activate_prepro: True
+- tc.use_entities: True
++ Upper Bound +
+- total_tweets: 564
+- no_oov: 247
+- upper_bound: (0.8422712933753943, 0.8031496062992126)
+- missing: 50
+- covered: 204
+- baselines: 63
+ERR: 0 
+POS: 460 
+NEG: 202 
+ACCUR: 69.4864048338 
+== Run ID [861], RevNum [ba85558] ================================================
+RunComment: PPR: look regex output up in lowercase
+- enviro: hslt-server
+- corpus: test
+- lm_app: lm_one
+- generic_lev: False
+- maxdista: -1.5
+- distaw: 0.7
+- accent_check_in_regexes: True
+- lmw: 0.3
+- lmpath: opensubs+tweets.tok.tc.es.arpa
+- increment_norm: True
+- accept_all_IV_regex_outputs: False
+- merge_iv_and_entities: False
++ Isolating/Cumulative Module Settings +
+- tc.use_regexes: True
+- tc.context_sens_ed: True
+- tc.use_ed: True
+- tc.no_postprocessing: False
+- tc.abbrev_end: False
+- tc.safelist_end: False
+- tc.activate_prepro: True
+- tc.use_entities: True
++ Upper Bound +
+- total_tweets: 564
+- no_oov: 247
+- upper_bound: (0.8422712933753943, 0.8031496062992126)
+- missing: 50
+- covered: 204
+- baselines: 63
+ERR: 0 
+POS: 461 
+NEG: 201 
+ACCUR: 69.6374622356 

@@ -168,12 +168,17 @@ class EdManager:
                [1] hash, keys: candidates, values: distances
                [2] hash, keys: candidates, values: times cand has been matched by a regex
         """
+        oov_before_rgdist = oov
+        if len(oov) > 3 and oov.isupper():
+            oov = oov.lower()
+            lgr.debug("ED LC O: [{0}], O_LC: [{1}]".format(repr(oov_before_rgdist), repr(oov)))
         # Ordered regexes. Format: (incorrect, correct)
         # TODO: treat side effects like laa=>lada, mia=>mida, solaa=>solada
         #       any stats (even unigram freq) may get rid of it wout extra lists
         # TODO: more precise regexes cos some (those w "h") are unlikely to bring good
         #       candidates
-        subs_tups = [('gi', 'gui'), ('ge', 'gue'),
+        subs_tups = [('^wa', 'gua'), ('^we', 'bue'),
+                     ('gi', 'gui'), ('ge', 'gue'),
                      ('q(?!ui)', 'que'),
                      ('qe', 'que'), ('qi', 'qui'), ('ke', 'que'), ('ki', 'qui'),
                      ('nio', u'ño'), ('nia', u'ña'), ('nyo', u'ño'), ('nya', u'ña'),
@@ -225,6 +230,10 @@ class EdManager:
     
     def edits1(self, word):
         """Generate candidates at Lev distance 1. From Norvig speller."""
+        orig_word = word
+        if len(word) > 3 and word.isupper():
+            word = word.lower()
+            lgr.debug("ED LC O: [{0}], O_LC: [{1}]".format(repr(orig_word), repr(word)))
         splits     = [(word[:i], word[i:]) for i in range(len(word) + 1)]
         deletes    = [a + b[1:] for a, b in splits if b]
         replaces   = [a + c + b[1:] for a, b in splits for c in self.alphabet if b]
