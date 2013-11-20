@@ -3431,3 +3431,479 @@ ERR: 1
 POS: 431 
 NEG: 173 
 ACCUR: 66.0030627871 
+== Run ID [849], RevNum [XXXXX] ================================================
+RunComment: lowercase form before candidate generation
+- enviro: work
+- corpus: dev
+- lm_app: lm_one
+- generic_lev: False
+- maxdista: -1.5
+- distaw: 0.7
+- accent_check_in_regexes: True
+- lmw: 0.3
+- lmpath: SUMATCasedLM_kenlm_es.arpa
+- increment_norm: True
+- accept_all_IV_regex_outputs: False
+- merge_iv_and_entities: False
++ Isolating/Cumulative Module Settings +
+- tc.use_regexes: True
+- tc.context_sens_ed: True
+- tc.use_ed: True
+- tc.no_postprocessing: False
+- tc.abbrev_end: False
+- tc.safelist_end: False
+- tc.activate_prepro: True
+- tc.use_entities: True
++ Upper Bound +
+- total_tweets: 475
+- no_oov: 189
+- upper_bound: (0.8391608391608392, 0.7955555555555556)
+- missing: 46
+- covered: 179
+- baselines: 61
+ERR: 1 
+POS: 433 
+NEG: 171 
+ACCUR: 66.3093415008 
+== Run ID [850], RevNum [XXXXX] ================================================
+RunComment: lowercase form before candidate generation
+- enviro: work
+- corpus: test
+- lm_app: lm_one
+- generic_lev: False
+- maxdista: -1.5
+- distaw: 0.7
+- accent_check_in_regexes: True
+- lmw: 0.3
+- lmpath: SUMATCasedLM_kenlm_es.arpa
+- increment_norm: True
+- accept_all_IV_regex_outputs: False
+- merge_iv_and_entities: False
++ Isolating/Cumulative Module Settings +
+- tc.use_regexes: True
+- tc.context_sens_ed: True
+- tc.use_ed: True
+- tc.no_postprocessing: False
+- tc.abbrev_end: False
+- tc.safelist_end: False
+- tc.activate_prepro: True
+- tc.use_entities: True
++ Upper Bound +
+- total_tweets: 564
+- no_oov: 247
+- upper_bound: (0.8422712933753943, 0.8031496062992126)
+- missing: 50
+- covered: 204
+- baselines: 63
+ERR: 0 
+POS: 458 
+NEG: 204 
+ACCUR: 69.1842900302 
+== Run ID [853], RevNum [XXXXX] ================================================
+RunComment: lowercase form before candidate generation
+- enviro: work
+- corpus: test
+- lm_app: lm_one
+- generic_lev: False
+- maxdista: -1.5
+- distaw: 0.7
+- accent_check_in_regexes: True
+- lmw: 0.3
+- lmpath: SUMATCasedLM_kenlm_es.arpa
+- increment_norm: True
+- accept_all_IV_regex_outputs: False
+- merge_iv_and_entities: False
++ Isolating/Cumulative Module Settings +
+- tc.use_regexes: True
+- tc.context_sens_ed: True
+- tc.use_ed: True
+- tc.no_postprocessing: False
+- tc.abbrev_end: False
+- tc.safelist_end: False
+- tc.activate_prepro: True
+- tc.use_entities: True
++ Upper Bound +
+- total_tweets: 564
+- no_oov: 247
+- upper_bound: (0.8422712933753943, 0.8031496062992126)
+- missing: 50
+- covered: 204
+- baselines: 63
+ERR: 0 
+POS: 458 
+NEG: 204 
+ACCUR: 69.1842900302 
+== Run ID [854], RevNum [XXXXX] ================================================
+RunComment: lowercase form before candidate generation
+- enviro: work
+- corpus: dev
+- lm_app: lm_one
+- generic_lev: False
+- maxdista: -1.5
+- distaw: 0.7
+- accent_check_in_regexes: True
+- lmw: 0.3
+- lmpath: SUMATCasedLM_kenlm_es.arpa
+- increment_norm: True
+- accept_all_IV_regex_outputs: False
+- merge_iv_and_entities: False
++ Isolating/Cumulative Module Settings +
+- tc.use_regexes: True
+- tc.context_sens_ed: True
+- tc.use_ed: True
+- tc.no_postprocessing: False
+- tc.abbrev_end: False
+- tc.safelist_end: False
+- tc.activate_prepro: True
+- tc.use_entities: True
++ Upper Bound +
+- total_tweets: 475
+- no_oov: 189
+- upper_bound: (0.8391608391608392, 0.7955555555555556)
+- missing: 46
+- covered: 179
+- baselines: 61
+ERR: 1 
+POS: 433 
+NEG: 171 
+ACCUR: 66.3093415008 
+== Run ID [855], RevNum [XXXXX] ================================================
+RunComment: lowercase form before candidate generation
+- enviro: work
+- corpus: dev
+- lm_app: lm_one
+- generic_lev: False
+- maxdista: -1.5
+- distaw: 0.7
+- accent_check_in_regexes: True
+- lmw: 0.3
+- lmpath: SUMATCasedLM_kenlm_es.arpa
+- increment_norm: True
+- accept_all_IV_regex_outputs: False
+- merge_iv_and_entities: False
++ Isolating/Cumulative Module Settings +
+- tc.use_regexes: True
+- tc.context_sens_ed: True
+- tc.use_ed: True
+- tc.no_postprocessing: False
+- tc.abbrev_end: False
+- tc.safelist_end: False
+- tc.activate_prepro: True
+- tc.use_entities: True
++ Upper Bound +
+- total_tweets: 475
+- no_oov: 189
+- upper_bound: (0.8391608391608392, 0.7955555555555556)
+- missing: 46
+- covered: 179
+- baselines: 61
+ERR: 1 
+POS: 433 
+NEG: 171 
+ACCUR: 66.3093415008 
+== Run ID [857], RevNum [XXXXX] ================================================
+RunComment: lowercase form before candidate generation
+- enviro: work
+- corpus: dev
+- lm_app: lm_one
+- generic_lev: False
+- maxdista: -1.5
+- distaw: 0.7
+- accent_check_in_regexes: True
+- lmw: 0.3
+- lmpath: SUMATCasedLM_kenlm_es.arpa
+- increment_norm: True
+- accept_all_IV_regex_outputs: False
+- merge_iv_and_entities: False
++ Isolating/Cumulative Module Settings +
+- tc.use_regexes: True
+- tc.context_sens_ed: True
+- tc.use_ed: True
+- tc.no_postprocessing: False
+- tc.abbrev_end: False
+- tc.safelist_end: False
+- tc.activate_prepro: True
+- tc.use_entities: True
++ Upper Bound +
+- total_tweets: 475
+- no_oov: 189
+- upper_bound: (0.8391608391608392, 0.7955555555555556)
+- missing: 46
+- covered: 179
+- baselines: 61
+ERR: 1 
+POS: 434 
+NEG: 170 
+ACCUR: 66.4624808576 
+== Run ID [858], RevNum [XXXXX] ================================================
+RunComment: lowercase form before candidate generation
+- enviro: work
+- corpus: dev
+- lm_app: lm_one
+- generic_lev: False
+- maxdista: -1.5
+- distaw: 0.7
+- accent_check_in_regexes: True
+- lmw: 0.3
+- lmpath: SUMATCasedLM_kenlm_es.arpa
+- increment_norm: True
+- accept_all_IV_regex_outputs: False
+- merge_iv_and_entities: False
++ Isolating/Cumulative Module Settings +
+- tc.use_regexes: True
+- tc.context_sens_ed: True
+- tc.use_ed: True
+- tc.no_postprocessing: False
+- tc.abbrev_end: False
+- tc.safelist_end: False
+- tc.activate_prepro: True
+- tc.use_entities: True
++ Upper Bound +
+- total_tweets: 475
+- no_oov: 189
+- upper_bound: (0.8391608391608392, 0.7955555555555556)
+- missing: 46
+- covered: 179
+- baselines: 61
+ERR: 1 
+POS: 434 
+NEG: 170 
+ACCUR: 66.4624808576 
+== Run ID [859], RevNum [XXXXX] ================================================
+RunComment: lowercase form before candidate generation
+- enviro: work
+- corpus: dev
+- lm_app: lm_one
+- generic_lev: False
+- maxdista: -1.5
+- distaw: 0.7
+- accent_check_in_regexes: True
+- lmw: 0.3
+- lmpath: SUMATCasedLM_kenlm_es.arpa
+- increment_norm: True
+- accept_all_IV_regex_outputs: False
+- merge_iv_and_entities: False
++ Isolating/Cumulative Module Settings +
+- tc.use_regexes: True
+- tc.context_sens_ed: True
+- tc.use_ed: True
+- tc.no_postprocessing: False
+- tc.abbrev_end: False
+- tc.safelist_end: False
+- tc.activate_prepro: True
+- tc.use_entities: True
++ Upper Bound +
+- total_tweets: 475
+- no_oov: 189
+- upper_bound: (0.8391608391608392, 0.7955555555555556)
+- missing: 46
+- covered: 179
+- baselines: 61
+ERR: 1 
+POS: 434 
+NEG: 170 
+ACCUR: 66.4624808576 
+== Run ID [860], RevNum [XXXXX] ================================================
+RunComment: lowercase form before candidate generation
+- enviro: work
+- corpus: dev
+- lm_app: lm_one
+- generic_lev: False
+- maxdista: -1.5
+- distaw: 0.7
+- accent_check_in_regexes: True
+- lmw: 0.3
+- lmpath: SUMATCasedLM_kenlm_es.arpa
+- increment_norm: True
+- accept_all_IV_regex_outputs: False
+- merge_iv_and_entities: False
++ Isolating/Cumulative Module Settings +
+- tc.use_regexes: True
+- tc.context_sens_ed: True
+- tc.use_ed: True
+- tc.no_postprocessing: False
+- tc.abbrev_end: False
+- tc.safelist_end: False
+- tc.activate_prepro: True
+- tc.use_entities: True
++ Upper Bound +
+- total_tweets: 475
+- no_oov: 189
+- upper_bound: (0.8391608391608392, 0.7955555555555556)
+- missing: 46
+- covered: 179
+- baselines: 61
+ERR: 1 
+POS: 434 
+NEG: 170 
+ACCUR: 66.4624808576 
+== Run ID [863], RevNum [XXXXX] ================================================
+RunComment: lowercase form before candidate generation
+- enviro: work
+- corpus: dev
+- lm_app: lm_one
+- generic_lev: False
+- maxdista: -1.5
+- distaw: 0.7
+- accent_check_in_regexes: True
+- lmw: 0.3
+- lmpath: SUMATCasedLM_kenlm_es.arpa
+- increment_norm: True
+- accept_all_IV_regex_outputs: False
+- merge_iv_and_entities: False
++ Isolating/Cumulative Module Settings +
+- tc.use_regexes: True
+- tc.context_sens_ed: True
+- tc.use_ed: True
+- tc.no_postprocessing: False
+- tc.abbrev_end: False
+- tc.safelist_end: False
+- tc.activate_prepro: True
+- tc.use_entities: True
++ Upper Bound +
+- total_tweets: 475
+- no_oov: 189
+- upper_bound: (0.8321678321678322, 0.7866666666666666)
+- missing: 48
+- covered: 177
+- baselines: 61
+ERR: 1 
+POS: 434 
+NEG: 170 
+ACCUR: 66.4624808576 
+== Run ID [864], RevNum [XXXXX] ================================================
+RunComment: lowercase form before candidate generation
+- enviro: work
+- corpus: test
+- lm_app: lm_one
+- generic_lev: False
+- maxdista: -1.5
+- distaw: 0.7
+- accent_check_in_regexes: True
+- lmw: 0.3
+- lmpath: SUMATCasedLM_kenlm_es.arpa
+- increment_norm: True
+- accept_all_IV_regex_outputs: False
+- merge_iv_and_entities: False
++ Isolating/Cumulative Module Settings +
+- tc.use_regexes: True
+- tc.context_sens_ed: True
+- tc.use_ed: True
+- tc.no_postprocessing: False
+- tc.abbrev_end: False
+- tc.safelist_end: False
+- tc.activate_prepro: True
+- tc.use_entities: True
++ Upper Bound +
+- total_tweets: 564
+- no_oov: 247
+- upper_bound: (0.8422712933753943, 0.8031496062992126)
+- missing: 50
+- covered: 204
+- baselines: 63
+ERR: 0 
+POS: 460 
+NEG: 202 
+ACCUR: 69.4864048338 
+== Run ID [866], RevNum [XXXXX] ================================================
+RunComment: lowercase form before candidate generation
+- enviro: work
+- corpus: test
+- lm_app: lm_one
+- generic_lev: False
+- maxdista: -1.5
+- distaw: 0.7
+- accent_check_in_regexes: True
+- lmw: 0.3
+- lmpath: SUMATCasedLM_kenlm_es.arpa
+- increment_norm: True
+- accept_all_IV_regex_outputs: False
+- merge_iv_and_entities: False
++ Isolating/Cumulative Module Settings +
+- tc.use_regexes: True
+- tc.context_sens_ed: True
+- tc.use_ed: True
+- tc.no_postprocessing: False
+- tc.abbrev_end: False
+- tc.safelist_end: False
+- tc.activate_prepro: True
+- tc.use_entities: True
++ Upper Bound +
+- total_tweets: 564
+- no_oov: 247
+- upper_bound: (0.8422712933753943, 0.8031496062992126)
+- missing: 50
+- covered: 204
+- baselines: 63
+ERR: 0 
+POS: 460 
+NEG: 202 
+ACCUR: 69.4864048338 
+== Run ID [867], RevNum [XXXXX] ================================================
+RunComment: lowercase form before candidate generation
+- enviro: work
+- corpus: test
+- lm_app: lm_one
+- generic_lev: False
+- maxdista: -1.5
+- distaw: 0.7
+- accent_check_in_regexes: True
+- lmw: 0.3
+- lmpath: SUMATCasedLM_kenlm_es.arpa
+- increment_norm: True
+- accept_all_IV_regex_outputs: False
+- merge_iv_and_entities: False
++ Isolating/Cumulative Module Settings +
+- tc.use_regexes: True
+- tc.context_sens_ed: True
+- tc.use_ed: True
+- tc.no_postprocessing: False
+- tc.abbrev_end: False
+- tc.safelist_end: False
+- tc.activate_prepro: True
+- tc.use_entities: True
++ Upper Bound +
+- total_tweets: 564
+- no_oov: 247
+- upper_bound: (0.8422712933753943, 0.8031496062992126)
+- missing: 50
+- covered: 204
+- baselines: 63
+ERR: 0 
+POS: 460 
+NEG: 202 
+ACCUR: 69.4864048338 
+== Run ID [868], RevNum [XXXXX] ================================================
+RunComment: lowercase form before candidate generation
+- enviro: work
+- corpus: dev
+- lm_app: lm_one
+- generic_lev: False
+- maxdista: -1.5
+- distaw: 0.7
+- accent_check_in_regexes: True
+- lmw: 0.3
+- lmpath: SUMATCasedLM_kenlm_es.arpa
+- increment_norm: True
+- accept_all_IV_regex_outputs: False
+- merge_iv_and_entities: False
++ Isolating/Cumulative Module Settings +
+- tc.use_regexes: True
+- tc.context_sens_ed: True
+- tc.use_ed: True
+- tc.no_postprocessing: False
+- tc.abbrev_end: False
+- tc.safelist_end: False
+- tc.activate_prepro: True
+- tc.use_entities: True
++ Upper Bound +
+- total_tweets: 475
+- no_oov: 189
+- upper_bound: (0.8321678321678322, 0.7866666666666666)
+- missing: 48
+- covered: 177
+- baselines: 61
+ERR: 1 
+POS: 434 
+NEG: 170 
+ACCUR: 66.4624808576 

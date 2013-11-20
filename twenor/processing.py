@@ -302,6 +302,7 @@ def create_edit_candidates(oov):
             oov.set_edbase(oov.form)
         else:
             oov.set_edbase(oov.ppro_recorr)
+        lgr.debug("ED EB [{0}]".format(repr(oov.edbase)))
 
         # Regex-based -------------------
         #TODO: some side-effects of regexes, treat them (list-based if need be)

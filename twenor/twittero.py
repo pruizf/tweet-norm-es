@@ -157,7 +157,7 @@ class OOV(Token):
 
     # ED and LM
     cands_filtered = None
-    #ed_filtered_ranked = None
+    ed_filtered_ranked = None
     edbase = None
     edbase_lmsco = None
     best_ed_cando = None

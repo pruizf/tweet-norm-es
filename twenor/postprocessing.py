@@ -50,10 +50,10 @@ def recase(orig, prop, tweet):
     else:
         return prop
 
-# TODO: Allcaps tokens become caps-initial if caps initial variant in entity-dico
-#       If lc variant in IV dico, see what ws convention is: lc, or original case?
-#
+# TODO: Allcaps tokens become caps-initial if caps initial variant in entity-dico:
+#       -> no, don't do that, cos results are worse
 #       Other: if jibberish string, put original and that's it
+#       -> no need, keep original string by elimination only (as last resort)
 
 
     

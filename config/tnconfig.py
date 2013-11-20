@@ -4,7 +4,7 @@ import re
 import sys
 
 # BASIC ========================================================================
-COMMENT = "PPR: look regex output up in lowercase"
+COMMENT = "lowercase form before candidate generation"
 RUNID = None
 TAG = False                 # Tag with Freeling (1) or read tags from TAGSDIR (0)
 ENV = "W"                   # Work, Home, Server
