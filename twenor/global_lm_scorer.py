@@ -17,9 +17,12 @@ cap_context = [".", "!", "?", '"', "...", "(", ")", "/"]
 tweet_markers = ['@', '#']
 
 def get_reduced_cands(tok, tweet, cand_list):
+    max_cands = 4
     orig_and_cands = [(tok.form, c.form, set_recase_val(tok, tweet), True) for c in cand_list]
-    if len(orig_and_cands) > 1:
-        orig_and_cands = orig_and_cands[:1]                        
+    if max_cands < 0:
+        max_cands = len(cand_list)
+    if len(orig_and_cands) >= max_cands:
+        orig_and_cands = orig_and_cands[:max_cands-1]                        
     return orig_and_cands
 
 def is_capitalization_context(tok_pos, tweet):
@@ -52,7 +55,7 @@ def get_candidate_combinations(tweets):
         tcp.initialize(tweet.tid)
         del tweet_sqs[:]
         for tok in tweet.toks:             
-            #if tok.form == u"Graaciaas":
+            #if tok.form == u"devolucion":
                 #pdb.set_trace()        
             #-- Check trusted corrections first and set them as unique candidate if they exist           
             del orig_and_cands[:]   
@@ -84,9 +87,14 @@ def get_candidate_combinations(tweets):
                                 orig_and_cands.extend(rcands)
                                                 
                 if len(orig_and_cands) == 0 and tok.ed_filtered_ranked != None:
-                    orig_and_cands = get_reduced_cands(tok, tweet, tok.ed_filtered_ranked)                    
-
-            if len(orig_and_cands) == 0:
+                    #rcands = get_reduced_cands(tok, tweet, tok.ed_filtered_ranked)
+                    #orig_and_cands.extend([tpl for tpl in rcands \
+                        #if is_accented_variant(tpl[1], tpl[0])])
+                    #if len(orig_and_cands) == 0:
+                        #orig_and_cands = get_reduced_cands(tok, tweet, tok.ed_filtered_ranked)         
+                    orig_and_cands = get_reduced_cands(tok, tweet, tok.ed_filtered_ranked)         
+                             
+            if len(orig_and_cands) == 0:                
                 orig_and_cands.append((tok.form, tok.form, set_recase_val(tok, tweet), isinstance(tok, OOV)))
                
             nw.add_leaves(orig_and_cands)           
