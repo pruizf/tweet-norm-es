@@ -16,32 +16,60 @@ cap_context = [".", "!", "?", '"', "...", "(", ")", "/"]
 
 tweet_markers = ['@', '#']
 
-def get_reduced_cands(tok, tweet, cand_list):
-    max_cands = 4
-    orig_and_cands = [(tok.form, c.form, set_recase_val(tok, tweet), True) for c in cand_list]
-    if max_cands < 0:
-        max_cands = len(cand_list)
-    if len(orig_and_cands) >= max_cands:
-        orig_and_cands = orig_and_cands[:max_cands-1]                        
-    return orig_and_cands
+#def get_reduced_cands(tok, tweet, cand_list):
+    #max_cands = 4
+    #orig_and_cands = [(tok.form, c.form, set_recase_val(tok, tweet), True) for c in cand_list]
+    #if max_cands < 0:
+        #max_cands = len(cand_list)
+    #if len(orig_and_cands) >= max_cands:
+        #orig_and_cands = orig_and_cands[:max_cands-1]                        
+    #return orig_and_cands
 
-def is_capitalization_context(tok_pos, tweet):
-    return tok_pos == 0 \
-            or ( (tok_pos > 0) \
-                and ( (tweet.toks[tok_pos-1].form in cap_context) 
-                       or (tok_pos == 1 and (tweet.toks[0].form[0] in tweet_markers)))) 
+#def get_reduced_cands(tok, tweet, cand_list):
+    #max_cands = 3
+    #orig_and_cands = [(tok.form, c.form, set_recase_val(tok, tweet), True) for c in cand_list]
+    #if max_cands < 0:
+        #max_cands = len(cand_list)
+    #if max_cands < len(orig_and_cands):
+        #res = orig_and_cands[:max_cands]                        
+        ##pos = max_cands+1
+        ##if (pos - 1) > 0:
+            ##while (pos < len(cand_list)) \
+                    ##and (cand_list[pos].dista == cand_list[pos-1].dista):
+                ##res.append((tok.form, cand_list[pos].form, set_recase_val(tok, tweet), True))
+                ##pos += 1
+    #else:
+        #res = orig_and_cands
+    #return res
+
+def get_reduced_cands(tok, tweet, cand_list):
+    res = []
+    best_dist = - 2
+    if len(cand_list) > 0:
+        orig_and_cands = [(tok.form, c.form, set_recase_val(tok, tweet), True) for c in cand_list]
+        pos = 0
+        while (pos < len(cand_list)):
+            if cand_list[pos].dista >= best_dist:
+                res.append((tok.form, cand_list[pos].form, set_recase_val(tok, tweet), True))
+                best_dist = cand_list[pos].dista
+                pos += 1
+                #pdb.set_trace()
+            else:
+                break
+    return res
 
 def is_accented_variant(acc_str, str2):    
     return unicodedata.normalize('NFD', acc_str).encode('ASCII', 'ignore') \
                 == unicodedata.normalize('NFD', str2).encode('ASCII', 'ignore')
 
 
-#--                  
 def set_recase_val(tok, tweet):    
-    return tok.posi == 0 or \
-        (tok.form[0].isupper() and len(tok.form) > 1 and is_capitalization_context(tok.posi, tweet))                      
-            
-                
+    return tok.posi == 0 \
+            or (tok.form[0].isupper() \
+                    and ( (tweet.toks[tok.posi-1].form in cap_context) \
+                            or (tok.posi == 1 and (tweet.toks[0].form[0] in tweet_markers)))) 
+                   
+                            
 def get_candidate_combinations(tweets):    
     print "---------------- Computing candidate combinations ----------------"
     res = []
@@ -55,7 +83,7 @@ def get_candidate_combinations(tweets):
         tcp.initialize(tweet.tid)
         del tweet_sqs[:]
         for tok in tweet.toks:             
-            #if tok.form == u"devolucion":
+            #if tok.form == u"pasaao":
                 #pdb.set_trace()        
             #-- Check trusted corrections first and set them as unique candidate if they exist           
             del orig_and_cands[:]   
