@@ -16,31 +16,6 @@ cap_context = [".", "!", "?", '"', "...", "(", ")", "/"]
 
 tweet_markers = ['@', '#']
 
-#def get_reduced_cands(tok, tweet, cand_list):
-    #max_cands = 4
-    #orig_and_cands = [(tok.form, c.form, set_recase_val(tok, tweet), True) for c in cand_list]
-    #if max_cands < 0:
-        #max_cands = len(cand_list)
-    #if len(orig_and_cands) >= max_cands:
-        #orig_and_cands = orig_and_cands[:max_cands-1]                        
-    #return orig_and_cands
-
-#def get_reduced_cands(tok, tweet, cand_list):
-    #max_cands = 3
-    #orig_and_cands = [(tok.form, c.form, set_recase_val(tok, tweet), True) for c in cand_list]
-    #if max_cands < 0:
-        #max_cands = len(cand_list)
-    #if max_cands < len(orig_and_cands):
-        #res = orig_and_cands[:max_cands]                        
-        ##pos = max_cands+1
-        ##if (pos - 1) > 0:
-            ##while (pos < len(cand_list)) \
-                    ##and (cand_list[pos].dista == cand_list[pos-1].dista):
-                ##res.append((tok.form, cand_list[pos].form, set_recase_val(tok, tweet), True))
-                ##pos += 1
-    #else:
-        #res = orig_and_cands
-    #return res
 
 def get_reduced_cands(tok, tweet, cand_list):
     res = []
@@ -53,7 +28,6 @@ def get_reduced_cands(tok, tweet, cand_list):
                 res.append((tok.form, cand_list[pos].form, set_recase_val(tok, tweet), True))
                 best_dist = cand_list[pos].dista
                 pos += 1
-                #pdb.set_trace()
             else:
                 break
     return res
@@ -83,8 +57,6 @@ def get_candidate_combinations(tweets):
         tcp.initialize(tweet.tid)
         del tweet_sqs[:]
         for tok in tweet.toks:             
-            #if tok.form == u"pasaao":
-                #pdb.set_trace()        
             #-- Check trusted corrections first and set them as unique candidate if they exist           
             del orig_and_cands[:]   
             if isinstance(tok, OOV):
@@ -115,11 +87,6 @@ def get_candidate_combinations(tweets):
                                 orig_and_cands.extend(rcands)
                                                 
                 if len(orig_and_cands) == 0 and tok.ed_filtered_ranked != None:
-                    #rcands = get_reduced_cands(tok, tweet, tok.ed_filtered_ranked)
-                    #orig_and_cands.extend([tpl for tpl in rcands \
-                        #if is_accented_variant(tpl[1], tpl[0])])
-                    #if len(orig_and_cands) == 0:
-                        #orig_and_cands = get_reduced_cands(tok, tweet, tok.ed_filtered_ranked)         
                     orig_and_cands = get_reduced_cands(tok, tweet, tok.ed_filtered_ranked)         
                              
             if len(orig_and_cands) == 0:                
