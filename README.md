@@ -67,7 +67,7 @@ Structure
 -------
 
 ```
-tnor2
+tweet-norm-es
  |_ config
     |_ tnconfig.py              Config file
  |_ scripts
