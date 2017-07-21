@@ -17,7 +17,7 @@ Options can be specified in config.py, but some of the settings in that file can
 ``` python
 >>> import sys
 >>> sys.argv = [""]
->>> execfile("/path/to/tnor2/twenor/processing.py")
+>>> execfile("/path/to/tweet-norm-es/twenor/processing.py")
 ```
 
     
