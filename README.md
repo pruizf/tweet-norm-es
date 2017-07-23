@@ -12,7 +12,7 @@ Running
 -------
 
 Preferred: from Python shell.
-Options can be specified in config.py, but some of the settings in that file can be modified with command line options when calling the program (adding more as we go)
+Options can be specified in tnconfig.py, but some of the settings in that file can be modified with command line options when calling the program (we'll expose more options in the CLI in the future).
 
 ``` python
 >>> import sys
@@ -21,11 +21,10 @@ Options can be specified in config.py, but some of the settings in that file can
 ```
 
     
-    # If using command line arguments
+    # If using command line arguments instead of tnconfig.py
 
 
-      age: processing.py [-h] [-t] [-c COMMENT] [-b] [-x MAXDISTA] [-d DISTAW]
-                         [-l LMW] [-p LMPATH] [-w LM_WINDOW]
+    Usage: processing.py [-h] [-t] [-c COMMENT]
 
     optional arguments:
       -h, --help            show this help message and exit
@@ -33,7 +32,7 @@ Options can be specified in config.py, but some of the settings in that file can
       -c COMMENT, --comment COMMENT
                             comment for run (shown in cumulog.txt)
 
-    #COMMAND_LINE OPTIONS BELOW HERE NOT FUNCTIONAL (set them in config/tnconfig.py)
+    #COMMAND_LINE OPTIONS BELOW HERE NOT YET FUNCTIONAL (set them in config/tnconfig.py)
       -b, --baseline        baseline run: accept all OOV
       -x MAXDISTA, --maxdista MAXDISTA
                             maximum edit distance above which candidate is
