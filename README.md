@@ -1,6 +1,6 @@
 tweet-norm-es: Spanish Tweet Normalization
 ===============================================
-Our system for the [Tweet-Norm 2013](http://komunitatea.elhuyar.eus/tweet-norm/) competition, which we later improved for the paper in [Ruiz, Cuadros, Etchegoyhen (2014)](http://journal.sepln.org/sepln/ojs/ojs/index.php/pln/article/download/4902/2916).
+Our system for the [Tweet-Norm 2013](http://komunitatea.elhuyar.eus/tweet-norm/) competition, which we later improved for the paper in [Ruiz, Cuadros, Etchegoyhen (2014)](http://journal.sepln.org/sepln/ojs/ojs/index.php/pln/article/download/4902/2916). (See complete references at the end).
 
 Requires
 --------
@@ -58,12 +58,12 @@ Also from command line:
 
 ``` python
 
-python /path/to/tnor2/twenor/processing.py
+python /path/to/tweet-norm-es/twenor/processing.py
 
 ```
 
-Structure
--------
+Project Structure
+-----------------
 
 ```
 tweet-norm-es
@@ -88,4 +88,17 @@ tweet-norm-es
     |_ dev                      devset texts and annotations
     |_ eval                     test-set texts and annotations
 ```
+
+System Architecture
+-------------------
+
+![System Architecture](./misc/tweet-norm-system-arch.png)
+
+
+Publications
+------------
+
+- Ruiz Fabo, Pablo, Montse Cuadros, and Thierry Etchegoyhen. (2014). [Lexical Normalization of Spanish Tweets with Rule-Based Components and Language Models.](http://journal.sepln.org/sepln/ojs/ojs/index.php/pln/article/download/4902/2916) _Procesamiento del Lenguaje Natural 52_:45-52. SEPLN, Spanish NLP Society. 
+
+- Ruiz, Pablo, Montse Cuadros, and Thierry Etchegoyhen. (2013) [Lexical Normalization of Spanish Tweets with Preprocessing Rules, Domain-specific Edit Distances, and Language Models.](http://ceur-ws.org/Vol-1086/paper12.pdf) In _Tweet-Norm@ SEPLN_, pp. 59-63. IV Congreso Español de Informática.
 
